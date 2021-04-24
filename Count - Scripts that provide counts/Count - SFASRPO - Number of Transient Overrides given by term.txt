@@ -1,0 +1,16 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    28-JUN-2019
+--Purpose: This query provides a count of Transient permits issued by prompted term.
+
+
+select (select COUNT (SFRSRPO_ROVR_CODE ) 
+from sfrsrpo where SFRSRPO_TERM_CODE = :Term and SFRSRPO_ROVR_CODE = 'TRANSIENT') AS "Transient Permits Given"
+
+from dual;
+
+-------------------Script 2 gives a distinct count of the number of students who received at least one transient override.
+/*
+select (select COUNT (distinct SFRSRPO_PIDM ) 
+from sfrsrpo where SFRSRPO_TERM_CODE = :Term and SFRSRPO_ROVR_CODE = 'TRANSIENT') AS "Number of Transient Students"
+
+from dual;  */

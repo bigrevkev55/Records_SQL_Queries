@@ -1,0 +1,107 @@
+
+--Author: Kevin Thomas (With help from Chuck Hackney)
+--Date:  28 November 2018
+--Purpose: This script returns email addresses of students that have turned in intents (by prompted term) but have not taken the Exit Exam. 
+
+
+SELECT SPRIDEN.SPRIDEN_ID        AS SCHOOL_ID,
+  SPRIDEN.SPRIDEN_LAST_NAME      AS LAST_NAME,
+  SPRIDEN.SPRIDEN_FIRST_NAME     AS FIRST_NAME,
+  SHRDGMR.SHRDGMR_TERM_CODE_GRAD AS GRAD_TERM,
+  SHRDGMR.SHRDGMR_GRST_CODE      AS GRADUATION_STATUS,
+  SHRDGMR.SHRDGMR_GRAD_DATE      AS GRADUATION_DATE,
+  GOREMAL.GOREMAL_EMAL_CODE      AS "Email Type",
+  GOREMAL.GOREMAL_EMAIL_ADDRESS  AS "Email Address"
+FROM SHRDGMR,
+  SPRIDEN,
+  GOREMAL,
+  SOVLCUR
+WHERE SHRDGMR.SHRDGMR_PIDM          = SOVLCUR.SOVLCUR_PIDM
+AND SHRDGMR.SHRDGMR_SEQ_NO          = SOVLCUR.SOVLCUR_KEY_SEQNO
+AND SHRDGMR.SHRDGMR_PIDM            = SPRIDEN.SPRIDEN_PIDM
+AND SPRIDEN.SPRIDEN_PIDM            = GOREMAL.GOREMAL_PIDM
+AND SHRDGMR.SHRDGMR_TERM_CODE_GRAD IN (:Term_1, :Term_2, :Term_3)
+AND SHRDGMR.SHRDGMR_GRST_CODE      IS NOT NULL
+AND GOREMAL.GOREMAL_EMAL_CODE      IN ('CAMP', 'PERS')
+AND SOVLCUR.SOVLCUR_CURRENT_IND     = 'Y'
+AND SOVLCUR.SOVLCUR_ACTIVE_IND      = 'Y'
+AND SOVLCUR.SOVLCUR_LMOD_CODE       = 'OUTCOME'
+AND SPRIDEN.SPRIDEN_CHANGE_IND     IS NULL
+AND SPRIDEN.SPRIDEN_CHANGE_IND     IS NULL
+AND SHRDGMR.SHRDGMR_DEGC_CODE      IN ('AS', 'AAS', 'AA', 'CERT')
+AND (GOREMAL.GOREMAL_STATUS_IND    IS NULL
+OR GOREMAL.GOREMAL_STATUS_IND      <> 'I')
+AND SPRIDEN.SPRIDEN_PIDM NOT       IN
+  (SELECT SORTEST.SORTEST_PIDM
+  FROM SORTEST
+  WHERE SORTEST.SORTEST_TESC_CODE = 'EXIT'
+  )
+ORDER BY GRAD_TERM,
+  LAST_NAME,
+  FIRST_NAME;
+
+
+
+
+SCRIPT 2 - SAME AS ABOVE BUT WITH PHONE NUMBERS
+
+
+
+
+--Author: Kevin Thomas (With help from Chuck Hackney)
+--Date:  28 November 2018
+--Purpose: This script returns phone numbers of students that have turned in intents (by prompted term) but have not taken the Exit Exam.
+
+
+SELECT SPRIDEN_ID AS SCHOOL_ID, 
+       --SPRIDEN_PIDM, 
+       SPRIDEN_LAST_NAME AS LAST_NAME,
+       SPRIDEN_FIRST_NAME AS FIRST_NAME, 
+       SHRDGMR_TERM_CODE_GRAD AS GRAD_TERM, 
+       SHRDGMR_GRST_CODE AS GRADUATION_STATUS, 
+       SHRDGMR_GRAD_DATE AS GRADUATION_DATE, 
+       SOVLCUR_TERM_CODE_CTLG AS CATALOG,
+       pr_phone_area as PR_Area_Code,
+       pr_phone_number as PR_Phone_Number,
+       lo_phone_area as LO_Area_Code,
+       lo_phone_number as LO_Phone_Number
+      
+FROM SHRDGMR, SPRIDEN, SOVLCUR, 
+      (select sprtele_pidm as pr_phone_pidm
+       ,      sprtele_phone_area as pr_phone_area
+       ,      sprtele_phone_number as pr_phone_number
+       from sprtele s
+       where sprtele_status_ind is null
+       and sprtele_tele_code = 'PR'
+       and sprtele_seqno = (select max(sprtele_seqno)
+                            from sprtele
+                            where sprtele_pidm = s.sprtele_pidm
+                            and sprtele_tele_code = s.sprtele_tele_code
+                            and sprtele_status_ind is null)),
+      (select sprtele_pidm as lo_phone_pidm
+       ,      sprtele_phone_area as lo_phone_area
+       ,      sprtele_phone_number as lo_phone_number
+       from sprtele s
+       where sprtele_status_ind is null
+       and sprtele_tele_code = 'LO'
+       and sprtele_seqno = (select max(sprtele_seqno)
+                            from sprtele
+                            where sprtele_pidm = s.sprtele_pidm
+                            and sprtele_tele_code = s.sprtele_tele_code
+                            and sprtele_status_ind is null))
+
+
+WHERE 
+      SHRDGMR_TERM_CODE_GRAD IN ('&Term_1') 
+      --for multiple terms add '&Term_2,', '&TERM_3 
+  AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
+  AND SHRDGMR_PIDM = SPRIDEN_PIDM AND SPRIDEN_CHANGE_IND IS NULL
+  AND SPRIDEN_CHANGE_IND IS NULL
+  AND SHRDGMR_GRST_CODE IS NOT NULL
+  AND SHRDGMR_DEGC_CODE IN ('AS', 'AAS', 'AA')
+  AND SPRIDEN_PIDM NOT IN (SELECT SORTEST_PIDM
+                           FROM SORTEST 
+                           where SORTEST_TESC_CODE = 'EXIT')
+  AND lo_phone_pidm (+) = spriden_pidm
+  and pr_phone_pidm (+) = spriden_pidm
+ORDER BY SHRDGMR_TERM_CODE_GRAD, SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME;

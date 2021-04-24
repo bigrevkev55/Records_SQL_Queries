@@ -1,0 +1,93 @@
+-- Author:    Kevin Thomas, Assistant Registrar
+--   Date:    28-FEB-2019
+--Purpose:    This script looks at SHATATR AAS Transfer Courses (top block) from other schools by school subject code and prompted school code
+--            and pulls in their NSCC equivalent.
+
+
+
+SELECT
+    shrtatc.shrtatc_sbgi_code           AS "School Code",
+    CASE
+        WHEN shrtatc.shrtatc_sbgi_code = '001081' THEN
+            'Columbia_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '002266' THEN
+            'Jackson_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '002848' THEN
+            'Cleveland_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '007323' THEN
+            'Dyersburg_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '001543' THEN
+            'Motlow_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '001893' THEN
+            'Walters_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '001881' THEN
+            'Volunteer_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '001656' THEN
+            'Roane_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '001084' THEN
+            'Chattanooga State'
+        WHEN shrtatc.SHRTATC_SBGI_CODE = '000274' THEN
+            'Southwest'
+        WHEN shrtatc.shrtatc_sbgi_code = '000453' Then
+            'Northwest_State'
+        WHEN shrtatc.shrtatc_sbgi_code = '000319' THEN
+            'Pellissippi'
+        ELSE Null
+    END AS "Transferring_Institution",
+    shrtatc.shrtatc_subj_code_trns      AS "Transfer SUBJ",
+    shrtatc.shrtatc_crse_numb_trns      AS "Transfer Course",
+    shbtatc.shbtatc_trns_title          AS "Transfer Title",
+    shrtatc.shrtatc_subj_code_inst      AS "NSCC SUBJ",
+    shrtatc.shrtatc_crse_numb_inst      AS "NSCC Course",
+    shrtatc.shrtatc_inst_title          AS "NSCC  Title",
+    shrtatc.shrtatc_inst_credits_used   AS "Credits",
+    shbtatc.shbtatc_user_id             AS "User ID",
+    shbtatc.shbtatc_activity_date       AS "Activity Date"
+FROM
+    shrtatc,
+    shbtatc
+WHERE
+    shrtatc.shrtatc_sbgi_code = shbtatc.shbtatc_sbgi_code
+    AND shrtatc.shrtatc_subj_code_trns = shbtatc.shbtatc_subj_code_trns
+    AND shrtatc.shrtatc_crse_numb_trns = shbtatc.shbtatc_crse_numb_trns
+    AND shbtatc.shbtatc_sbgi_code = :transfer_school_code
+    AND shbtatc.shbtatc_subj_code_trns IN (
+        'ACCT',
+        'ADMN',
+        'ARCT',
+        'BUSN',
+        'CITC',
+        'CIVT',
+        'CRMJ',
+        'CULA',
+        'ECED',
+        'EETC',
+        'HSCMT',
+        'HMGT',
+        'IPCT',
+        'LEGL',
+        'OTAP',
+        'SURG'
+    )
+ORDER BY
+    2,
+    3,
+    4
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

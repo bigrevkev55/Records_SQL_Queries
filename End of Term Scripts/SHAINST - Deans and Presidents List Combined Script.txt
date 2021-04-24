@@ -1,0 +1,71 @@
+ --Author:  Kevin Thomas, Assistant Registrar
+--   Date:  06-JUN-2019
+--Purpose:  The query returns students that should be on the Dean's list (Dean's List indicator on SHAINST and GPA < 3.999999999)
+ --         and President's List (Dean's List indicator on SHAINST and GPA = 4.0) by prompted term.  
+ --  Note:  Dean's list indicator is used because it guarantees that the student is degree seeking. 
+ --  Note:  The list is sorted by academic standing then last name.
+ 
+ /*
+ Edited on 2/3/2021 by Trey Dalton, TSD Systems Analyst
+ Added "address" subtable to pull address information from SPRADDR
+ */
+
+
+select distinct spriden_id as "A Number",
+                spriden_last_name as "Last",
+                spriden_first_name as "First",
+                SHRTTRM_TERM_CODE as "Term",
+                trunc (shrtgpa_gpa, 2) as "Term GPA",
+                CASE When trunc (shrtgpa_gpa, 2) < '4.0'  --dont' have to worry about someone with less than 3.5GPA because of Dean's List attribute on SHAINST
+                     then 'Deans List'
+                     when trunc (shrtgpa_gpa, 2) > '3.9999999999'
+                     then 'Presidents List'
+                     Else null
+                     End as "Academic Standing",
+                address.street1,
+                address.street2,
+                address.city,
+                address.state,
+                address.zip,
+                address.city||', '||address.state||' '||address.zip city_state_zip
+              
+from spriden, shrttrm, shrtgpa,
+    (
+            select  spraddr_pidm pidm,
+                    (select spriden_id from spriden where spriden_pidm = spraddr_pidm and spriden_change_ind is null) name,
+                    spraddr_street_line1 street1,
+                    spraddr_street_line2 street2,
+                    spraddr_city city,
+                    spraddr_stat_code state,
+                    spraddr_zip zip
+            from    spraddr x
+            where   spraddr_status_ind is null
+            and     spraddr_seqno =
+            (
+                    select  max(spraddr_seqno)
+                    from    spraddr y
+                    where   x.spraddr_pidm = y.spraddr_pidm
+                    and     x.spraddr_atyp_code = y.spraddr_atyp_code
+                    and    spraddr_status_ind is null
+            )
+                    and    spraddr_atyp_code =
+            (
+                    select  min(spraddr_atyp_code)
+                    from    spraddr y
+                    where   x.spraddr_pidm = y.spraddr_pidm
+                    and     spraddr_atyp_code in ('LO','PR')
+                    and     spraddr_status_ind is null
+            )
+	) address
+
+where   spriden_pidm = shrttrm_pidm 
+    and  spriden_pidm = shrtgpa_pidm
+    and  spriden_pidm = address.pidm
+    and  spriden_change_ind is NULL
+    and  shrttrm_term_code = :Term
+    and  shrttrm_term_code = shrtgpa.SHRTGPA_TERM_CODE
+    and  SHRTTRM_ASTD_CODE_DL = 'DL'
+    and shrtgpa_levl_code = 'UG'
+    -- and  trunc (shrtgpa_gpa,2)  < =  '4.0'  --commented out because there is no need to check GPA due to Dean's List Attribute on SHAINST
+    and  shrtgpa_gpa_type_ind = 'I'  --I = Institutional GPA and T = Transfer GPA
+    order by 6, 2,3;

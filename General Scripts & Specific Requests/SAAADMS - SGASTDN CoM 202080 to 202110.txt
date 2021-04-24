@@ -1,0 +1,44 @@
+-- Author:  Kevin Thomas, Interim Registrar
+--   Date:  '07-DEC-2020'
+--Purpose:  This query returns 202080 First Time Freshmen who have changed their major for 202110.
+
+--desc SGBSTDN;
+--desc SARADAP;
+--desc SORLCUR;
+--desc SGBSTDN;  Select * from SGBSTDN;
+
+/*
+
+Select *        --subquery to find all 202080 First Time Freshmen
+From SARADAP 
+Where SARADAP_TERM_CODE_ENTRY = '202080'
+      and SARADAP_ADMT_CODE = 'FR'
+      and SARADAP_STYP_CODE = 'N'
+      and SARADAP_APST_CODE = 'D'
+order by SARADAP_PIDM;
+
+*/
+
+Select SPRIDEN_ID as "ID",     
+       SPRIDEN_LAST_NAME as "Last",    
+       SPRIDEN_FIRST_NAME as "First",
+       SGBSTDN_ACTIVITY_DATE as "Date",
+       SGBSTDN_TERM_CODE_EFF as "Effective Term"
+From SPRIDEN, SGBSTDN
+Where SPRIDEN_PIDM = SGBSTDN_PIDM
+      and SPRIDEN_CHANGE_IND iS NULL
+      and SGBSTDN_TERM_CODE_EFF = '202110'
+      and SGBSTDN_ACTIVITY_DATE > '02-NOV-2020'
+      and SGBSTDN_PIDM IN (Select SARADAP_PIDM       --subquery to find all 202080 First Time Freshmen
+                           From SARADAP 
+                           Where SARADAP_TERM_CODE_ENTRY = '202080'
+                           and SARADAP_ADMT_CODE = 'FR'
+                           and SARADAP_STYP_CODE = 'N'
+                           and SARADAP_APST_CODE = 'D')
+Order by SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME;
+       
+
+       
+       
+               
+

@@ -1,0 +1,34 @@
+-- Created By: Kevin Thomas, Assistant Registrar
+--       Date: 20-JUN-2019
+--    Purpose: Script to pull the students for a prompted term with CHEX attribute on SGASADD.
+--       Note: Comment out "AND sgrsatt.sgrsatt_term_code_eff = :Term" in the "Where" section
+--             to return all students who have a CHEX attribute by the most recent term.   
+
+
+
+
+SELECT
+    spriden.spriden_id           AS id,
+    MAX(sgrsatt.sgrsatt_term_code_eff) AS "Term",
+    spriden.spriden_last_name    AS "Last Name",
+    spriden.spriden_first_name   AS "First Name",
+    sgrsatt.sgrsatt_atts_code    AS "Attribute",
+    MAX(sgrsatt.sgrsatt_activity_date) AS "Activity Date",
+    sgrsatt.sgrsatt_user_id      AS "User ID"
+FROM
+    spriden,
+    sgrsatt
+WHERE
+    spriden.spriden_pidm = sgrsatt.sgrsatt_pidm
+    AND sgrsatt.sgrsatt_term_code_eff = :Term
+    AND sgrsatt.sgrsatt_atts_code = 'CHEX'
+    AND spriden.spriden_change_ind IS NULL
+GROUP BY
+    spriden.spriden_id,
+    spriden.spriden_last_name,
+    spriden.spriden_first_name,
+    sgrsatt.sgrsatt_atts_code,
+    sgrsatt.sgrsatt_user_id
+ORDER By
+    "Last Name",
+    "First Name"

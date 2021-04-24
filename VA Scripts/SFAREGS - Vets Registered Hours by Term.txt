@@ -1,0 +1,25 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    14-Feb-2020
+--Purpose: This query returns vets registered hours by prompted term. 
+
+
+
+--desc sgbstdn;
+--desc sfrstcr;
+
+select spriden_id as "ID",
+       SFRSTCR_TERM_CODE as "Term",
+       SGRVETN_VETC_CODE as "Vet Code",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name", 
+       sum (SFRSTCR_CREDIT_HR)
+from  spriden, sfrstcr, sgrvetn
+where SFRSTCR_TERM_CODE = :Term
+      and SGRVETN_TERM_CODE_VA = :Term
+      and SGRVETN_VETC_CODE is NOT NULL
+      and spriden_pidm = SFRSTCR_PIDM 
+      and spriden_pidm = sgrvetn_pidm
+      and spriden_change_ind is  NULL     
+group by spriden_id, spriden_last_name, spriden_first_name,  SGRVETN_VETC_CODE, 
+SFRSTCR_TERM_CODE
+Order by SGRVETN_VETC_CODE, spriden_last_name, spriden_first_name;

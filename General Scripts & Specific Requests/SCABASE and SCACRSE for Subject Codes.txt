@@ -1,0 +1,63 @@
+--Author:    Kevin Thomas
+--Date:      03-MAY-2019
+--Purpose:   Secarch SCACRSE active classes for ACT, CIT, CAD so we can end them
+--           as these subject codes have ended.  
+--Note:      This is two separate scripts
+
+
+Select      MAX  (scbcrse_eff_term),
+            SCBCRSE_SUBJ_CODE AS Subject,
+            SCBCRSE_CRSE_NUMB AS Course,
+            SCBCRSE_CSTA_CODE AS Status
+            --SCBCRSE_EFF_TERM AS "Effective Term",
+            
+FROM scbcrse 
+where SCBCRSE_SUBJ_CODE in ('ACT', 'CIT', 'CAD') and SCBCRSE_CSTA_CODE = 'A'
+Group by SCBCRSE_SUBJ_CODE, SCBCRSE_CRSE_NUMB, scbcrse_eff_term, SCBCRSE_CSTA_CODE
+
+
+
+--select * from scbcrse where SCBCRSE_CSTA_CODE = 'A' and SCBCRSE_SUBJ_CODE in ('ACT', 'CIT', 'CAD');
+
+
+
+
+
+--Author:    Kevin Thomas
+--Date:      03-MAY-2019
+--Purpose    Secarch SCABASE for ACT, CIT, CAD courses that are in Active status so we can end them
+--           as these subject codes have ended.  
+
+
+
+select scbcrky_subj_code AS "SUBJECT CODE",
+       scbcrky_crse_numb AS "Course Number",
+       SCBCRKY_TERM_CODE_START AS "Start Term",
+       SCBCRKY_TERM_CODE_END AS "End Term"
+from scbcrky 
+where scbcrky_subj_code in ('ACT', 'CIT', 'CAD')
+                        and SCBCRKY_TERM_CODE_END > 201950
+
+Order by 1 ASC;
+
+
+--Author:    Kevin Thomas
+--Date:      03-MAY-2019
+--Purpose:   Secarch SCACRSE active classes for ACT, CIT, CAD so we can end them
+--           as these subject codes have ended.  
+--Note:      This is two separate scripts
+
+
+Select      (Select MAX(scbcrse_eff_term) from scbcrse where SCBCRSE_SUBJ_CODE in 'ACT', 'CIT', 'CAD') group by SCBCRSE_SUBJ_CODE ) as "Max Term",
+            SCBCRSE_SUBJ_CODE AS Subject,
+            SCBCRSE_CRSE_NUMB AS Course,
+            SCBCRSE_CSTA_CODE AS Status
+            --SCBCRSE_EFF_TERM AS "Effective Term",
+            
+FROM scbcrse 
+where SCBCRSE_SUBJ_CODE in ('ACT', 'CIT', 'CAD') and SCBCRSE_CSTA_CODE = 'A'
+;
+
+
+
+--select * from scbcrse where SCBCRSE_CSTA_CODE = 'A' and SCBCRSE_SUBJ_CODE in ('ACT', 'CIT', 'CAD');

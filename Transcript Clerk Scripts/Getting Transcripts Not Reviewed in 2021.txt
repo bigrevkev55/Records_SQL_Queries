@@ -1,0 +1,28 @@
+-- Author: Javon Yokley, Records Clerk
+--   Date: 09-FEB-2021
+--Purpose: Get transcripts received but not reviewed
+
+SELECT DISTINCT SPRIDEN_ID as "A#",
+                SPRIDEN_LAST_NAME as "Last Name",
+                SPRIDEN_FIRST_NAME as "First Name",
+                a.STVSBGI_CODE as "College Code",
+                a.STVSBGI_DESC as "College Name",
+                b.SORPCOL_TRANS_REV_DATE as "Transcript Review Date"
+FROM SPRIDEN, STVSBGI a, SORPCOL b
+WHERE SPRIDEN_PIDM = SORPCOL_PIDM
+  and b.SORPCOL_SBGI_CODE = a.STVSBGI_CODE
+  and SPRIDEN_ID LIKE 'A00%'
+  and SPRIDEN_LAST_NAME IS NOT NULL
+  and SPRIDEN_FIRST_NAME IS NOT NULL
+  and b.SORPCOL_TRANS_RECV_DATE >= '01-JAN-2021'
+  and b.SORPCOL_TRANS_RECV_DATE <= '31-DEC-2021'
+  and b.SORPCOL_TRANS_REV_DATE IS NULL
+ORDER BY 6
+
+;
+
+SELECT COUNT (DISTINCT SORPCOL_PIDM) AS "Number of Transcripts Reviewed"
+FROM SORPCOL b
+WHERE b.SORPCOL_TRANS_REV_DATE >= '01-JAN-2021'
+  and b.SORPCOL_TRANS_REV_DATE <= '31-DEC-2021'
+  and b.SORPCOL_USER_ID = 

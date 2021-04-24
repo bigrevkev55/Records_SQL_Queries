@@ -1,0 +1,57 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    16-JUN-2020	
+--Purpose: This query returns all students in the AFA_UTPF_UMUS from 202010 until today.
+
+
+--desc SGBSTDN;
+
+SELECT          SGBSTDN_TERM_CODE_EFF as "Effective Term",
+            --    MAX(SFRSTCR_TERM_CODE) as "Max Registered Term",
+                SPRIDEN_ID           AS "A Number",
+                SPRIDEN_LAST_NAME    as "Last Name",
+                SPRIDEN_FIRST_NAME   as "First Name",
+                SGBSTDN_DEGC_CODE_1  as "Degree",
+                SGBSTDN_MAJR_CODE_1  as "Major",
+                SGBSTDN_MAJR_CODE_CONC_1 as "Concentration"--,
+
+
+             --  SGBSTDN_MAJR_CODE_CONC_1--,
+
+  --             GOREMAL_EMAL_CODE as "Email Type",
+   --             GOREMAL_EMAIL_ADDRESS as "Preferred Email Address",
+              --  SPRTELE_TELE_CODE as "Phone Type",
+   --             SPRTELE_PHONE_AREA ||'-'|| SPRTELE_PHONE_NUMBER || '' || SPRTELE_PHONE_EXT  as "Preferred Phone"--,
+                --SPRTELE_STATUS_IND,
+                --SPRTELE_ACTIVITY_DATE
+FROM   SGBSTDN, SPRIDEN--, sfrstcr--, goremal, sprtele
+WHERE  SGBSTDN_PIDM = SPRIDEN_PIDM
+       --and spriden_pidm = goremal_pidm (+)
+      --and spriden_pidm = sprtele_pidm (+)
+      -- AND SPRIDEN_PIDM = SFRSTCR_PIDM
+      -- AND SPRTELE_ACTIVITY_DATE = (select max (SPRTELE_ACTIVITY_DATE) from sprtele where sprtele_pidm = spriden_pidm)
+       AND SGBSTDN_TERM_CODE_EFF = (select max(sgbstdn_term_code_eff)
+                               From sgbstdn
+                                    Where sgbstdn_pidm = spriden_pidm)
+       AND SGBSTDN_TERM_CODE_EFF > ='202010'
+       --AND SGBSTDN_MAJR_CODE_1 = any ('NURS','CSPT', 'STC', 'OTA', 'SURG')--List of all students In your major whether they are taking your classes or not
+       AND SGBSTDN_DEGC_CODE_1 = 'AFA'
+       AND SGBSTDN_MAJR_CODE_1 = 'UTPF'--, 'CRMJ', 'COM')
+       AND SGBSTDN_MAJR_CODE_CONC_1 = 'UMUS'
+       AND SPRIDEN_CHANGE_IND IS NULL
+     --  and GOREMAL_PREFERRED_IND (+)  = 'Y'
+   --    and GOREMAL_EMAL_CODE (+) = 'CAMP'
+ --      and SPRTELE_STATUS_IND (+) IS NULL
+      -- AND SFRSTCR_TERM_CODE >'201950'
+     --  AND (SFRSTCR_ERROR_FLAG NOT IN ('F','D')
+      --       OR SFRSTCR_ERROR_FLAG IS NULL
+      --       OR SFRSTCR_RSTS_CODE IN
+       --         (SELECT STVRSTS_CODE
+       --            FROM STVRSTS
+       --           WHERE STVRSTS_CODE = SFRSTCR_RSTS_CODE
+      --              AND STVRSTS_GRADABLE_IND = 'Y'))
+--group by SGBSTDN_TERM_CODE_EFF, SPRIDEN_ID, SPRIDEN_LAST_NAME,
+       --  SPRIDEN_FIRST_NAME, SGBSTDN_DEGC_CODE_1, SGBSTDN_MAJR_CODE_1--,
+        -- GOREMAL_EMAL_CODE, GOREMAL_EMAIL_ADDRESS,
+        -- SPRTELE_PHONE_AREA, SPRTELE_PHONE_NUMBER, SPRTELE_PHONE_EXT
+ORDER BY --MAX(SFRSTCR_TERM_CODE) DESC, 
+SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME, SGBSTDN_TERM_CODE_EFF;

@@ -1,0 +1,21 @@
+--Author:  Kevin Thomas, Assistant Registrar	
+--Date: 06-JUN-2019
+--Purpose:  Use this script to reverse search SCADETL by prompted SUBJ and CRSE Codes (Search by equivalency).
+--Instructions:  When prompted enter the Subject Code and Course Code of the older course to find the 
+--               current rubric of the course or the next course to enter and re-run the script.  
+
+
+
+
+SELECT screqiv.SCREQIV_SUBJ_CODE_EQIV as "Equivalent Subject Code",
+  screqiv.SCREQIV_CRSE_NUMB_EQIV as "Equivalent Course Number",
+  screqiv.SCREQIV_SUBJ_CODE || ' ' || screqiv.SCREQIV_CRSE_NUMB as "Key Block Rubric",
+  screqiv.SCREQIV_EFF_TERM as "Key Block Term",
+  screqiv.SCREQIV_START_TERM as "Equivalent Start Term",
+  screqiv.SCREQIV_END_TERM as "Equivalent End Term",
+  screqiv.SCREQIV_ACTIVITY_DATE "Activity Date",
+  screqiv.SCREQIV_USER_ID "User"
+FROM screqiv
+WHERE screqiv.SCREQIV_SUBJ_CODE_EQIV = :Equivalent_Subject_Code
+AND screqiv.SCREQIV_CRSE_NUMB_EQIV   = :Equivalent_Course_Number;
+

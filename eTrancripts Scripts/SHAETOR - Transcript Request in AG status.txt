@@ -1,0 +1,41 @@
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    11-MAY-2020
+--Purpose: This query returns transcript request on SHAETOR 
+           that are in AG status.  Compare this against 
+           any submitted paper requests with the same recipient to 
+           prevent duplication.  
+
+--desc SHBTEOT;
+--desc SHRTEOS;
+--DESC SHRTEOD;
+
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    11-MAY-2020
+--Purpose: This query returns transcript request on SHAETOR 
+           that are in AG status.  Compare this against 
+           any submitted paper requests with the same recipient to 
+           prevent duplication.  
+
+--desc SHBTEOT;
+--desc SHRTEOS;
+--DESC SHRTEOD;
+
+select 
+SHBTEOT_LAST_NAME LAST,
+SHBTEOT_FIRST_NAME FIRST,
+SHBTEOT_BANNER_ID  A_NUMBER,
+SHRTEOS_ORDER_ID ORDER_NUMBER,
+SHRTEOS_ETST_CODE STATUS_CODE,
+SHRTEOS_ETST_DATE STATUS_DATE,
+SHBTEOT_ATTACHMENT_IND ATTACHMENT,
+SHBTEOT_CANCEL_IND CANCELLED,
+SHRTEOD_RECIPIENT_NAME RECIPIENT
+from shrteos 
+Inner join shbteot 
+on shrteos_order_ID = shbteot_order_Id
+iNNER JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
+and shrteos_etst_code = 'AG'
+and SHRTEOS_PIDM not in (select distinct SHRTEOS_PIDM from shrteos where SHRTEOS_ETST_CODE = 'RG')
+Order by shbteot_last_name, shbteot_first_name;

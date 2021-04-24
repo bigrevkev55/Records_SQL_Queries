@@ -1,0 +1,44 @@
+-- Author:    Kevin Thomas, Assistant Registrar
+--   Date:    16-JUN-2020
+--Purpose:    This query returns CH 33 VA Students in RODP Courses by prompted term.  
+
+
+--desc sftregs;
+--desc sgbstdn;
+--desc sftregs;
+--desc sfrstcr;
+--desc sgrvetn;
+
+select SPRIDEN_ID as "A Number",
+       SPRIDEN_LAST_NAME as "Last Name",
+       SPRIDEN_FIRST_NAME as "First Name",
+       --SGBSTDN_DEGC_CODE_1 as "Degree Type",
+      -- SGBSTDN_MAJR_CODE_1 as "Major",
+      -- SGBSTDN_MAJR_CODE_CONC_1 as "Concentration",
+      -- GORVISA_VTYP_CODE as "Student Status",
+      -- GORVISA_VISA_START_DATE as "Status Start Date"
+      SGRVETN_VETC_CODE as "Vet Code",
+      SFRSTCR_TERM_CODE as "Term",
+      SFRSTCR_CRN as "CRN",
+      SSBSECT_SUBJ_CODE as "Subject",
+      SSBSECT_CRSE_NUMB as "Course",
+      SSBSECT_SEQ_NUMB  as "Section",
+      SFRSTCR_RSTS_CODE as "Registration Status",  
+      SFRSTCR_RSTS_DATE as "Reg Status Eff Date"
+          
+       
+from spriden, sgrvetn, sfrstcr, ssbsect --, sgbstdn
+where spriden_pidm = sgrvetn_pidm
+      and  spriden_pidm = sfrstcr_pidm
+      --and spriden_pidm = sgbstdn_pidm
+      and ssbsect_term_code = sfrstcr_term_code
+      and ssbsect_crn = sfrstcr_crn
+      and spriden.spriden_change_ind is null
+      and sgrvetn_vetc_code in ('T', 'U')
+      and sgrvetn_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code = :TERM)
+      and sfrstcr_term_code = :TERM
+      and SGRVETN_term_code_va = :TERM
+     -- and sfrstcr_rsts_code like 'R%'
+      and ssbsect_seq_numb like 'R%'
+
+Order by SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME; 

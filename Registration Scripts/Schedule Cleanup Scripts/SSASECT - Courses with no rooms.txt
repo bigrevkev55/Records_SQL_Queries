@@ -1,0 +1,25 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    07-OCT-2019
+--Purpose: This query returns courses, by prompted term, that do not have an assigned room in SSASECT.  
+--Note:    
+
+
+desc ssbsect;
+desc ssrmeet; 
+
+select distinct ssbsect_crn CRN,
+                SSBSECT_TERM_CODE Term_Code,
+                SSBSECT_PTRM_CODE Part_of_Term,
+                SSBSECT_SEQ_NUMB  Section,
+                SSBSECT_SUBJ_CODE Subject,
+                SSBSECT_CRSE_NUMB Course,
+                SSBSECT_CAMP_CODE Campus,
+                SSBSECT_INSM_CODE Instructional_Method
+from ssbsect
+where ssbsect_term_code = :TERM_CODE
+      and SSBSECT_INSM_CODE in ('CON', 'HYB')
+      and SSBSECT_SEQ_NUMB not like ('S%')
+      and SSBSECT_SEQ_NUMB not like ('X%')
+      and SSBSECT_SEQ_NUMB not like ('W%')
+      and SSBSECT_SEQ_NUMB not like ('R%')
+      and ssbsect_crn not in (select distinct ssrmeet_crn from ssrmeet where ssrmeet_term_code = :TERM_CODE and ssrmeet_room_code is NOT NULL);

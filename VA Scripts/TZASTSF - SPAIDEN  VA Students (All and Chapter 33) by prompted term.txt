@@ -1,0 +1,67 @@
+
+
+
+
+
+--Author: Kevin Thomas
+--Date: 8/17/2018
+--This script will give a list of Chapter 33 (T and U) VA students and their email addresseses by prompted term.
+
+
+
+
+--THIS SCRIPT NEEDS TO BE EDITED BECAUSE TZRSTSF IS NOT ALWAYS UPDATED APPROPIATELY...
+
+/*
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       TZRSTSF_STATUS_CODE as "Status",
+       SGRVETN.SGRVETN_TERM_CODE_VA as "Term",
+       GOREMAL_EMAIL_ADDRESS as "Email",
+       sgrvetn_vetc_code as "VET TYPE"
+from spriden, TZRSTSF, GOREMAL, sgrvetn
+Where spriden_pidm = TZRSTSF_PIDM
+and TZRSTSF_STATUS_CODE in ('V', 'E')
+and spriden_pidm = GOREMAL_PIDM
+and goremal_emal_code IN ('CAMP','PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+and spriden_change_ind is NULL
+and spriden_pidm = sgrvetn_pidm
+and sgrvetn_vetc_code IN ('T','U')--,'1', '5', 'C', 'D')
+and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+Order by spriden_last_name,spriden_first_name;       
+
+
+*/  
+
+
+
+
+---This script looks up the students on TZASTSF which does not always get updated per VA Coordinator Tracy Collins.  A better script is above which look for Vet Status on SGASTDN by Vet Type
+  
+ /*
+ 
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       TZRSTSF_STATUS_CODE as "Status",
+       TZRSTSF_Term as "Term",
+       GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+from spriden, TZRSTSF, GOREMAL
+Where spriden_pidm = TZRSTSF_PIDM
+and spriden_pidm = GOREMAL_PIDM
+and goremal_emal_code IN ('CAMP','PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+and spriden_change_ind is NULL
+and tzrstsf_status_code = 'V'
+and tzrstsf_term = :Term
+Order by spriden_last_name,spriden_first_name;  */
+
+
+
+
+
+
+

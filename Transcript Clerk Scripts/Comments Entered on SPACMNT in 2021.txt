@@ -1,0 +1,19 @@
+-- Author: Javon Yokley, Records Clerk
+--   Date: 09-FEB-2021
+--Purpose: Get all comments entered by user on SPACMNT in 2021
+
+--Swap out my user ID to get the particular person's comments
+
+SELECT DISTINCT SPRIDEN_ID AS "A#",
+                SPRIDEN_LAST_NAME AS "Last Name",
+                SPRIDEN_FIRST_NAME AS "First Name",
+                a.SPRCMNT_CMTT_CODE AS "Comment Code",
+                a.SPRCMNT_TEXT AS "Description",
+                a.SPRCMNT_DATE AS "Date Entered"
+FROM SPRIDEN, SPRCMNT a
+WHERE SPRIDEN_PIDM = SPRCMNT_PIDM
+  and SPRIDEN_ID LIKE 'A00%'
+  and SPRCMNT_USER_ID = 'YOKLEY_T'
+  and a.SPRCMNT_CMTT_CODE = 'REC'
+  and a.SPRCMNT_DATE > '01-JAN-2021'
+ORDER BY 2

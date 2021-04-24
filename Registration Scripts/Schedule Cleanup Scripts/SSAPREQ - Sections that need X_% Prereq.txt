@@ -1,0 +1,108 @@
+
+-- Author:  Kevin Thomas, Assistant Registrar
+--   Date:  18-OCT-2019
+--Purpose:  This query returns CRNs by prompted term, subject code, and course code
+--          that need to be coded on SSAPREQ with the appropiate X_% Code.
+
+
+
+--Request:  CRNs that need X_% on SSAPREQ......College level web sections
+--          that have a LS Co-req.  (Web Sections of Courses cannot be taken with Reading, Writing, and MATH LS  courses - LS must be completed.)
+
+--
+--
+--   Note:  The top script is commented out and hard coded to courses as of 202010.  
+--          The bottom script is dynamic and searches for courses that meet the criteria 
+--          of Web Sections of Courses that can be taken with Reading, Writing, or MATH LS courses concurrently but do not have the X_% prereq on SMAAREA.
+--
+--   Edit:  Edited the bottom script to look for ssbsect_insm_code in ('WEB', 'RD1') for online 
+--          sections rather than using ( ssbsect.ssbsect_seq_numb LIKE 'R%' or ssbsect.ssbsect_seq_numb LIKE 'W%') to 
+--          look for them...kt...03-JUL-2020.
+--
+--
+--   Edit:  Edited top (commented out script) to look for SSBSECT_INSM_CODE in ('WEB', 'RD1') for online 
+--          sections rather than using ( ssbsect.ssbsect_seq_numb LIKE 'R%' or ssbsect.ssbsect_seq_numb LIKE 'W%') to 
+--          look for them...kt...13-JUL-2020.
+
+/*
+
+SELECT
+    ssbsect.ssbsect_term_code   term,
+    ssbsect.ssbsect_crn         crn,
+    ssbsect_insm_code       Instrucional_Method,
+    ssbsect.ssbsect_subj_code   subject,
+    ssbsect.ssbsect_crse_numb    course,
+    SSRRARE_AREA  "Prereq"
+FROM
+    ssbsect, ssrrare
+WHERE
+     ssbsect.ssbsect_term_code = :term_code
+    and  ssbsect_insm_code in ('WEB', 'RD1')
+    and  ssbsect_seq_numb not like 'S%'
+    and  SSRRARE_TERM_CODE = ssbsect_term_code
+    and  SSRRARE_CRN = ssbsect_crn
+    
+   -- and  ssbsect_subj_code = :SUBJ_CODE 
+   -- and  ssbsect_crse_numb = :COURSE_CODE
+    and(  (ssbsect_subj_code = 'MATH' and ssbsect_crse_numb = '1000')
+    or  (ssbsect_subj_code = 'MATH' and ssbsect_crse_numb = '1010')
+    or  (ssbsect_subj_code = 'MATH' and ssbsect_crse_numb = '1530')
+    or  (ssbsect_subj_code = 'MATH' and ssbsect_crse_numb = '1630')
+    or  (ssbsect_subj_code = 'ENGL' and ssbsect_crse_numb = '1010')
+    or  (ssbsect_subj_code = 'ART' and ssbsect_crse_numb = '1035')
+    or  (ssbsect_subj_code = 'ART' and ssbsect_crse_numb = '2000')
+    or  (ssbsect_subj_code = 'ART' and ssbsect_crse_numb = '2020')
+    or  (ssbsect_subj_code = 'HIST' and ssbsect_crse_numb = '2000')
+    or  (ssbsect_subj_code = 'HIST' and ssbsect_crse_numb = '2010')
+    or  (ssbsect_subj_code = 'HIST' and ssbsect_crse_numb = '2020')  --Keep because the course allows ENGL 0815 Concurrently
+    or  (ssbsect_subj_code = 'HIST' and ssbsect_crse_numb = '2030')  --Keep because the course allows READ 0815 Concurrently
+    or  (ssbsect_subj_code =  'MUS' and ssbsect_crse_numb = '1030')  
+    or  (ssbsect_subj_code = 'PSYC' and ssbsect_crse_numb = '1030')
+    or  (ssbsect_subj_code = 'PSYC' and ssbsect_crse_numb = '2000')
+    or  (ssbsect_subj_code = 'PSYC' and ssbsect_crse_numb = '2110') --Keep because the course allows ENGL 0815 Concurrently
+    or  (ssbsect_subj_code = 'PSYC' and ssbsect_crse_numb = '2130') --Keep because the course allows ENGL 0815 Concurrently
+    or  (ssbsect_subj_code = 'SOCI' and ssbsect_crse_numb = '1010') --Keep because the course allows ENGL 0815 Concurrently
+    or  (ssbsect_subj_code = 'THEA' and ssbsect_crse_numb = '1030'))
+
+   and  SSRRARE_AREA not like 'X_%'  
+Order by ssbsect.ssbsect_subj_code, ssbsect.ssbsect_crse_numb;
+
+*/
+
+--/*
+----2nd Script  ----SEE NOTE ABOVE
+
+
+--desc ssrrare;
+--desc ssbsect;
+SELECT
+    ssbsect.ssbsect_term_code   term,
+    ssbsect.ssbsect_crn         crn,
+    ssbsect.ssbsect_seq_numb    section_number,
+    SSBSECT_INSM_CODE  Instructional_method,     --select distinct ssbsect_insm_code from SSBSECT;
+    ssbsect.ssbsect_subj_code   subject,
+    ssbsect.ssbsect_crse_numb    course,
+    SSRRARE_AREA  "Prereq"
+FROM
+    ssbsect, ssrrare
+WHERE
+     ssbsect.ssbsect_term_code = :term_code
+     --and  ( ssbsect.ssbsect_seq_numb LIKE 'R%' or ssbsect.ssbsect_seq_numb LIKE 'W%')
+    and ssbsect_insm_code in ('WEB', 'RD1')
+    and ssbsect_seq_numb not like 'S%'  ---Sections that begin with "S" are Dual Enrollment Sections
+    and  SSRRARE_TERM_CODE = ssbsect_term_code
+    and  SSRRARE_CRN = ssbsect_crn
+    and  SSRRARE_AREA NOT like 'X_%'  
+    and  SSRRARE_AREA in (select distinct SMRACAA_AREA            --Subquery to find all Z_% prereqs
+                          from smracaa x       
+                          where   SMRACAA_SUBJ_CODE in ('READ','ENGL', 'MATH')
+                         and SMRACAA_CONCURRENCY_IND = 'Y'
+                         and SMRACAA_AREA like 'Z_%'
+                         and smracaa_term_code_eff = 
+                              (select max (smracaa_term_code_eff)
+                               from smracaa y
+                               where y.smracaa_area = x.smracaa_area
+                               and SMRACAA_CRSE_NUMB_LOW < '1000'
+                               and SMRACAA_SUBJ_CODE in ('READ','ENGL', 'MATH')))     --Courses that need ENGL 0815 but not READ 0815 will be returned
+Order by ssbsect.ssbsect_subj_code,ssbsect.ssbsect_crse_numb;
+--*/

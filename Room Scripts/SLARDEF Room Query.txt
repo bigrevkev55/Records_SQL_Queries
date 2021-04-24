@@ -1,0 +1,26 @@
+--Drew Kovacs 6/3/2020
+--Used to pull room information from SLARDEF
+
+Select unique
+SLBRDEF_BLDG_CODE as "Building",
+SLBRDEF_ROOM_NUMBER as "Room",
+SLBRDEF_DESC as "Description",
+SLRRDEF_RDEF_CODE as "Amenities",
+SLBRDEF_CAPACITY as "Capacity",
+SLBRDEF_DEPT_CODE as "Department"
+
+From
+SLBRDEF,
+SLRRDEF
+
+Where
+
+SLBRDEF_TERM_CODE_EFF = '201910'
+and SLRRDEF_TERM_CODE_EFF = SLBRDEF_TERM_CODE_EFF
+and SLRRDEF_BLDG_CODE = SLBRDEF_BLDG_CODE
+and SLRRDEF_ROOM_NUMBER = SLBRDEF_ROOM_NUMBER
+and SLBRDEF_RMST_CODE = 'AC'
+and SLRRDEF_RDEF_CODE in ('DOCC', 'LCDP', 'VTC', 'PRJT') or SLRRDEF_RDEF_CODE is NULL
+
+
+order by "Building", "Room", "Description", "Amenities", "Department";

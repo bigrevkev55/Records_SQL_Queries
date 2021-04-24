@@ -1,0 +1,253 @@
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         1
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+             Element                                                  Error
+ID        Lv Num Title                                 Data           Code   Suggested Corrections
+_________ __ ___ ____________________________________  ___________    _____  _____________________
+A00282451 02  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00375298 02  43 TN addr,out-state tuition             47     Y         72   EVEA
+
+A00412708 01  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00413418 02  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+A00413418 02  43 Addr and resd mismatch                       Z         59   Non-TN and In-state
+
+A00428182 01  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+A00428182 01  43 Addr and resd mismatch                       Z         59   Non-TN and In-state
+
+A00509368 06  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00516419 02  23 FEE PAY STATUS / AGE                  5      22        55   Age must be 65 or > 65
+
+A00518061 01  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+A00518061 01  43 Addr and resd mismatch                       Z         59   Non-TN and In-state
+
+A00519744 01 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00522453 01  43 Addr and resd mismatch                36     Z         59   Non-TN and In-state
+
+A00535033 02  43 Addr and resd mismatch                13     Z         59   Non-TN and In-state
+
+A00536779 02  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+A00536779 02  43 Addr and resd mismatch                       Z         59   Non-TN and In-state
+
+A00537329 01  23 FEE PAY STATUS / YOB                  E      1995      45   Age < 24
+A00537329 01  28 FEE PAY STATUS / YOB                  E      1995      45   Age < 24
+
+A00538730 02  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00539646 02  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+A00539646 02  43 Addr and resd mismatch                       Z         59   Non-TN and In-state
+
+A00546669 02  43 Addr and resd mismatch                06     Z         59   Non-TN and In-state
+
+A00549899 06  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+
+A00554445 06  17 REG TYPE / STUD LEV                   1      06        44   Stud Lev=01/REGTYP=1
+A00554445 06  13 STUD LEV / PREV REG TYPE              06     1         47   Stud Lev=01/PrevRegTyp=1
+
+A00556030 06  17 REG TYPE / STUD LEV                   1      06        44   Stud Lev=01/REGTYP=1
+A00556030 06  13 STUD LEV / PREV REG TYPE              06     1         47   Stud Lev=01/PrevRegTyp=1
+
+A00556076 01  23 FEE PAY STATUS / AGE                  5      24        55   Age must be 65 or > 65
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         2
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+             Element                                                  Error
+ID        Lv Num Title                                 Data           Code   Suggested Corrections
+_________ __ ___ ____________________________________  ___________    _____  _____________________
+A00556076 01  28 FEE PAY STATUS / AGE                  5      24        55   Age must be 65 or > 65
+
+A00557772 06  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00560948 06  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00561319 06  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00563028 01 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00564723 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00564769 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+A00564769 01  28 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00565185 01 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00565827 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00567151 02  23 FEE PAY STATUS / AGE                  5      39        55   Age must be 65 or > 65
+
+A00568865 01 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00569050 02 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00569152 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00569343 01 116 NO RACE SELECTED                                       69   Race Not Populated
+
+A00569450 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+A00569450 02  28 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00571451 01  11 PERMANENT ADDRESS                                       7   Blank Permanent Address
+
+A00572420 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00572619 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00574667 06  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00575617 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00576710 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00577550 02  43 TN addr,out-state tuition             47     Y         72   EVEA
+
+A00578566 01  43 Addr and resd mismatch                17     Z         59   Non-TN and In-state
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         3
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+             Element                                                  Error
+ID        Lv Num Title                                 Data           Code   Suggested Corrections
+_________ __ ___ ____________________________________  ___________    _____  _____________________
+
+A00579006 01  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00579537 01  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00580471 02  43 TN addr,out-state tuition             47     Y         72   EVEA
+
+A00581984 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+A00581984 02  28 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00582596 01  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00582816 06  17 STUD LEV / PHASEOUT DATE              06     052017    66   Phase out date
+
+A00582831 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00582951 02  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00583319 06  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00583908 01  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00584616 02  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00585808 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00586132 01  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00587484 06  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00587485 06  23 FEE PAY STATUS / STATE                A      47        41   State Perm Addrs NOT = 47
+
+A00587511 02  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00587753 06  43 TN addr,out-state tuition             47     Y         72   EVEA
+
+A00588217 06  43 TN addr,out-state tuition             47     Y         72   EVEA
+
+A00588405 06  43 Addr and resd mismatch                47     W         63   TN and Out-state
+
+A00588518 01  19 STUDENT MAJOR                         0915100100       10   Invalid Major Code
+
+A00588567 06  17 STUD LEV / PHASEOUT DATE              06     052017    66   Phase out date
+
+A00588676 06  17 STUD LEV / PHASEOUT DATE              06     052017    66   Phase out date
+
+A00588677 01  43 Addr and resd mismatch                47     W         63   TN and Out-state
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         4
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+             Element                                                  Error
+ID        Lv Num Title                                 Data           Code   Suggested Corrections
+_________ __ ___ ____________________________________  ___________    _____  _____________________
+
+A00588693 06  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00588760 06  43 Addr and resd mismatch                01     Y         59   Non-TN and In-state
+
+A00588798 06  43 Addr and resd mismatch                47     X         63   TN and Out-state
+
+A00588806 06  17 STUD LEV / PHASEOUT DATE              06     052017    66   Phase out date
+
+A00588955 06  17 STUD LEV / PHASEOUT DATE              06     052017    66   Phase out date
+
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         5
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+                                  Error #   Edits     Error #   Edits     Error #   Edits     Error #   Edits     Error #   Edits
+                                  _______   _____     _______   _____     _______   _____     _______   _____     _______   _____
+   Headcount              2,348        01         0        18         0        35         0        52         0        69         6
+                                       02         0        19         0        36         0        53         0        70         0
+   Records With Errors       70        03         0        20         0        37         0        54         0        71         0
+                                       04         0        21         0        38         0        55         4        72         5
+   {0,% o}f Error Records  2.98        05         0        22         0        39         0        56         0        73         0
+                                       06         0        23         0        40         0        57         0        74         0
+                                       07         7        24         0        41        22        58         0        75         0
+                                       08         0        25         0        42         0        59        10        76         0
+                                       09         0        26         0        43         0        60         0        77         0
+                                       10         9        27         0        44         2        61         0        78         0
+                                       11         0        28         0        45         2        62         0        79         0
+                                       12         0        29         0        46         0        63         8        80         0
+                                       13         0        30         0        47         2        64         0        81         0
+                                       14         0        31         0        48         0        65         0        82         0
+                                       15         0        32         0        49         0        66         5        83         0
+                                       16         0        33         0        50         0        67         0        84         0
+                                       17         0        34         0        51         0        68         0        85         0
+                                                                                                                  Total          82
+
+   Cr Typ        0    1,2 & 5        3         4         6         7      8 & 9   R,S,T,U        D      A & P        B       Total
+                 _    _______        _         _         _         _      _____   _______        _      _____        _       _____
+    Level
+    Ft Fr     407.00      6.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00     413.00
+       01   3,691.00    108.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00   3,799.00
+       02   6,958.00     48.00      0.00      0.00      0.00      3.00      0.00      0.00      0.00      0.00      0.00   7,009.00
+       03       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       04       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       05       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       06   2,874.00      3.00      0.00      0.00      0.00     16.00      0.00      0.00      0.00      0.00      0.00   2,893.00
+       10       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       11       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       12       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       21       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       22       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       23       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       24       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       30       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       31       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       32       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       35       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+       40       0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00       0.00
+
+    Total  13,930.00    165.00      0.00      0.00      0.00     19.00      0.00      0.00      0.00      0.00      0.00  14,114.00
+
+         ^ The totals may or may not include all records depending on the nature of the error in the records.
+Report: SZRSTEE                               Nashville State Comm College                                   PAGE         6
+Version: TBR: 1.16                            Student Enrollment Data Edit                                   09-JUL-2020 08:53 AM
+                                                   Term: 4 Year: 2020
+
+
+Parameter Name                         Value
+_____________________________          ________________
+RUN SEQUENCE NUMBER:                   2803168
+FILE NAME:                             elfile202007090805e.dat
+TERM CODE:                             4
+YEAR:                                  2020
+REPORT OPTION:                         B
+EDIT OPTION:                           E
+LINES PER PAGE:                        55
+
+NUMBER OF RECORDS PROCESSED:       2,348
+

@@ -1,0 +1,65 @@
+--Author:   Kevin Thomas, Assistant Registrar
+--Date:     14-APR-2020
+--Request: 
+
+/*
+ From: Moran, Laura
+Sent: Monday, April 6, 2020 11:53 AM
+To: IR_Requests <IR_Requests@nscc.edu>
+Cc: Martin-Osorio, Carol <Carol.Martin-Osorio@nscc.edu>
+Subject: high school gpa request
+ 
+Based on this new rule that is coming out from TBR, I’d like to know how many summer and fall applicants have a high school gpa of 3.6. They have to graduate from high school from 2015 to present (SORHSCH_GRADUATION_DATE). I’d like to exclude people that have already been placed based ACT or Accuplacer. Those people would have a (SORTEST_TESC_CODE) DSPM, DSPR, or DSPW score (SORTEST_TEST_SCORE) of 4 on SOATEST. They may have one score of 4 and the other as 2. 
+
+It may be best to send me a file with A numbers and show me everyone in the above criteria that has a 2 for at least one of the DSP levels or no DSP levels at all. 
+
+Feel free to call me if you have questions. 615-364-9552.
+
+Laura
+
+*/
+
+--Query:   
+
+--desc sorhsch;
+
+select distinct spriden_id as "ID",
+       SARADAP_TERM_CODE_ENTRY as "Application Term",
+       SORHSCH_SBGI_CODE as "SBGI Code",
+       STVSBGI_DESC  as "Institution",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SORHSCH_GPA        as "HS GPA",
+       a.SORTEST_TESC_CODE as "DSP Code",
+       a.SORTEST_TEST_SCORE as "DSP Score",
+       SORHSCH_GRADUATION_DATE as "HS Grad Date"
+
+from spriden, sorhsch, stvsbgi, saradap, sortest a
+
+where spriden_pidm = sorhsch_pidm
+and spriden_pidm = saradap_pidm
+and spriden_pidm = a.sortest_pidm 
+and SARADAP_TERM_CODE_ENTRY > = '202050'
+and SORTEST_TESC_CODE like 'DSP%' --or SORTEST_TESC_CODE not like 'DSP%')
+and  (
+not exists (select * from sortest b where a.sortest_pidm = b.sortest_pidm and b.sortest_tesc_code = 'DSPR')
+or   not exists (select * from sortest b where a.sortest_pidm = b.sortest_pidm and b.sortest_tesc_code = 'DSPW')
+or   not exists (select * from sortest b where a.sortest_pidm = b.sortest_pidm and b.sortest_tesc_code = 'DSPM')
+)--and b.sortest_tesc_code = 'DSPW' and b.sortest_tesc_code = 'DSPM')
+and a.SORTEST_TEST_SCORE > = '2' --or a. SORTEST_TEST_SCORE is NULL)
+and spriden.spriden_change_ind is null 
+and STVSBGI_CODE = SORHSCH_SBGI_CODE
+and sorhsch_SBGI_code in (select stvsbgi_code from stvsbgi where STVSBGI_TYPE_IND = 'H')
+and sorhsch_SBGI_code <> '888888'
+and sorhsch_gpa > = '3.6'
+and SORHSCH_GRADUATION_DATE > (select TO_CHAR(ADD_MONTHS(TRUNC(SYSDATE,'YEAR'),12*5*-1),'DD-MON-YY') from dual)
+
+Order by  spriden_last_name, spriden_first_name;
+
+
+--select TO_CHAR(ADD_MONTHS(TRUNC(SYSDATE,'YEAR'),12*5*-1),'DD-MON-YY') from dual;
+
+--select stvsbgi_code, STVSBGI_DESC from stvsbgi where STVSBGI_TYPE_IND = 'H';
+
+--select distinct stvsbgi_type_ind from stvsbgi;
+--select * from sortest where sortest_tesc_code = 'DSPW' and sortest_tesc_code = 'DSPM' and sortest_tesc_code = 'DSPR';

@@ -1,0 +1,48 @@
+-- Author: Kevin Thomas, Interim Registrar
+--   Date: 10-SEP-2020
+--Purpose: RODP Courses for TBR
+
+
+
+--desc ssbsect;
+--desc stvcamp;
+--desc scbcrse;
+
+select distinct ssbsect_crn,
+       ssbsect_term_code,
+       --ssbsect_ptrm_code,
+       ssbsect_subj_code,
+       ssbsect_crse_numb,
+       SCBCRSE.SCBCRSE_TITLE,  --select * from ssbsect
+       SSBSECT_CAMP_CODE,
+      -- STVCAMP_DESC
+       --ssbsect_seq_numb,
+       SSBSECT_ENRL
+       --ssbsect_tuiw_ind
+from ssbsect join scbcrse on ssbsect_subj_code = scbcrse_subj_code and ssbsect_crse_numb = scbcrse_crse_numb
+--join stvcamp on  ssbsect_camp_code = stvcamp_code
+where ssbsect_term_code = :Term_Code
+      and   SCBCRSE_EFF_TERM = (select max (SCBCRSE_EFF_TERM) 
+                                from scbcrse 
+                                where ssbsect_subj_code = scbcrse_subj_code and ssbsect_crse_numb = scbcrse_crse_numb)
+      and   ssbsect_ptrm_code IN ('R','RA1','RA2')
+--and   ssbsect_tuiw_ind IS NULL
+order by ssbsect_crn, ssbsect_term_code,ssbsect_subj_code,ssbsect_crse_numb;
+
+
+/*
+
+select ssbsect_term_code,
+       ssbsect_crn,
+       ssbsect_ptrm_code,
+       ssbsect_subj_code,
+       ssbsect_crse_numb,
+       ssbsect_seq_numb--,
+       --ssbsect_tuiw_ind
+from ssbsect
+where ssbsect_term_code = '202080'
+and   ssbsect_ptrm_code IN ('R','RA1','RA2')
+--and   ssbsect_tuiw_ind IS NULL
+order by ssbsect_term_code,ssbsect_subj_code,ssbsect_crse_numb;
+
+*/

@@ -1,0 +1,37 @@
+--     Author: Kevin Thomas, Assistant Registrar
+--       Date: 13-MAR-2020
+--    Purpose: This query returns students who have dropped or withdrawn from 2nd 7 Weeks courses by prompted term and date.
+--       Note: When prompted for date enter the date of first day of classes.
+
+--desc sfrstcr;
+
+select  SFRSTCR_CRN as "CRN",
+        SFRSTCR_RSTS_CODE as "Registration Status",
+        SFRSTCR_RSTS_DATE as "Status Date",
+        SFRSTCR_TERM_CODE as "Term",
+        SFRSTCR_PTRM_CODE as "Part of Term", 
+        spriden_id as "ID",
+        spriden_last_name as "Last Name", 
+        spriden_first_name as "First Name"--,    
+     -- camp_email as "Email Address",
+     -- pers_email as "Secondary Email"--,
+     -- SPRTELE_TELE_CODE as "Phone Type",
+     -- SPRTELE_PHONE_AREA ||'-'|| SPRTELE_PHONE_NUMBER || '' || SPRTELE_PHONE_EXT  as "Preferred Phone"
+                    
+from spriden, sfrstcr--, sprtele
+ 
+
+where spriden_change_ind is null
+      and   spriden_pidm = sfrstcr_pidm
+    --  and spriden_pidm = sprtele_pidm (+)
+     -- and SPRTELE_STATUS_IND (+) IS NULL
+     -- and SPRTELE_TELE_CODE (+) = any ('LO','PR')
+      and   (SFRSTCR_RSTS_CODE like 'D%' or SFRSTCR_RSTS_CODE like 'W%')
+      and   SFRSTCR_TERM_CODE = :Term
+      and   SFRSTCR_RSTS_DATE> = :First_Day_of_Class   -- DD-MON-YYYY
+      and   SFRSTCR_PTRM_CODE = any ('7', 'RA2')
+     -- and   SFRSTCR_CRN = any ('14169', '14555', '16686', '14763', '16014', '014565', '15421')
+     -- and camp_email_pidm (+) = spriden_pidm 
+     -- and pers_email_pidm (+) = spriden_pidm
+
+order by  spriden_last_name,spriden_first_name;

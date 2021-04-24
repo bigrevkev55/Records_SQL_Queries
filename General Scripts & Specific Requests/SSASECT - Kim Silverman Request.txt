@@ -1,0 +1,54 @@
+-- Author:  Kevin Thomas, Interim Registrar
+--   Date:  16-NOV-2020
+--Purpose:  Requested by Kim Silverman, AVP of extended campuses 
+--Request:  
+        /*  
+Hi Kevin,
+Let me explain why we need this information- this is a program that currently exists with Clarksville Montgomery Schools
+and Austin Peay. It is targeted towards graduating seniors and classified Clarksville Mongomery staff who want to become 
+teachers. They work during the day as teacher aides and take their classes in the late afternoon. This will be an 
+accelerated AST degree( 1.5 years for completion for students and we need to offer the courses in different modes 
+of delivery- on ground, hybrid, online and in different terms. Students would then go to Austin Peay for their bachelor's
+degree.
+
+The information that you will provide will help us determine the right "mix" to present to Clarksville.
+
+Thanks so much for your help,
+Kim*/
+
+
+--select * from ssbsect;
+--desc ssbsect;
+
+Select SSBSECT_TERM_CODE as "Term",
+       SSBSECT_CRN as "CRN",
+       SSBSECT_PTRM_CODE as "Part of Term",
+       STVPTRM_DESC "Description",
+       SSBSECT_SUBJ_CODE as "Subject",
+       SSBSECT_CRSE_NUMB as "Course", 
+       SSBSECT_INSM_CODE as "Instrucitonal Method",
+       GTVINSM_DESC as "Instructional Description"
+From SSBSECT, GTVINSM, STVPTRM 
+--Inner Join STVPTRM on SSBSECT_PTRM_CODE = STVPTRM_CODE
+Where SSBSECT_PTRM_CODE in ('6', '7', '2', '3', 'RA1', 'RA2')
+      and SSBSECT_PTRM_CODE = STVPTRM_Code
+      and GTVINSM_CODE = SSBSECT_INSM_CODE   
+      and ((SSBSECT_SUBJ_CODE = 'ART'and SSBSECT_CRSE_NUMB = '1035')
+      or (SSBSECT_SUBJ_CODE = 'ASTR' and SSBSECT_CRSE_NUMB = '1010')
+      or (SSBSECT_SUBJ_CODE = 'BIOL' and SSBSECT_CRSE_NUMB = '1010')
+      or (SSBSECT_SUBJ_CODE = 'COMM' and SSBSECT_CRSE_NUMB = '2025')
+      or (SSBSECT_SUBJ_CODE = 'ENGL' and SSBSECT_CRSE_NUMB = '1010')
+      or (SSBSECT_SUBJ_CODE = 'ENGL' and SSBSECT_CRSE_NUMB = '1020')
+      or (SSBSECT_SUBJ_CODE = 'ENGL' and SSBSECT_CRSE_NUMB = '2035')
+      or (SSBSECT_SUBJ_CODE = 'EDUC' and SSBSECT_CRSE_NUMB = '2010')
+      or (SSBSECT_SUBJ_CODE = 'EDUC' and SSBSECT_CRSE_NUMB = '2120')
+      or (SSBSECT_SUBJ_CODE = 'GEOG' and SSBSECT_CRSE_NUMB = '1030')
+      or (SSBSECT_SUBJ_CODE = 'GEOG' and SSBSECT_CRSE_NUMB = '1035')
+      or (SSBSECT_SUBJ_CODE = 'HIST' and SSBSECT_CRSE_NUMB = '2010')
+      or (SSBSECT_SUBJ_CODE = 'HIST' and SSBSECT_CRSE_NUMB = '2020')
+      or (SSBSECT_SUBJ_CODE = 'MATH' and SSBSECT_CRSE_NUMB = '1010')
+      or (SSBSECT_SUBJ_CODE = 'MATH' and SSBSECT_CRSE_NUMB = '1410')
+      or (SSBSECT_SUBJ_CODE = 'MATH' and SSBSECT_CRSE_NUMB = '1420')
+      or (SSBSECT_SUBJ_CODE = 'MUS'  and SSBSECT_CRSE_NUMB = '1030')
+      or (SSBSECT_SUBJ_CODE = 'POLS' and SSBSECT_CRSE_NUMB = '1030'))
+Order by SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, SSBSECT_TERM_CODE, SSBSECT_PTRM_CODE;

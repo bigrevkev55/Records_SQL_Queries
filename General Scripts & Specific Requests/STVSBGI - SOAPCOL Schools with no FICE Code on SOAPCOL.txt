@@ -1,0 +1,29 @@
+--Authors:  Kevin Thomas, Assistant Director of Records and Registration
+            Drew Kovacs, Records Office Technical Clerk
+--Date:     12-SEP-2019
+--Purpos:   This query searches for institutions that are in STVSBGI with no FICE code and are on a student's SOAPCOL. The bottom portion searches backwards for the student who has that code on SOAPCOL
+
+Select STVSBGI.STVSBGI_CODE, STVSBGI.STVSBGI_DESC, STVSBGI.STVSBGI_TYPE_IND, STVSBGI.STVSBGI_FICE
+
+from stvsbgi
+
+where STVSBGI.STVSBGI_FICE is null
+and STVSBGI.STVSBGI_TYPE_IND = 'C'
+and STVSBGI_CODE  in (select distinct SORPCOL.SORPCOL_SBGI_CODE
+from SORPCOL)
+
+order by 2, 1;
+
+
+
+
+
+/*select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SORPCOL.SORPCOL_SBGI_CODE
+       
+from spriden, sorpcol
+       
+where spriden.spriden_pidm = sorpcol.sorpcol_pidm
+and SORPCOL.SORPCOL_SBGI_CODE = '030955'; */

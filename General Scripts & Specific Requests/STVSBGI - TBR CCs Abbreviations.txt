@@ -1,0 +1,13 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    27-JUL-2019
+--Purpose: This query returns institutional descrtiptions from STVSBGI for standardization among the TBR 13 CC XMI 
+
+
+
+desc stvsbgi;
+
+select STVSBGI_DESC as "Abbreviated Institution Name"
+
+from stvsbgi
+
+where stvsbgi_code in ('001084','002848','001081','007323', '002266', '001543', '000453', '000319', '001656', '000274', '001881', '001893', '000850');

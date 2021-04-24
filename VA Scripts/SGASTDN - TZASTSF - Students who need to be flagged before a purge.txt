@@ -1,0 +1,56 @@
+--   Name:  Kevin Thomas, Assistant Registrar
+--   Date:  06-DEC-2019
+--Purpose:  Use before a purge as this query returns students who need 
+--          to be flagged on TZASTSF because they
+--          have a vet type on SGASTN but have not
+--          been flagged on TZASTSF to prevent them from being purged.  
+--
+--   Note:  There are several different queries that have been commented out that
+--          give additional information.  For instance, the top query can be 
+--          uncommented out to find all the students who have a "V" deferment on TZASTSF.
+
+
+--desc TZRSTSF;
+--desc spriden;
+--desc sgrvetn;
+
+/*
+select spriden_id as "ID",
+       TZRSTSF_TERM as "Term",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       TZRSTSF_STATUS_CODE as "Deferment"
+from spriden, tzrstsf
+where spriden_pidm =  tzrstsf_pidm
+      and SPRIDEN_CHANGE_IND IS NULL
+      and TZRSTSF_TERM = :Term
+      and TZRSTSF_ACTIVITY_DATE = (select max (TZRSTSF_ACTIVITY_DATE) from TZRSTSF where spriden_pidm =  tzrstsf_pidm)
+      and TZRSTSF_STATUS_CODE = 'V'
+Order by spriden_last_name, spriden_first_name;
+*/
+
+
+--/*
+
+select spriden_id as "ID",
+       --spriden_pidm,
+       SGRVETN_TERM_CODE_VA  as "Term",
+       SGRVETN_VETC_CODE as "Vet Type",
+       STVVETC_DESC as "Vet Description",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name"
+from spriden, sgrvetn, stvvetc
+where spriden_pidm = sgrvetn_pidm
+      and sgrvetn_vetc_code = STVVETC_CODE
+      and SPRIDEN_CHANGE_IND IS NULL
+      and SGRVETN_VETC_CODE is NOT NULL
+      and SGRVETN_TERM_CODE_VA = :Term
+      and spriden_pidm not in 
+                              (select spriden_pidm 
+                               from spriden, tzrstsf
+                               where spriden_pidm =  tzrstsf_pidm
+                               and SPRIDEN_CHANGE_IND IS NULL
+                               and TZRSTSF_TERM = :Term
+                               and TZRSTSF_ACTIVITY_DATE = (select max (TZRSTSF_ACTIVITY_DATE) from TZRSTSF where spriden_pidm =  tzrstsf_pidm)
+                               and TZRSTSF_STATUS_CODE = 'V')                         
+Order by SGRVETN_VETC_CODE, spriden_last_name, spriden_first_name;

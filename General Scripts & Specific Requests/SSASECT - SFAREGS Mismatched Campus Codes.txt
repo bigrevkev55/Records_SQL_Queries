@@ -1,0 +1,32 @@
+
+-- Author:  Kevin Thomas, Interim Registrar
+--   Date:  23-JUL-2020
+--Purpose:  This query returns CRNs of students whose campus code on 
+--          SFAREGS does not match the campus code on SSASECT.  This is
+--          due to the fact when departments update SSASECT, SFAREGS does
+--          not update for students who have already registered for
+--          section.  Use this output to go to SFAREGS and re-register 
+--          the students to get the correct campus code.  
+
+
+    select
+        spriden_last_name   Last_NAME
+        ,spriden_first_name First_Name
+        ,spriden_id         A_Number
+        ,SSBSECT_TERM_CODE  SSASECT_TERM
+        ,SSBSECT_CAMP_CODE  SSASECT_CAMP
+        ,SSBSECT_CRN        SSASECT_CRN
+        ,sfrstcr_camp_code  SFAREGS_CAMPUS
+
+    from
+        spriden, SSBSECT
+        join sfrstcr on ssbsect_term_code = sfrstcr_term_code
+            and ssbsect_crn = sfrstcr_crn
+            and ssbsect_camp_code <> sfrstcr_camp_code
+    WHERE
+        Spriden_change_ind is NULL
+        and spriden_pidm = sfrstcr_pidm
+        and SSBSECT_TERM_CODE = :Registration_Term
+        and SSBSECT_CRN = sfrstcr_crn
+    order by
+        3 desc

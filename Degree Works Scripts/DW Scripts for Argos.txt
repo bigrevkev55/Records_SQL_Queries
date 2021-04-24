@@ -1,0 +1,74 @@
+Hi, Kevin!  This is a copy of the coding.  I think this was one of the reports that came with DW, though it might be slightly modified.  For example, we’re not including students we have in “academic focus areas” in this report so you’ll notice <>’25AFC’ to remove them.  Evelyn also modified this further to only look for students who had not applied to graduate.  I’ll send both:
+
+Percent complete:
+select distinct RAD_PRIMARY_MST.RAD_ID as "E_Number",
+       RAD_PRIMARY_MST.RAD_NAME as "Student_Name",
+       RAD_PRIMARY_MST.RAD_EMAIL as "Email",
+       RAD_GOALDATA_DTL.RAD_GOAL_VALUE as "Major",
+       CPA_BLOCKGPA.PCT_COMPLETE_NUM as "FI__Complete",
+       RAD_GOALDATA_DTL.RAD_DEGREE_CODE as "Degree",
+       RAD_REPORT_DTL.RAD_REPORT_VALUE as "Credits"
+  from DWSCHEMA.RAD_REPORT_DTL RAD_REPORT_DTL inner join ( DWSCHEMA.RAD_GOALDATA_DTL RAD_GOALDATA_DTL inner join ( DWSCHEMA.RAD_CUSTOM_DTL RAD_CUSTOM_DTL inner join ( DWSCHEMA.CPA_BLOCKGPA CPA_BLOCKGPA inner join DWSCHEMA.RAD_PRIMARY_MST RAD_PRIMARY_MST on CPA_BLOCKGPA.STU_ID = RAD_PRIMARY_MST.RAD_ID ) on (RAD_CUSTOM_DTL.RAD_ID = RAD_PRIMARY_MST.RAD_ID) and (CPA_BLOCKGPA.STU_ID = RAD_CUSTOM_DTL.RAD_ID) ) on (RAD_GOALDATA_DTL.RAD_ID = RAD_PRIMARY_MST.RAD_ID) and (CPA_BLOCKGPA.STU_ID = RAD_GOALDATA_DTL.RAD_ID) and (RAD_GOALDATA_DTL.RAD_DEGREE_CODE = CPA_BLOCKGPA.DEGREE) ) on (RAD_REPORT_DTL.SRN_ID = RAD_GOALDATA_DTL.SRN_ID) and (RAD_REPORT_DTL.RAD_ID = RAD_GOALDATA_DTL.RAD_ID)
+where CPA_BLOCKGPA.PCT_COMPLETE_NUM > 70
+       and CPA_BLOCKGPA.BLOCK_TYPE ='DEGREE'
+       and RAD_CUSTOM_DTL.RAD_CUSTOM_VALUE in 'PN'
+       and RAD_GOALDATA_DTL.RAD_GOAL_CODE ='MAJOR'
+       and CPA_BLOCKGPA.ACTIVE_TERM ='201680'
+       and CPA_BLOCKGPA.SCHOOL <>'GR'
+       and RAD_GOALDATA_DTL.RAD_DEGREE_CODE <> '25AFC'
+       and RAD_GOALDATA_DTL.RAD_DEGREE_CODE <> '000002'
+       and RAD_GOALDATA_DTL.RAD_GOAL_VALUE not in ('UDEG','PBUS', 'PBSN')
+       and RAD_REPORT_DTL.RAD_REPORT_CODE ='GPACREDITSOV'
+       and RAD_REPORT_DTL.RAD_SCHOOL ='UG'
+order by CPA_BLOCKGPA.BLOCK_TYPE
+
+Need to file:
+select distinct RAD_PRIMARY_MST.RAD_ID as "E_Number",
+       RAD_PRIMARY_MST.RAD_NAME as "Student_Name",
+       RAD_PRIMARY_MST.RAD_EMAIL as "Email",
+       RAD_GOALDATA_DTL.RAD_GOAL_VALUE as "Major",
+       CPA_BLOCKGPA.PCT_COMPLETE_NUM as "FI__Complete",
+       RAD_GOALDATA_DTL.RAD_DEGREE_CODE as "Degree",
+       RAD_REPORT_DTL.RAD_REPORT_VALUE as "Credits"
+  from DWSCHEMA.RAD_REPORT_DTL RAD_REPORT_DTL inner join
+  ( DWSCHEMA.RAD_GOALDATA_DTL RAD_GOALDATA_DTL inner join
+  ( DWSCHEMA.RAD_CUSTOM_DTL RAD_CUSTOM_DTL
+  inner join ( DWSCHEMA.CPA_BLOCKGPA CPA_BLOCKGPA
+  inner join DWSCHEMA.RAD_PRIMARY_MST RAD_PRIMARY_MST on CPA_BLOCKGPA.STU_ID = RAD_PRIMARY_MST.RAD_ID )
+  on (RAD_CUSTOM_DTL.RAD_ID = RAD_PRIMARY_MST.RAD_ID) and (CPA_BLOCKGPA.STU_ID = RAD_CUSTOM_DTL.RAD_ID) )
+  on (RAD_GOALDATA_DTL.RAD_ID = RAD_PRIMARY_MST.RAD_ID) and (CPA_BLOCKGPA.STU_ID = RAD_GOALDATA_DTL.RAD_ID)
+  and (RAD_GOALDATA_DTL.RAD_DEGREE_CODE = CPA_BLOCKGPA.DEGREE) ) on (RAD_REPORT_DTL.SRN_ID = RAD_GOALDATA_DTL.SRN_ID)
+  and (RAD_REPORT_DTL.RAD_ID = RAD_GOALDATA_DTL.RAD_ID)
+
+where CPA_BLOCKGPA.PCT_COMPLETE_NUM > 75
+       and CPA_BLOCKGPA.BLOCK_TYPE ='DEGREE'
+       and RAD_GOALDATA_DTL.RAD_GOAL_CODE ='MAJOR'
+       and CPA_BLOCKGPA.ACTIVE_TERM >'201680'
+       and CPA_BLOCKGPA.SCHOOL <>'GR'
+       and RAD_GOALDATA_DTL.RAD_DEGREE_CODE <> '25AFC'
+       and RAD_GOALDATA_DTL.RAD_DEGREE_CODE <> '000002'
+       and RAD_GOALDATA_DTL.RAD_GOAL_VALUE not in ('UDEG','PBUS', 'PBSN')
+       and RAD_CUSTOM_DTL.RAD_CUSTOM_VALUE not in ('PN', 'AW')
+       and RAD_REPORT_DTL.RAD_REPORT_CODE ='GPACREDITSOV'
+       and RAD_REPORT_DTL.RAD_SCHOOL ='UG'
+       and RAD_PRIMARY_MST.RAD_ID <> 'E00140483'
+and not exists
+              (select * from RAD_CUSTOM_dtl
+                 where RAD_CUSTOM_DTL.RAD_CUSTOM_CODE in 'INTGRAD'
+         and rad_custom_dtl.rad_id = rad_goaldata_dtl.rad_id)
+
+
+order by CPA_BLOCKGPA.BLOCK_TYPE
+
+
+
+
+Please let me know if you have any questions.  I hope this helps!
+
+Jessica E. Miller
+Assistant Registrar, Graduation
+East Tennessee State University
+P.O. Box 70561
+Johnson City, TN 37614
+(423) 439-6851 phone
+(423) 439-6604 fax

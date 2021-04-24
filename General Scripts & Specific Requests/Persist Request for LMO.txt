@@ -1,0 +1,42 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    28-APR-2020
+--Request: 
+
+/*
+
+From: Moran, Laura <Laura.Moran@nscc.edu>
+Sent: Tuesday, April 28, 2020 3:06 PM
+To: Thomas, Kevin <Kevin.Thomas@nscc.edu>
+Cc: Williams, Julie <Julie.Williams@nscc.edu>
+Subject: Quick SQl request
+ 
+could you find people where SGRCHRT_CHRT_CODE = PER% and tell me if they are enrolled or not enrolled. 
+ I'd need A number, first and last name, then a Y or N for enrolled.  Display the SGRCHRT_CHRT_CODE. 
+
+*/
+
+
+
+--desc sgrchrt;
+--desc spriden;
+--desc sfrstcr;
+
+
+select spriden_id A_Number,
+       spriden_last_name Last_Name,
+       Spriden_first_name First_Name,
+      -- Max(SGRCHRT_TERM_CODE_EFF) as "Max Effective CHRT Term",        
+       sgrchrt_chrt_code--,
+      -- sfrstcr_term_code Registered_Term
+       
+
+from Spriden, sgrchrt, sfrstcr
+
+Where spriden_pidm = sgrchrt_pidm
+      and spriden_pidm = sfrstcr_pidm
+      and spriden_change_ind is NULL
+      and sgrchrt_chrt_code like 'PER%'
+   --   and spriden_pidm not in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code > '202010' and sfrstcr_rsts_code like 'R%' and sfrstcr_credit_hr > '0')
+    --  and spriden_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code > '202010' and sfrstcr_rsts_code like 'R%' and sfrstcr_credit_hr > '0')
+ group by spriden_id, spriden_last_name, Spriden_first_name, sgrchrt_chrt_code--, sfrstcr_term_code
+ Order by spriden_last_name, spriden_first_name;

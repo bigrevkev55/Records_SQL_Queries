@@ -1,0 +1,13 @@
+select distinct spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       shrttrm_astd_code_end_of_term       
+from shrttrm,spriden,sfrstcr
+where spriden_change_ind IS NULL
+and   spriden_pidm = shrttrm_pidm
+and   shrttrm_pidm = sfrstcr_pidm
+and   shrttrm_term_code = :Susp_Term
+and   sfrstcr_term_code = :Reg_Term
+and   shrttrm_astd_code_end_of_term LIKE '%S%'
+and   sfrstcr_credit_hr > 0
+ORDER BY shrttrm_astd_code_end_of_term,spriden_last_name;

@@ -1,0 +1,33 @@
+--   Author:  Kevin Thomas, Interim Registrar
+--     Date:  24-DEC-2020
+--  Purpose:  Students who have NULL concentration code in a AS/AA program since 202050.
+
+
+
+--desc sgbstdn;  select * from sgbstdn;
+--desc sorlcur;
+
+
+Select spriden_ID as "A Number",
+       SGBSTDN_TERM_CODE_EFF as "Effective Term",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+      -- SGBSTDN_TERM_CODE_EFF as "Effective Term",
+       SGBSTDN_DEGC_CODE_1 as "Degree",
+       SGBSTDN_MAJR_CODE_1 as "Major",
+       SGBSTDN_MAJR_CODE_CONC_1 as "Concentration"--,
+       --SORLCUR_ACTIVITY_DATE as "Activity Date",
+       --SORLCUR_USER_ID as "User ID"
+From SGBSTDN s
+Inner Join spriden on spriden_pidm = sgbstdn_pidm
+Where (SGBSTDN_DEGC_CODE_1 = 'AS' or SGBSTDN_DEGC_CODE_1 = 'AA')
+      and spriden_change_ind is NULL
+      and (SGBSTDN_MAJR_CODE_1 = 'UTP' or SGBSTDN_MAJR_CODE_1 = 'UNPA')
+      and SGBSTDN_MAJR_CODE_CONC_1 is NULL
+      and SGBSTDN_TERM_CODE_EFF = (Select max (SGBSTDN_TERM_CODE_EFF) from SGBSTDN  Where SGBSTDN_pidm = s.sgbstdn_pidm)--202080    --desc sfrstcr
+     -- and SGBSTDN_PIDM in (select sfrstcr_pidm from sfrstcr where SFRSTCR_TERM_CODE = '202110' and SFRSTCR_BILL_HR > '0')
+     and SGBSTDN_TERM_CODE_EFF >= '202050'
+Order by  sgbstdn_term_code_eff DESC, spriden_last_name, spriden_first_name;
+
+
+

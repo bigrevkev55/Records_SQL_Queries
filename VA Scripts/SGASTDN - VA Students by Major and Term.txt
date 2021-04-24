@@ -1,0 +1,42 @@
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    09-OCT-2019
+--Purpose: This query returns VA Students and their programs of study.
+
+
+--desc stvvetc;
+
+SELECT
+    spriden.spriden_id,
+    spriden.spriden_last_name,
+    spriden.spriden_first_name,
+    sgrvetn.sgrvetn_cert_hours,
+    --sgbstdn.sgbstdn_stst_code,
+    --sgbstdn.sgbstdn_term_code_eff,
+    sgbstdn.sgbstdn_degc_code_1,
+    sgbstdn.sgbstdn_majr_code_1,
+    sgbstdn.sgbstdn_majr_code_conc_1,
+    sgrvetn.sgrvetn_term_code_va,
+    sgrvetn.sgrvetn_vetc_code
+FROM
+    spriden,
+    sgrvetn,
+    sgbstdn
+WHERE
+    spriden.spriden_pidm = sgrvetn.sgrvetn_pidm
+   -- AND spriden.spriden_pidm = sgbstdn.sgbstdn_pidm
+    and sgbstdn_pidm = sgrvetn_pidm
+    AND sgrvetn.sgrvetn_term_code_va = :TERM
+    AND SGRVETN.sgrvetn_vetc_code IS NOT NULL
+    AND spriden.spriden_change_ind IS Null
+    AND SGBSTDN_TERM_CODE_EFF =
+           (SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+            FROM SGBSTDN
+            WHERE SGBSTDN_PIDM = sgrvetn_PIDM
+            AND SGBSTDN_TERM_CODE_EFF <= :TERM) --Change term
+ORDER BY
+    sgrvetn.sgrvetn_cert_hours,
+    spriden.spriden_last_name,
+    spriden.spriden_last_name, 
+    SPRIDEN.spriden_first_name,
+    sgrvetn.sgrvetn_term_code_va

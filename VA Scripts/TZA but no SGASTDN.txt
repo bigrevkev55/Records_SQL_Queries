@@ -1,0 +1,60 @@
+--   Name:  Kevin Thomas, Assistant Registrar
+--   Date:  17-MAY-2020
+--Purpose:  This query returns any student's who have been flagged to prevent being purged but have not been coded in SGASTDN
+--Prompts:  1.  When prompted for "Term" enter the term code of the term in question
+--  Edits:  1.  Edit SFRSTCR_TERM_CODE to the term before the term in question
+--          2.  Edit TZRSTSF_ACTIVITY_DATE > = to the first day of registration for the term in question.  
+
+
+--desc TZRSTSF;
+--desc spriden;
+--desc sgrvetn;
+
+/*
+select spriden_id as "ID",
+       TZRSTSF_TERM as "Term",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       TZRSTSF_STATUS_CODE as "Deferment"
+from spriden, tzrstsf
+where spriden_pidm =  tzrstsf_pidm
+      and SPRIDEN_CHANGE_IND IS NULL
+      and TZRSTSF_TERM = :Term
+      and TZRSTSF_ACTIVITY_DATE = (select max (TZRSTSF_ACTIVITY_DATE) from TZRSTSF where spriden_pidm =  tzrstsf_pidm)
+      and TZRSTSF_STATUS_CODE = 'V'
+Order by spriden_last_name, spriden_first_name;
+*/
+
+
+--/*
+select spriden_id as "ID",
+       max(SGRVETN_TERM_CODE_VA)  as "Term",
+       SGRVETN_VETC_CODE as "Vet Type",
+       STVVETC_DESC as "Vet Description",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name"
+from spriden, sgrvetn, stvvetc
+where spriden_pidm = sgrvetn_pidm
+      and sgrvetn_vetc_code = STVVETC_CODE
+      and SPRIDEN_CHANGE_IND IS NULL
+      --and SGRVETN_term_code_va < '202050'
+     -- and SGRVETN_TERM_CODE_VA = :Term
+      and spriden_pidm in 
+                              (select spriden_pidm 
+                               from spriden, tzrstsf
+                               where spriden_pidm =  tzrstsf_pidm
+                               and SPRIDEN_CHANGE_IND IS NULL
+                               and TZRSTSF_TERM = :Term
+                               and TZRSTSF_ACTIVITY_DATE > = '06-APR-2020' --First day of registration
+                               and TZRSTSF_STATUS_CODE = 'V')     
+     and spriden_pidm in (select distinct sfrstcr_pidm     --desc sfrstcr
+                           from sfrstcr
+                           where SFRSTCR_TERM_CODE = :Term
+                           and sfrstcr_credit_hr > '0')
+    and spriden_pidm not in (select distinct SGRVETN_pidm
+                             from sgrvetn
+                             where sgrvetn_term_code_va = :Term
+                             and SGRVETN_vetc_code is not null)
+group by spriden_id, SGRVETN_VETC_CODE, STVVETC_DESC, spriden_last_name, spriden_first_name
+Having max(sgrvetn_term_code_va) < '202050'
+Order by spriden_last_name, spriden_first_name, max (sgrvetn_term_code_va), SGRVETN_VETC_CODE;

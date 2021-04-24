@@ -1,0 +1,31 @@
+-- Author:  Kevin Thomas, Interim Registrar
+--   Date:  09-JUL-2020
+--Purpose:  Pull all 202080 Meeting Types in SSASECT 
+
+
+
+
+--desc ssrmeet;
+
+--desc ssbsect;
+
+select ssrmeet_crn CRN,
+       SSRMEET_TERM_CODE TERM,
+       SSRMEET_MTYP_CODE as "Meeting Type",
+       Gtvmtyp_desc as "Description",
+       ssbsect_subj_code as "Subject",
+       ssbsect_crse_numb as "Course"
+       
+from SSRMEET, gtvmtyp, ssbsect
+
+Where ssrmeet_term_code = '202080'
+      and SSBSECT_CRN = SSRMEET_CRN
+      AND ssbsect.ssbsect_term_code= ssrmeet.ssrmeet_term_code
+      and ssrmeet_mtyp_code = gtvmtyp_code
+Order by SSRMEET_MTYP_CODE, ssbsect_subj_code,ssbsect_crse_numb;
+
+
+     
+
+
+     

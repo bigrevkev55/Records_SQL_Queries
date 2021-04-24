@@ -1,0 +1,35 @@
+--Author:  Lance Woodard, Registrar
+--Date:    UNKNOWN
+--Purpose: Returns CRNs that need Y Concurrent Prereq
+
+--Edit History:  17-OCT-2019 Found this SQL tab of an output file Title "201580 - SSAPREQ Sections that Need Y Concurrent Pre-Requisite" 
+--               in the "Lance for Melissa Folder" and changed the term code to be a prompt...kt 10/17/19
+--
+--               17-OCT-2019 added "  and ssrrare_area not like 'Y_%'   " to the "Where" clause to filter out sections
+--               that have already been coded appropiately...kt 10/17/19                
+
+
+
+
+select ssbsect_term_code as "Term", 
+       ssbsect_crn as "CRN", 
+       ssbsect_camp_code as "Camp", 
+       ssbsect_subj_code as "Subject", 
+       ssbsect_crse_numb as "Crse Numb", 
+       ssbsect_seq_numb as "Section", 
+       ssbsect_ptrm_code as "Ptrm", 
+       ssbsect_ptrm_start_date as "Class Begin Date", 
+       ssbsect_ptrm_end_date as "Class End Date", 
+       ssrrare_area as "Pre-Req", 
+       ssrrare_activity_date as "Pre-Req Date" 
+from ssbsect,ssrrare 
+where ssbsect_term_code = ssrrare_term_code 
+and   ssbsect_crn = ssrrare_crn 
+and   ssbsect_term_code = :Term_Code 
+and   ssbsect_ptrm_code IN ('3','7','RA2')
+and   ssrrare_area not like 'Y_%' 
+order by ssbsect_camp_code,ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb
+
+
+--Only add Y_% if the prereq is a college level course as LS Courses aren't offered in the first 5/7 Weeks...
+

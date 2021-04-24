@@ -1,0 +1,34 @@
+-- Author: Kevin Thomas, Interim Registrar
+--   Date: 11-DEC-2020
+--Purpose: This Query returns CRNs that do not have the proper DCM fee on SSADETL.  When Prompted enter term, rubric, and the 
+--         amount the fee is suppossed to be.  
+--  Edits: 1.  Added correct fees, instructional method, campus, and section code to output to prevent referencing SSASECT manually...kt...15-JAN-2021
+--         2.  Corrected issue where previous terms would appear in the output...kt...15-JAN-2021
+
+
+--desc ssrfees;
+--desc ssbsect;
+
+/*Query to find section of prompted rubric that aren't in ssadetl*/
+Select SSBSECT_CRN CRN, SSBSECT_TERM_CODE TERM, 'NULL' incorrect_fee, :CORRECT_DCM_FEE Correct_Fee, SSBSECT_INSM_CODE Instructional_Method, SSBSECT_CAMP_CODE Campus, SSBSECT_SEQ_NUMB Section    
+from SSBSECT
+where SSBSECT_TERM_CODE = :TERM
+      and SSBSECT_CRN not in (Select DISTINCT SSRFEES_CRN from SSRFEES --Subquery that finds all CRNS with DCM fees
+                              where SSRFEES_TERM_CODE = :TERM)
+      and SSBSECT_SUBJ_CODE = :SUBJ_CODE 
+      and SSBSECT_CRSE_NUMB = :COURSE_NUMBER
+      and ssbsect_term_code = :TERM
+
+UNION
+
+/*Query to find sections in SSADETL that don't have the appropiate dollar amount*/
+Select SSBSECT_CRN CRN, SSBSECT_TERM_CODE TERM, 'NULL' incorrect_fee, :CORRECT_DCM_FEE Correct_Fee, SSBSECT_INSM_CODE Instructional_Method, SSBSECT_CAMP_CODE Campus, SSBSECT_SEQ_NUMB Section 
+From SSRFEES
+Inner Join SSBSECT on SSBSECT_CRN = SSRFEES_CRN
+Where (ssrfees_CRN  in (select ssbsect_CRN   --Subquery to find SSASECT sections of desired course
+                           from ssbsect 
+                           where SSBSECT_SUBJ_CODE = :SUBJ_CODE 
+                           and SSBSECT_CRSE_NUMB = :COURSE_NUMBER 
+                           and SSBSECT_TERM_CODE = :TERM)                
+     and SSRFEES_AMOUNT != :CORRECT_DCM_FEE)
+     and SSRFEES_TERM_CODE = :TERM;

@@ -1,0 +1,29 @@
+-- Author:  Kevin Thomas, Assistant Registrar
+--   Date:  02-JAN-2020
+--Purpose:  This query returns the listed transfer school on students Intent to Graduate packet by prompted term.
+--          The prompted term will look for students in the prompted term and greater.  
+
+
+
+
+
+desc sgrcoop;
+
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+      max (SGRCOOP_TERM_CODE) as "Gradtion Term",
+       SGRCOOP_EMPL_CODE as  "Continuing Education",
+       SGRCOOP_EMPL_CONTACT_NAME as "Listed School"
+       
+from spriden, sgrcoop
+
+Where spriden_pidm = sgrcoop_pidm
+      and spriden_change_ind is NULL
+      and SGRCOOP_EMPL_CODE = 'CE'
+      and SGRCOOP_TERM_CODE > = :Earliest_Term
+      and SGRCOOP_EMPL_CONTACT_NAME is NOT NULL
+      
+Group by spriden_id, spriden_last_name, spriden_first_name, SGRCOOP_EMPL_CODE, SGRCOOP_EMPL_CONTACT_NAME
+Order by SGRCOOP_EMPL_CONTACT_NAME, spriden_last_name, spriden_last_name 

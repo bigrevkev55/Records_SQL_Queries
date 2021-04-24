@@ -1,0 +1,31 @@
+-- Author:  Kevin Thomas, Assistant Registrar
+--   Date:  01-MAY-2019
+--Purpsoe:  Looking for students who have a 'AU' OR 'W%' Registration Status on SFASLST but no W grade OR AU grade.  
+--   Note:  As of 06-May-2019 Chuck Hackney has added this as a nightly Automic process and edited it to insert a grade of 'W'
+--          in SFRSTCR_GRDE_CODE column (SFASLST 'Status' field) where SFRSTS_CODE = 'W' (SFASLST Final Grade' field).
+--          He did not include 'AU' grades as it would have 
+--          to be a second Automic process.  There are very few 'AU' grades and we can 
+--          run this script to identify those students and manually insert the 'AU' grade.   
+--   Edit:  Changed where clause to sfrstcr_term_code = :Term Code from hard coded sfrstcr_term_code = '201910'...kt...12/9/19
+
+
+
+select distinct spriden_id as "A Number",
+       spriden_last_name as "Last Name",
+       Spriden_first_name as "First Name",
+       sfrstcr_crn as "CRN",
+       sfrstcr_RSTS_CODE as "Reg. Status Code",
+       sfrstcr_rsts_date as "Reg Status Date",
+       sfrstcr_grde_code as "Grade",
+       sfrstcr_user as "User"
+	
+       
+from spriden, sfrstcr
+
+where sfrstcr_pidm = spriden_pidm
+      and spriden_change_ind IS NULL
+      and ( sfrstcr_RSTS_CODE LIKE 'W%' OR SFRSTCR_RSTS_CODE = 'AU')
+      and sfrstcr_term_code = :Term_Code
+      and sfrstcr_grde_code IS NULL
+
+Order by 4;

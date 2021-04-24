@@ -1,0 +1,28 @@
+Name:    Kevin Thomas, Assistant Registrar
+Date:    28-FEB-2019
+Purpse:  This script pulls students that have obtained a Law Enforcement Certificate or Police Science Certificate.
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME  AS "Name",
+  sorlcur.SORLCUR_PROGRAM        AS "Program",
+  shrdgmr.SHRDGMR_GRST_CODE      AS "Graduation Status",
+  shrdgmr.SHRDGMR_TERM_CODE_GRAD AS "Graduation Term"
+FROM spriden,
+  sorlcur,
+  shrdgmr
+WHERE (spriden.SPRIDEN_ID LIKE 'A00%'
+AND sorlcur.SORLCUR_PROGRAM   = 'CERT_LAWE'
+AND shrdgmr.SHRDGMR_GRST_CODE = 'GR'
+AND spriden.SPRIDEN_PIDM      = sorlcur.SORLCUR_PIDM
+AND shrdgmr.SHRDGMR_PIDM      = spriden.SPRIDEN_PIDM
+AND shrdgmr_pidm = sorlcur_pidm)
+OR (spriden.SPRIDEN_ID LIKE 'A00%'
+AND sorlcur.SORLCUR_PROGRAM   = 'CERT_PSTA'
+AND shrdgmr.SHRDGMR_GRST_CODE = 'GR'
+AND spriden.SPRIDEN_PIDM      = sorlcur.SORLCUR_PIDM
+AND shrdgmr.SHRDGMR_PIDM      = spriden.SPRIDEN_PIDM
+AND shrdgmr_pidm = sorlcur_pidm)
+ORDER BY 2

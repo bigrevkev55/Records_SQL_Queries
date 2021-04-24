@@ -1,0 +1,24 @@
+--Author:   Kevin Thomas, Assistant Director of Records and Registration
+--Date:     27-AUG-2019
+--Purpose:  This query returns a distinct headcount of students by prompted term with at least one credit hour.  
+--Note:     This script excludes Students that are auditing their courses.  
+--Edit:     Added RSTS date line to check how many students had registred by date...kt...10-ARR-2020
+
+
+--desc sfrstcr;
+
+
+select (select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code = :Term_Code 
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < :Latest_Reg_Date_to_Check     --201980 1 week date = 4/1/19 - 4/7/19
+                                                                    --201950 1 week date = 4/1/19 - 4/7/19
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = :Term_Code
+                                             and sfrstcr_rsts_code in 'AU')) AS "Term Hecadcount"  
+from dual;
+
+
+

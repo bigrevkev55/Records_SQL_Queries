@@ -1,0 +1,31 @@
+--Author:  Kevin Thomas, Interim Registrar
+--Date:    10-JUL-2020
+--Purpose: This query returns a distinct list of CH 33 students from 202010, 202050, and 202080 and their preferred email addresses.
+--         Use this to BCC these students to inform them about the converted modality but not converted campus codes (ie - extended
+--         campuses now have WEB Sections.
+
+
+
+
+select distinct GOREMAL_EMAIL_ADDRESS as EMAIL--,
+       --spriden_id as "ID",
+      -- spriden_last_name as "Last Name",
+      -- spriden_first_name as "First Name",
+      -- GOREMAL_EMAIL_ADDRESS as "Email",
+     --  SGRVETN_TERM_CODE_VA  Term,
+     --  STVVETC_DESC as Type
+       
+--desc sgrvetn;
+--desc spriden;
+from spriden, SGRVETN, stvvetc, goremal
+
+where spriden_pidm = sgrvetn_pidm
+      and spriden_pidm = GOREMAL_PIDM (+)
+      and goremal_preferred_IND (+) = 'Y'
+      --and goremal_emal_code (+) = 'CAMP'
+      and SGRVETN_VETC_CODE in ('T', 'U')
+      and SGRVETN_TERM_CODE_VA in ('202010', '202050', '202080') 
+      and stvvetc_code = sgrvetn_vetc_code
+      and SPRIDEN_CHANGE_IND is NULL
+      
+--Order by spriden_last_name, spriden_first_name;

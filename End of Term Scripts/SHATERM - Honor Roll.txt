@@ -1,0 +1,40 @@
+ --Author:  Kevin Thomas, Assistant Registrar
+--   Date:  29-JUN-2020
+--Purpose:  The query returns students that have an institutional GPA, term GPA of 3.0 or greater.  
+--   Note:  There are no filters outside of
+--          institutional GPA (Don't have to be degree seeking or taking a minimum amount of hours).        
+
+--desc shrtgpa; -- select * from shrtgpa where shrtgpa_term_code = '202010' order by 1;
+select distinct spriden_id as "A Number",
+                spriden_last_name as "Last",
+                spriden_first_name as "First",
+                SHRTTRM_TERM_CODE as "Term",    
+                SHRTGPA_GPA_TYPE_IND as "GPA TYPE",
+                shrtgpa_hours_attempted as "Attempted Hours",
+                trunc (shrtgpa_gpa, 2) as "Term GPA"--,
+        /*
+                CASE When trunc (shrtgpa_gpa, 2) > '3.49'  and trunc (shrtgpa_gpa,2) < '4.00'--dont' have to worry about someone with less than 3.5GPA because of Dean's List attribute on SHAINST
+                     then 'Deans List'
+                     when trunc (shrtgpa_gpa, 2) > '3.9999999999'
+                     then 'Presidents List'
+                     when trunc (shrtgpa_gpa, 2) > '2.99' and trunc (shrtgpa_gpa,2) < '3.5' 
+                     then 'Honor Roll'
+                     Else null
+                     End as "Academic Standing"
+         */     
+from spriden, shrttrm, shrtgpa
+
+where   spriden_pidm = shrttrm_pidm 
+   and  spriden_pidm = shrtgpa_pidm
+   and  spriden_change_ind is NULL
+   and  shrttrm_term_code = :Term
+   and  shrttrm_term_code = shrtgpa.SHRTGPA_TERM_CODE
+   --and  SHRTTRM_ASTD_CODE_DL = 'DL'
+   and shrtgpa_levl_code = 'UG'
+   and  trunc (shrtgpa_gpa,2)  >  '2.99'  --commented out because there is no need to check GPA due to Dean's List Attribute on SHAINST
+   and  shrtgpa_gpa_type_ind = 'I'  --I = Institutional GPA (College level only) 
+                                    --T = Transfer GPA  
+                                    --C = Institutional Combined (College Level and DSP)
+   --and shrt_gpa_hours_attempted > 5
+   order by 5 desc, 2,3;
+

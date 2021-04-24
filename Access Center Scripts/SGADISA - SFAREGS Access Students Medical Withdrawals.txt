@@ -1,0 +1,32 @@
+--Author:  Kevin Thomas, Assistant Registrar and Drew Kovacs, Technical Clerk
+--Date:    05-JUN-2019
+--Purpose: This query finds Access Center Students that withdrew during the 2018 - 2019 Fiscal Year
+--         for health related reasons.
+
+
+
+select  distinct spriden_id as "A Number",
+        spriden_last_name as "Last Name",
+        spriden_first_name as "First Name",
+        
+       -- SFTREGS_RSTS_CODE as "Withdrawal Code",
+        Case
+        WHEN sftregs_rsts_code = 'WP'
+        Then 'Withdrawl - Health Related'
+        ELSE 'Other'
+        End as "Withdrawal Description",
+         SGRDISA_DISA_CODE as "Access Center Code",
+         sftregs_activity_date as "Activity Date",
+         sftregs.SFTREGS_SECT_SUBJ_CODE as "Subject",
+         sftregs.SFTREGS_SECT_CRSE_NUMB as "Course"
+
+from spriden, sftregs, sgrdisa
+
+Where spriden_pidm = sftregs_pidm
+      and spriden_pidm = sgrdisa_pidm
+      and spriden_change_ind is NULL
+      and sftregs_rsts_code = 'WP'
+      and sgrdisa_disa_code = 'Y'
+      and sftregs_activity_date > '30-JUN-2018'
+      and sftregs.SFTREGS_ACTIVITY_DATE < '01-JUL-2019'
+Order by 2, 6;

@@ -1,0 +1,254 @@
+--Author:  Kevin Thomas
+--Date: August 22,2018
+--Description:  2 Scipts...
+
+--Scipt 1...This query will give a list of all studnts with active XB, XR, and XO codes on SOAHOLD (Student Debt Students). 
+
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SPRHOLD_HLDD_CODE as "Hold Type",
+CASE
+WHEN   SPRHOLD_HLDD_CODE = 'XB'
+THEN  'Broken_Agreement'
+WHEN   SPRHOLD_HLDD_CODE = 'XO'
+THEN  'Original_Institution'
+WHEN  SPRHOLD_HLDD_CODE = 'XR'
+THEN  'Receiving_Institution'
+ELSE NULL
+END AS "Hold Description",
+       SPRHOLD_ORIG_CODE as "Origination",
+CASE 
+WHEN SPRHOLD_ORIG_CODE = 'SD02'
+THEN 'Columbia_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD03'
+THEN 'T_Athens'
+WHEN SPRHOLD_ORIG_CODE = 'SD04'
+THEN 'T_Covington'
+WHEN SPRHOLD_ORIG_CODE = 'SD05'
+THEN 'T_Crossville'
+WHEN SPRHOLD_ORIG_CODE = 'SD06'
+THEN 'T_Dickson'
+WHEN SPRHOLD_ORIG_CODE = 'SD07'
+THEN 'T_Elizabethton'
+WHEN SPRHOLD_ORIG_CODE = 'SD08'
+THEN 'T_Harriman'
+WHEN SPRHOLD_ORIG_CODE = 'SD09'
+THEN 'T_Hartsville'
+WHEN SPRHOLD_ORIG_CODE = 'SD10'
+THEN 'T_Hohenwald'
+WHEN SPRHOLD_ORIG_CODE = 'SD12'
+THEN 'T_Jacksboro'
+WHEN SPRHOLD_ORIG_CODE = 'SD13'
+THEN 'T_Jackson'
+WHEN SPRHOLD_ORIG_CODE = 'SD15'
+THEN 'T_Jackson_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD16'
+THEN 'T_Knoxville'
+WHEN SPRHOLD_ORIG_CODE = 'SD17'
+THEN 'T_Livingston'
+WHEN SPRHOLD_ORIG_CODE = 'SD18'
+THEN 'T_McKenzie'
+WHEN SPRHOLD_ORIG_CODE = 'SD19'
+THEN 'T_McMinnville'
+WHEN SPRHOLD_ORIG_CODE = 'SD20'
+THEN 'T_Memphis'
+WHEN SPRHOLD_ORIG_CODE = 'SD21'
+THEN 'T_Morristown'
+WHEN SPRHOLD_ORIG_CODE = 'SD22'
+THEN 'T_Murfreesboro'
+WHEN SPRHOLD_ORIG_CODE = 'SD25'
+THEN 'T_Nashville'
+WHEN SPRHOLD_ORIG_CODE = 'SD26'
+THEN 'T_Newbern'
+WHEN SPRHOLD_ORIG_CODE = 'SD27'
+THEN 'T_Oneida'
+WHEN SPRHOLD_ORIG_CODE = 'SD28'
+THEN 'T_Paris'
+WHEN SPRHOLD_ORIG_CODE = 'SD29'
+THEN 'T_Pulaski'
+WHEN SPRHOLD_ORIG_CODE = 'SD34'
+THEN 'T_Ripley'
+WHEN SPRHOLD_ORIG_CODE = 'SD35'
+THEN 'T_Crump'
+WHEN SPRHOLD_ORIG_CODE = 'SD36'
+THEN 'T_Shelbyville'
+WHEN SPRHOLD_ORIG_CODE = 'SD38'
+THEN 'T_Whiteville'
+WHEN SPRHOLD_ORIG_CODE = 'SD40'
+THEN 'T_Chattanooga'
+WHEN SPRHOLD_ORIG_CODE = 'SD51'
+THEN 'Cleveland_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD59'
+THEN 'Dyersburg_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD60'
+THEN 'Motlow_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD61'
+THEN 'Walters_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD63'
+THEN 'Volunteer_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD64'
+THEN 'Roane_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD65'
+THEN 'Chattanooga State'
+WHEN SPRHOLD_ORIG_CODE = 'SD70'
+THEN 'Southwest'
+WHEN SPRHOLD_ORIG_CODE = 'SD73'
+THEN 'Northwest_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD90'
+THEN 'Nashville_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD96'
+THEN 'Pellissippi'
+Else Null
+END as "ORIGINAL_INSTITUTION",
+       SPRHOLD_FROM_DATE AS "Hold_from_Date",
+       SPRHOLD_TO_DATE AS "Hold_to_Date",
+       SPRHOLD_FROM_DATE as "Date of Processing",
+       SPRHOLD_USER_ID AS "Processed by"     
+--       GOREMAL_EMAIL_ADDRESS as "Email",
+--       SFRTHST_TMST_CODE as "Time Status",
+--       SFRTHST_TMST_DATE as "Time Status Date"  
+from spriden, SPRHOLD --GOREMAL
+--SFRTHST
+where spriden_pidm = SPRHOLD_pidm
+and SPRHOLD_HLDD_CODE in ('XR','XO', 'XB')
+--and spriden_pidm = GOREMAL_PIDM
+-- and SFRTHST_pidm = spriden_pidm
+-- and sfrthst_tmst_date > = :Census
+-- date format is dd-mon-yyyy
+--and goremal_emal_code IN ('CAMP')
+--and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'N')
+and spriden_change_ind is NULL
+and SPRHOLD_TO_DATE > SYSDATE
+order by SPRHOLD_HLDD_CODE,spriden_last_name,spriden_first_name;
+
+
+
+
+--Script 2 - to find student debt studednts students time status' at census date of the semester.
+
+
+--Author:  Kevin Thomas
+--Date: August 22,2018
+--Description:  This query will give a list of studnts with XR and XO codes on SOAHOLD and their SFAREGS Time Status 
+--              at the prompted Census Date.  This is to check registration status of Student Debt students. 
+
+
+
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SPRHOLD_HLDD_CODE as "Hold Type",
+       CASE
+WHEN   SPRHOLD_HLDD_CODE = 'XB'
+THEN  'Broken_Agreement'
+WHEN   SPRHOLD_HLDD_CODE = 'XO'
+THEN  'Original_Institution'
+WHEN  SPRHOLD_HLDD_CODE = 'XR'
+THEN  'Receiving_Institution'
+ELSE NULL
+END AS "Hold Description",
+       SPRHOLD_ORIG_CODE as "Origination",
+       CASE 
+WHEN SPRHOLD_ORIG_CODE = 'SD02'
+THEN 'Columbia_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD03'
+THEN 'T_Athens'
+WHEN SPRHOLD_ORIG_CODE = 'SD04'
+THEN 'T_Covington'
+WHEN SPRHOLD_ORIG_CODE = 'SD05'
+THEN 'T_Crossville'
+WHEN SPRHOLD_ORIG_CODE = 'SD06'
+THEN 'T_Dickson'
+WHEN SPRHOLD_ORIG_CODE = 'SD07'
+THEN 'T_Elizabethton'
+WHEN SPRHOLD_ORIG_CODE = 'SD08'
+THEN 'T_Harriman'
+WHEN SPRHOLD_ORIG_CODE = 'SD09'
+THEN 'T_Hartsville'
+WHEN SPRHOLD_ORIG_CODE = 'SD10'
+THEN 'T_Hohenwald'
+WHEN SPRHOLD_ORIG_CODE = 'SD12'
+THEN 'T_Jacksboro'
+WHEN SPRHOLD_ORIG_CODE = 'SD13'
+THEN 'T_Jackson'
+WHEN SPRHOLD_ORIG_CODE = 'SD15'
+THEN 'T_Jackson_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD16'
+THEN 'T_Knoxville'
+WHEN SPRHOLD_ORIG_CODE = 'SD17'
+THEN 'T_Livingston'
+WHEN SPRHOLD_ORIG_CODE = 'SD18'
+THEN 'T_McKenzie'
+WHEN SPRHOLD_ORIG_CODE = 'SD19'
+THEN 'T_McMinnville'
+WHEN SPRHOLD_ORIG_CODE = 'SD20'
+THEN 'T_Memphis'
+WHEN SPRHOLD_ORIG_CODE = 'SD21'
+THEN 'T_Morristown'
+WHEN SPRHOLD_ORIG_CODE = 'SD22'
+THEN 'T_Murfreesboro'
+WHEN SPRHOLD_ORIG_CODE = 'SD25'
+THEN 'T_Nashville'
+WHEN SPRHOLD_ORIG_CODE = 'SD26'
+THEN 'T_Newbern'
+WHEN SPRHOLD_ORIG_CODE = 'SD27'
+THEN 'T_Oneida'
+WHEN SPRHOLD_ORIG_CODE = 'SD28'
+THEN 'T_Paris'
+WHEN SPRHOLD_ORIG_CODE = 'SD29'
+THEN 'T_Pulaski'
+WHEN SPRHOLD_ORIG_CODE = 'SD34'
+THEN 'T_Ripley'
+WHEN SPRHOLD_ORIG_CODE = 'SD35'
+THEN 'T_Crump'
+WHEN SPRHOLD_ORIG_CODE = 'SD36'
+THEN 'T_Shelbyville'
+WHEN SPRHOLD_ORIG_CODE = 'SD38'
+THEN 'T_Whiteville'
+WHEN SPRHOLD_ORIG_CODE = 'SD40'
+THEN 'T_Chattanooga'
+WHEN SPRHOLD_ORIG_CODE = 'SD51'
+THEN 'Cleveland_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD59'
+THEN 'Dyersburg_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD60'
+THEN 'Motlow_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD61'
+THEN 'Walters_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD63'
+THEN 'Volunteer_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD64'
+THEN 'Roane_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD65'
+THEN 'Chattanooga State'
+WHEN SPRHOLD_ORIG_CODE = 'SD70'
+THEN 'Southwest'
+WHEN SPRHOLD_ORIG_CODE = 'SD73'
+THEN 'Northwest_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD90'
+THEN 'Nashville_State'
+WHEN SPRHOLD_ORIG_CODE = 'SD96'
+THEN 'Pellissippi'
+Else Null
+END as "ORIGINAL_INSTITUTION",
+       SPRHOLD_ORIG_CODE as "Origination",
+       SPRHOLD_FROM_DATE as "Date of Processing",
+       SPRHOLD_USER_ID AS "Processed by",
+       GOREMAL_EMAIL_ADDRESS as "Email",
+      SFRTHST_TMST_CODE as "Time Status",
+      SFRTHST_TMST_DATE as "Time Status Date"       
+from spriden, SPRHOLD, GOREMAL, SFRTHST
+--SFRTHST
+where spriden_pidm = SPRHOLD_pidm
+and SPRHOLD_HLDD_CODE in ('XR','XO')
+and spriden_pidm = GOREMAL_PIDM
+and SFRTHST_pidm = spriden_pidm
+and sfrthst_tmst_date > = :Census
+-- date format is dd-mon-yyyy
+and goremal_emal_code IN ('CAMP')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'N')
+and spriden_change_ind is NULL
+order by SPRHOLD_HLDD_CODE,spriden_last_name,spriden_first_name;

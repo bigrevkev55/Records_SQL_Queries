@@ -1,0 +1,22 @@
+--Author:  Kevin Thomas
+--Date: August 22,2018
+--Description:  This query will give a list of studnts with XR and XO codes on SOAHOLD.  This is to check registration status of Student Debt students. 
+
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SPRHOLD_HLDD_CODE as "Hold Type",
+       SPRHOLD_ORIG_CODE as "Origination",
+       SPRHOLD_FROM_DATE as "Date of Processing",
+       SPRHOLD_USER_ID AS "Processed by"
+       --GOREMAL_EMAIL_ADDRESS as "Email"
+--remove previous line if email address is not needed or wanted
+from spriden, SPRHOLD --GOREMAL
+where spriden_pidm = SPRHOLD_pidm
+and SPRHOLD_HLDD_CODE in ('XR','XO')
+--and spriden_pidm = GOREMAL_PIDM
+--and goremal_emal_code IN ('CAMP')
+--and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'N')
+and spriden_change_ind is NULL
+order by SPRHOLD_HLDD_CODE,spriden_last_name,spriden_first_name;

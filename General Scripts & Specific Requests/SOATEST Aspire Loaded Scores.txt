@@ -1,0 +1,21 @@
+-- Author:    Kevin Thomas, Interim Registrar
+--   Date:    12-NOV-2020
+--Request:    Find students in SOATEST that have an Aspire scores loaded on their 
+--            SOATEST Form.  Codes A41-A46 were defined from TBR as "Aspire".  However,
+--            these need to be 
+--            changed to "ACT SUPERSCORE READING", "ACT SUPERSCORE MATH", etc.
+--            See email from Teresa Thomas dated NOV 12, 2020 3:21PM.
+
+
+
+select spriden_ID as "ID",
+       Spriden_last_name as "Last",
+       SPRIDEN_FIRST_name as "First",
+       SORTEST_TESC_CODE as "Test Code",
+       STVTESC_DESC as "Description"
+From spriden, sortest, stvtesc
+Where spriden_pidm = sortest_pidm
+      and sortest_tesc_code = stvtesc_code
+      and spriden_change_ind is NULL
+      and sortest_tesc_code like 'A4%'
+Order by Spriden_last_name, SPRIDEN_FIRST_name;

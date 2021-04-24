@@ -1,0 +1,62 @@
+--Author:  Kevin Thomas
+--Date: October 30, 2018
+--Description:  
+--Use this script to find RODP courses by prompted term that do not have
+--the "Tuition and Fee Waiver" box checked in SSASECT.
+--Edits:  Created a Union to join two more queries.  
+--          1.  A Query that looks for RODP Sections that do not have the correct Part of Term (R%) (PoT on SSASECT)
+--          2.  A query that looks for RODP sections that do not have the correct Campus Code (%R)...kt...12-DEC-2020
+--        Created a Union to join a query that looks for RODP sections that D2L listed as a integration partner.  
+--          Accoring to TSD (Troy Valentine) thiese need to be removed so that these sections don't get pulled into the 
+--          D2L system...kt...2/26/21
+--        Changed the name of the query to "RODP Cleanup Script" from "RODP Missing Tuition and Fee Waiver Box"...kt...2.26.21
+--        Added a Order by clause to order by CRNs as some CRNs have multiple issues...kt...2.26.21
+
+ 
+select ssbsect_term_code as "Term",
+       ssbsect_camp_code as "Campus",
+       ssbsect_ptrm_code as "Part of Term",
+       ssbsect_crn as "CRN",
+       ssbsect_subj_code as "SUBJ",
+       ssbsect_crse_numb as "NUMBER",
+       ssbsect_seq_numb as "Section Number",
+       ssbsect_tuiw_ind as "Tuition Waiver", 
+       SSBSECT_INTG_CDE as "Integration Partner"
+
+from ssbsect--,  
+where ssbsect_term_code IN :Term
+and   ssbsect_ptrm_code in ('R', 'RA1', 'RA2') --comment out to to see all parts of term
+and   (ssbsect_tuiw_ind != 'Y' or ssbsect_tuiw_ind is NULL)
+--and   SSBSECT_TUIW_IND = 'Y'  --Uncomment this line and commment out the line above to see courses that do have the box checked
+
+UNION
+
+Select ' ', ' ', 'Incorrect PoT', ssbsect_crn as "CRN", ' ', ' ', ' ', ' ', ''     --Query that finds sections that are not in and RODP PoT but have an RODP Section Number
+from ssbsect    
+where ssbsect_term_code IN :Term
+      and ssbsect_ptrm_code Not like 'R%'
+      and ssbsect_seq_numb like 'R%'
+
+
+UNION
+
+Select ' ', 'Incorrect Camp', ' ', ssbsect_crn as "CRN", ' ', ' ', ' ', ' ', ''   /*  --Query that finds sections that are not in an RODP campus (%R) but have and RODP Section Number */
+from ssbsect
+Where ssbsect_term_code in :Term
+      and ssbsect_seq_numb like 'R%'
+      and ssbsect_camp_code not like '%R'
+
+UNION
+
+Select ssbsect_term_code as "Term", ssbsect_camp_code as "Campus", ' ', ssbsect_crn as "CRN", ' ', ' ', ssbsect_seq_numb as "Section Number" , ' ', 'Remove D2L'   /*  --Query that finds RODP sections that list D2L as an integration partner*/
+from SSBSECT
+Where ssbsect_term_code in :Term
+      and (SSBSECT_SEQ_NUMB like 'R%' or SSBSECT_CAMP_CODE like '%R' or SSBSECT_INSM_CODE like 'R%')
+      and SSBSECT_CAMP_CODE not like 'H%'
+      and SSBSECT_INTG_CDE is not NULL
+Order by CRN;
+
+
+
+
+

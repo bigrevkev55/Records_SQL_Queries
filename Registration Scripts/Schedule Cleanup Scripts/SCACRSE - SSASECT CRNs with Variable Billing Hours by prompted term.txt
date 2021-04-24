@@ -1,0 +1,25 @@
+--Author:  Kevin Thomas, Interim Director
+--         Chuck Hackney, Systems Analyst II
+--Date:    17-APR-2021
+--Purpose: This query returns CRNs that have variable billing hours by prompted term
+
+--DESC SCBCRSE;
+--DESC SSBSECT; 
+
+
+
+Select SSBSECT_TERM_CODE as "Term",
+-- SCBCRSEEFFTERM as "Variable Eff Term",
+SSBSECT_CRN as "CRN",
+SSBSECT_SUBJ_CODE || ' ' || SSBSECT_CRSE_NUMB as "Course",
+SSBSECT_CREDIT_HRS  as "Credit Hours",
+ssbsect_bill_hrs as "Bill Hours"
+FROM SSBSECT, SCBCRSE s
+where ssbsect_subj_code || ssbsect_crse_numb = scbcrse_subj_code || scbcrse_crse_numb
+and ssbsect_term_code = :term
+and scbcrse_crse_numb not like '%999'
+and scbcrse_credit_hr_ind is not null
+and scbcrse_eff_term = (select max(scbcrse_eff_term)
+                                           from scbcrse
+                                            where scbcrse_subj_code || scbcrse_crse_numb = s.scbcrse_subj_code || s.scbcrse_crse_numb);
+       

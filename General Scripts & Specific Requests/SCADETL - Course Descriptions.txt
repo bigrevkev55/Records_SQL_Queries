@@ -1,0 +1,14 @@
+--AUTHOR: Kevin Thomas, Assistant Registrar
+--DATE:  12-APR-2019	
+--PURPOSE:THIS QUERY LOOKS FOR COURSES THAT HAVE UPDATED DESCRIPTIONS FOR THE 201910 semester AND FORWARD.  
+
+
+
+SELECT scbdesc.SCBDESC_TERM_CODE_EFF AS "Term Updated",
+  scbdesc.SCBDESC_SUBJ_CODE || ' ' || scbdesc.SCBDESC_CRSE_NUMB AS "Rubric",
+  scbdesc.SCBDESC_ACTIVITY_DATE AS "Date Updated",
+  scbdesc.SCBDESC_USER_ID AS "User ID"--,
+  --scbdesc.SCBDESC_TEXT_NARRATIVE AS "Course Description"
+FROM scbdesc
+WHERE scbdesc.SCBDESC_TERM_CODE_EFF > 201910
+ORDER BY 2;

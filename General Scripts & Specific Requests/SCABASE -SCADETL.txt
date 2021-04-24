@@ -1,0 +1,34 @@
+--Author:   Kevin Thomas, Assistant Registrar
+--Date:     26-FEB-2019
+--Purpose:  This query looks at SCABASE and SCADETL for course rubrics that do not have
+--          a general education attribute and are new as of 201480.  This is for electronic transcripts         
+--          XML downloads.  These courses will need to be 
+--          checked on SHATATR for TN CCs to make sure they are 
+--          built correctly.
+--          General education attributes are excluded as those have already been updated on 
+--          SHATATR.
+--          Remove concatenation pikes (||) to divide out data. Additionally, Cooperative Education courses have 
+--          been removed as students are not transferring those courses.    
+
+
+
+select DISTINCT SCBCRKY_SUBJ_CODE || ' ' || SCBCRKY_CRSE_NUMB AS "Rubric", 
+       --SCBCRKY_CRSE_NUMB, 
+       SCBCRSE_CREDIT_HR_LOW AS "Hours",
+       SCBCRSE_TITLE AS "Course Title",
+       SCBCRKY_TERM_CODE_START || ' - ' || SCBCRKY_TERM_CODE_END AS "Effective Terms"--,
+       --SCBCRKY_TERM_CODE_END,
+       --SCBCRKY_ACTIVITY_DATE AS "Activity Date"
+       
+from SCBCRKY, SCRATTR, SCBCRSE
+where SCBCRKY_TERM_CODE_START >= '201480' 
+      and SCBCRKY_TERM_CODE_END = '999999' 
+      and SCRATTR_SUBJ_CODE = SCBCRKY_SUBJ_CODE
+      and SCRATTR_EFF_TERM >= SCBCRKY_TERM_CODE_START
+      and SCBCRSE_SUBJ_CODE = SCBCRKY_SUBJ_CODE
+      and SCBCRKY_CRSE_NUMB = SCBCRSE_CRSE_NUMB
+      and SCRATTR_ATTR_CODE NOT IN ('G-CM', 'G-FL', 'G-HF','G-LT', 'G-MT', 'G-SC', 'G-SS')
+      and SCBCRKY_SUBJ_CODE <> 'MUS'
+      and SCBCRSE_TITLE NOT LIKE ('%Cooperative E%')
+      
+order by 2 asc;

@@ -1,0 +1,15 @@
+--Name:  Kevin Thomas, Interim Registrar
+--Date:  15-Jan-2021
+--Purpose:  Use this script to lookup student name and A# by partial phone number.
+
+
+--SPRTELE_PHONE_NUMBER
+
+--desc sprtele
+
+Select spriden_id, spriden_last_name, spriden_first_name, sprtele_phone_number
+from spriden, sprtele
+
+Where spriden_change_ind is null
+      and sprtele_pidm =  spriden_pidm
+      and SPRTELE_PHONE_NUMBER like '%3724667';

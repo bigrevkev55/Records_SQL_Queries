@@ -1,0 +1,83 @@
+--desc sgrvetn;
+
+select
+--COUNT(sgrvetn_vetc_code),
+spriden_id,
+SGRVETN_CERT_HOURS,
+spriden.spriden_last_name,
+spriden.spriden_first_name, 
+sgrvetn_term_code_va,
+sgrvetn_vetc_code
+from spriden,sgrvetn,stvvetc
+where spriden_change_ind IS NULL
+and   spriden_pidm = sgrvetn_pidm
+and   sgrvetn_vetc_code = stvvetc_code
+--and   sgrvetn_term_code_va IN ('200880','200910','200950','200980','201010','201050','201080')
+and   sgrvetn_term_code_va = '&Term'
+--and   sgrvetn_vetc_code = '&Vet_Code'
+and  sgrvetn_vetc_code IS NOT NULL
+order by SGRVETN_CERT_HOURS, spriden.spriden_last_name, spriden.spriden_first_name, sgrvetn_term_code_va;
+
+/*
+
+VA Students in AAS_LOGISTICS
+
+--Author: Kevin Thomas
+--Date: 03-JUN-2019
+--This script will give a list of Chapter 33 (T and U) VA students and their email addresseses by prompted term that are in the AAS_LGST program.
+
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --TZRSTSF_STATUS_CODE as "Status",
+       SGRVETN.SGRVETN_TERM_CODE_VA as "Term",
+       GOREMAL_EMAIL_ADDRESS as "Email",
+       sgrvetn_vetc_code as "VET TYPE",
+       SORLCUR_PROGRAM as "Program"
+from spriden, TZRSTSF, GOREMAL, sgrvetn, sorlcur
+Where spriden_pidm = GOREMAL_PIDM
+--and TZRSTSF_STATUS_CODE in ('V', 'E')
+and sorlcur_pidm = spriden_pidm
+--and sorlcur_term_code = sgrvetn_term_code_va
+and goremal_emal_code IN ('CAMP')--,'PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+and spriden_change_ind is NULL
+and spriden_pidm = sgrvetn_pidm
+and sgrvetn_vetc_code IN ('1','T','U')--,'1', '5', 'C', 'D')
+and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+and sorlcur_cact_code = 'ACTIVE'
+and sorlcur_program =  ( 'AAS_LGST')
+Order by spriden_last_name,spriden_first_name; */
+
+
+
+
+/*
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    03-JUN-2019
+--Purpose: The query finds Veteran students from the AAS_LGST program by prompted term.   
+
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME  AS "Name",
+  sorlcur.SORLCUR_PROGRAM        AS "Program"
+FROM spriden,
+  sorlcur,
+  shrdgmr,
+  sgrvetn
+WHERE spriden.SPRIDEN_ID LIKE 'A00%'
+AND sorlcur.SORLCUR_PROGRAM   = 'AAS_LGST'
+AND spriden.SPRIDEN_PIDM      = sorlcur.SORLCUR_PIDM
+AND shrdgmr.SHRDGMR_PIDM      = spriden.SPRIDEN_PIDM
+AND shrdgmr_pidm = sorlcur_pidm
+AND sgrvetn_pidm = spriden_pidm
+and sgrvetn_vetc_code in ('1','T','U')
+and sgrvetn_term_code_va = :Term
+ORDER BY 2;
+
+*/

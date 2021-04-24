@@ -1,0 +1,31 @@
+--Author:  Kevin Thomas, Assistant Director of Records and Registration
+--Date:    20-AUG-2019
+--Purpose: This script returns Healthcare Professions students by prompted term code
+--Note:    This script will only work with HCPR Degree Programs as the effective date of the major will  be the prompted term.  
+
+
+--desc sgbstdn;
+--desc spriden;
+
+SELECT Distinct SPRIDEN_ID           AS "A Number",
+                SPRIDEN_LAST_NAME    as "Last Name",
+                SPRIDEN_FIRST_NAME   as "First Name",
+                SGBSTDN_DEGC_CODE_1  as "Degree",
+                SGBSTDN_MAJR_CODE_1  as "Major",--, SGBSTDN_MAJR_CODE_CONC_1 
+                Case
+                When SGBSTDN_MAJR_CODE_1 = 'NURS' Then 'NURSING'
+                When SGBSTDN_MAJR_CODE_1 = 'CSPT' Then 'Central Sterile Processing'
+                When SGBSTDN_MAJR_CODE_1 = 'STC'  Then 'Surgical Technology'
+                When SGBSTDN_MAJR_CODE_1 = 'OTA'  Then 'Occupational Therapy'
+                When SGBSTDN_MAJR_CODE_1 = 'SURG'  Then 'Surgical Technology'
+                Else 'Other'
+                End as "Major Code Description"
+
+FROM   SGBSTDN, SPRIDEN 
+WHERE  SGBSTDN_PIDM = SPRIDEN_PIDM --SFRSTCR_PIDM
+       AND SGBSTDN_TERM_CODE_EFF = '&Term_Code'
+       AND SGBSTDN_MAJR_CODE_1 = any ('NURS','CSPT', 'STC', 'OTA', 'SURG')--List of all students In your major wether they are taking your classes or not
+       --AND SGBSTDN_MAJR_CODE_1 = '&Major_Code'
+       AND SPRIDEN_CHANGE_IND IS NULL
+    
+ORDER BY 4, 5, 2, 3

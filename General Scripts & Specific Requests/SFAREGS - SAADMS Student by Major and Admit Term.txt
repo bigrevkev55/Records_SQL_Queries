@@ -1,0 +1,77 @@
+--Author:   Kevin Thomas, Assistant Registrar, NSCC
+--Date:     4/1/2019
+--Purpose:  This script finds students by prompted program code and admit term.    
+  
+SELECT DISTINCT spriden.SPRIDEN_ID AS "Student ID",
+  spriden.SPRIDEN_LAST_NAME        AS "Last Name",
+  spriden.SPRIDEN_FIRST_NAME       AS "First Name",
+  SARADAP.SARADAP_TERM_CODE_ENTRY  AS "Entry Term",
+  SORLCUR.SORLCUR_PROGRAM          AS "Major",
+  MAX (SORLFOS_MAJR_CODE)                AS "Concentration",
+  SORLFOS_CURRENT_CDE              AS "Active"
+  
+FROM spriden, saradap, sorlcur, sorlfos
+
+WHERE spriden.SPRIDEN_PIDM      = saradap_PIDM
+AND   spriden_pidm             = sorlcur_pidm
+and   spriden_pidm             = sorlfos_pidm
+AND   saradap_term_code_entry  = 201980
+and  sorlcur_program           = :Program_Code
+AND spriden.SPRIDEN_CHANGE_IND IS NULL
+and SORLFOS_CURRENT_CDE  is not NULL 
+group by spriden.SPRIDEN_ID, spriden.SPRIDEN_LAST_NAME, spriden.SPRIDEN_FIRST_NAME, SARADAP.SARADAP_TERM_CODE_ENTRY, SORLCUR.SORLCUR_PROGRAM, 
+SORLFOS_CURRENT_CDE
+ORDER BY 2;
+
+
+
+
+
+
+----REFINING....
+
+
+--Author:   Kevin Thomas, Assistant Registrar, NSCC
+--Date:     4/1/2019
+--Purpose:  This script finds students by prompted program code and admit term.   
+
+
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "Student ID",
+  spriden.SPRIDEN_LAST_NAME        AS "Last Name",
+  spriden.SPRIDEN_FIRST_NAME       AS "First Name",
+  saradap.SARADAP_TERM_CODE_ENTRY  AS "Entry Term",
+  sorlcur.SORLCUR_PROGRAM          AS "Degree",
+  sorlfos.SORLFOS_MAJR_CODE_ATTACH AS "Major",
+  MAX(sorlfos.SORLFOS_MAJR_CODE)   AS "Concentration",
+  sorlcur.SORLCUR_TERM_CODE_CTLG   AS "Catalog",
+  sorlfos.SORLFOS_CURRENT_CDE      AS "Active",
+  MAX(sorlfos.SORLFOS_LCUR_SEQNO)
+FROM spriden,
+  saradap,
+  sorlcur,
+  sorlfos
+WHERE spriden.SPRIDEN_PIDM          = saradap.SARADAP_PIDM
+AND spriden.SPRIDEN_PIDM            = sorlcur.SORLCUR_PIDM
+AND spriden.SPRIDEN_PIDM            = sorlfos.SORLFOS_PIDM
+AND sorlcur.SORLCUR_TERM_CODE_CTLG  = saradap.SARADAP_TERM_CODE_ENTRY
+AND saradap.SARADAP_TERM_CODE_ENTRY = :Entry_term
+AND sorlcur.SORLCUR_PROGRAM         = :Degree_Code
+AND spriden.SPRIDEN_CHANGE_IND     IS NULL
+AND sorlfos.SORLFOS_CURRENT_CDE    IS NOT NULL
+AND SORLFOS_MAJR_CODE_ATTACH       IS NOT NULL
+GROUP BY spriden.SPRIDEN_ID,
+  spriden.SPRIDEN_LAST_NAME,
+  spriden.SPRIDEN_FIRST_NAME,
+  saradap.SARADAP_TERM_CODE_ENTRY,
+  sorlcur.SORLCUR_PROGRAM,
+  sorlfos.SORLFOS_MAJR_CODE_ATTACH,
+  sorlcur.SORLCUR_TERM_CODE_CTLG,
+  sorlfos.SORLFOS_CURRENT_CDE,
+  saradap.SARADAP_TERM_CODE_ENTRY,
+  sorlcur.SORLCUR_PROGRAM,
+  spriden.SPRIDEN_CHANGE_IND,
+  sorlfos.SORLFOS_CURRENT_CDE,
+  2
+ORDER BY 2

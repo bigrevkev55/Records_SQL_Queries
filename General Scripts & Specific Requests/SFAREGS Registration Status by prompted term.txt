@@ -1,0 +1,55 @@
+--Author:   Kevin Thomas, Assistant Registrar, NSCC
+--Date:     2/4/2019
+--Purpose:  This script finds students by prompted, registration status, term, and part of term,
+--            and registration status date (RSTS Code).  
+  
+SELECT DISTINCT spriden.SPRIDEN_ID AS "Student ID",
+  spriden.SPRIDEN_LAST_NAME        AS "Last Name",
+  spriden.SPRIDEN_FIRST_NAME       AS "First Name",
+  sftregs_CRN                      AS  CRN,
+  sftregs.SFTREGS_CRSE_TITLE       AS  Course,
+  sftregs.SFTREGS_RSTS_CODE        AS "Registration Code",
+  sftregs.SFTREGS_ACTIVITY_DATE    AS "Activity Date",
+  sftregs.SFTREGS_TERM_CODE        AS Term,
+  sftregs.SFTREGS_PTRM_CODE        AS "Part of Term",
+  sftregs_user                     AS "Registered By"
+FROM spriden,
+  sftregs
+WHERE spriden.SPRIDEN_PIDM      = sftregs.SFTREGS_PIDM
+AND sftregs.SFTREGS_RSTS_CODE  IN :RSTS_Code
+--(AU, CC, DD, D1, D2, D5, D7, DD, DE, DF, DM, DS, DW R1, R2, R3, R4, R5, R6, R9, 
+--U1, U6, RW)
+--And sftregs_rsts_code in (RW) -- Used 2/4/19 to look for students with RW after RW was to be closed for 201910
+AND sftregs.SFTREGS_TERM_CODE  IN :Term
+--AND sftregs.SFTREGS_RSTS_DATE   > '14-JAN-19' --Used 2/4/19 to look for students with RW after RW was to be closed for 201910
+AND spriden.SPRIDEN_CHANGE_IND IS NULL
+AND sftregs.SFTREGS_PTRM_CODE   in :Part_of_Term
+ORDER BY 7 desc;
+
+
+--------------------
+/*select * from sftregs 
+where sftregs_term_code in (201910)
+      and sftregs_rsts_code in 'RW'
+      and sftregs_ptrm_code not in ('RA2', '8', '7')
+order by SFTREGS_RSTS_Date desc;
+
+--------DW Students for Angela
+
+
+Select distinct Spriden_id as "Student ID",
+      spriden_last_name as "Last Name",
+      spriden_first_name as "First Name",
+       SFTREGS_RSTS_CODE as "Registration Code",
+       sftregs_activity_date as "Activity Date",
+       sftregs_term_code as Term
+       
+from spriden,sftregs
+       
+Where spriden_pidm = sftregs_pidm 
+      and sftregs_term_code in '201910'
+     and sftregs_rsts_code in 'DW'
+     and SFTREGS_RSTS_DATE > '29-JAN-19'
+      and spriden_change_ind is null
+
+order by 4 */

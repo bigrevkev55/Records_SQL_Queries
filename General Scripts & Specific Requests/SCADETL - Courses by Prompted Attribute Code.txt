@@ -1,0 +1,19 @@
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    10-JUL-2019
+--Purpose: Pull a list of courses from SCADETL by attached attribute code. 
+
+
+
+
+DESC SCRATTR;
+
+select scrattr_eff_term as "Begin Term",
+       scrattr_subj_code as "Subject",
+       scrattr_crse_numb as "Crse Numb",
+       scrattr_attr_code as "Attribute"
+from scrattr
+where scrattr_attr_code = :Attribute
+AND      SCRATTR_SUBJ_CODE NOT IN ('ARTP', 'ARAB', 'ARTH')
+
+order by scrattr_attr_code,scrattr_subj_code,scrattr_crse_numb;

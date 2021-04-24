@@ -1,0 +1,16 @@
+
+
+--Author:	Kevin Thomas, Assistant Director of Records and Registration
+--Date:  	2/5/19
+--Purpose:      This querty looks for course subject codes by end term.  
+
+--Script:
+
+select scbcrky_subj_code AS "SUBJECT CODE",
+       scbcrky_crse_numb AS "Course Number",
+       SCBCRKY_TERM_CODE_START AS "Start Term",
+       SCBCRKY_TERM_CODE_END AS "End Term"
+from scbcrky 
+where scbcrky_subj_code in ('ACT', 'CIT', 'CAD')
+                        and SCBCRKY_TERM_CODE_END > 201950
+Order by 1 ASC;	

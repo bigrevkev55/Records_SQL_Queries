@@ -1,0 +1,146 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:  01-AUG-2019
+--Purpose:  This query returns NSCC AAS courses that do not have an equivalency built on SHATATR. 
+--          Use this for AAS realignments. When prompted enter 
+--NOTE:   **When prompted enter the school code of the transfer school.** 
+
+
+SELECT 
+ /*   :transfer_school_code as "Transfer School Code",
+CASE
+        WHEN :transfer_school_code = '001081' THEN
+            'Columbia_State'
+        WHEN :transfer_school_code = '002266' THEN
+            'Jackson_State'
+        WHEN :transfer_school_code = '002848' THEN
+            'Cleveland_State'
+        WHEN :transfer_school_code = '007323' THEN
+            'Dyersburg_State'
+        WHEN :transfer_school_code = '001543' THEN
+            'Motlow_State'
+        WHEN :transfer_school_code = '001893' THEN
+            'Walters_State'
+        WHEN :transfer_school_code = '001881' THEN
+            'Volunteer_State'
+        WHEN :transfer_school_code = '001656' THEN
+            'Roane_State'
+        WHEN :transfer_school_code = '001084' THEN
+            'Chattanooga State'
+        WHEN :transfer_school_code = '000274' THEN
+            'Southwest'
+        WHEN :transfer_school_code = '000453' Then
+            'Northwest_State'
+        WHEN :transfer_school_code = '000319' THEN
+            'Pellissippi'
+        ELSE Null
+   END AS "Transferring_Institution",*/
+   Distinct scbcrse.scbcrse_subj_code
+    || ' '
+    || scbcrse.scbcrse_crse_numb AS "Rubric",
+    scbcrse.scbcrse_title AS "Course Title"--,
+    --MAX((scbcrse.scbcrse_eff_term)) AS "Start Term"
+FROM
+    scbcrse
+WHERE
+    scbcrse.scbcrse_subj_code
+    || ' '
+    || scbcrse.scbcrse_crse_numb NOT IN 
+ 
+ --Begin subquery for courses in SHATATR for school code
+    (
+        SELECT Distinct
+            shbtatc.shbtatc_subj_code_trns
+            || ' '
+            || shbtatc.shbtatc_crse_numb_trns
+        FROM
+            shbtatc,
+            shrtatc
+        WHERE
+            shbtatc.shbtatc_subj_code_trns IN (
+                'ACCT',
+                'ADMN',
+                'ARCT',
+                'BUSN',
+                'CITC',
+                'CIVT', 'CRMJ',
+                'CULA',
+                'ECED',
+                'EETC',
+                'HSCMT',
+                'HMGT',
+                'IPCT',
+                'LEGL',
+                'OTAP',
+                'SURG'
+            )
+            AND shrtatc.shrtatc_sbgi_code IN :Transfer_School_Code
+            and shbtatc_sbgi_code in :Transfer_School_Code
+    )
+--End subquery of courses in SHATATR for school code
+
+    AND scbcrse.scbcrse_subj_code
+        || ' '
+        || scbcrse.scbcrse_crse_numb IN
+        
+--Begin Subquery for courses offered on SSASECT after 201510
+        (
+        SELECT DISTINCT
+            ssbsect.ssbsect_subj_code
+            || ' '
+            || ssbsect.ssbsect_crse_numb
+        FROM
+            ssbsect,scbcrse
+        WHERE
+            ssbsect.ssbsect_term_code > 201510     --Greater than this term in SSASECT
+    )
+--End of Subquery for courses offered on SSASECT after 201510
+
+
+    AND scbcrse.scbcrse_title NOT LIKE ( '%Cooperative E%' )
+    AND scbcrse.scbcrse_title NOT LIKE ( 'Co-%' )
+    AND scbcrse.scbcrse_subj_code IN (
+        'ACCT',
+        'ADMN',
+        'ARCT',
+        'BUSN',
+        'CITC',
+        'CIVT',
+        'CRMJ',
+        'CULA',
+        'ECED',
+        'EETC',
+        'HSCMT',
+        'HMGT',
+        'IPCT',
+        'LEGL',
+        'OTAP',
+        'SURG'
+    )
+
+ORDER BY 1;
+
+
+desc shbtatc;
+desc scbcrse;
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+

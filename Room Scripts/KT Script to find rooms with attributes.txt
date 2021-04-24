@@ -1,0 +1,68 @@
+--***3 Scripts
+
+
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    08-MAR-2019
+--Purporse:This script finds rooms by prompted attribute code.
+--Script to find rooms by prompted attributes.  
+
+
+SELECT DISTINCT MAX(SLBRDEF.SLBRDEF_TERM_CODE_EFF) AS "Max Effective Term",
+  SLRRDEF.SLRRDEF_BLDG_CODE                        AS "Building",
+  SLBRDEF.SLBRDEF_ROOM_NUMBER                      AS "Room",
+  SLBRDEF.SLBRDEF_DESC                             AS "Description",
+  SLRRDEF.SLRRDEF_RDEF_CODE                        AS "Attribute",
+  SLBRDEF.SLBRDEF_MAXIMUM_CAPACITY                 AS "Capacity"
+FROM SLRRDEF,
+  SLBRDEF
+WHERE SLBRDEF.SLBRDEF_ROOM_NUMBER = SLRRDEF.SLRRDEF_ROOM_NUMBER
+AND SLBRDEF.SLBRDEF_BLDG_CODE     = SLRRDEF.SLRRDEF_BLDG_CODE
+AND SLBRDEF.SLBRDEF_TERM_CODE_EFF = SLRRDEF.SLRRDEF_TERM_CODE_EFF
+AND SLRRDEF.SLRRDEF_RDEF_CODE     = :Attribute
+AND SLRRDEF.SLRRDEF_RDEF_CODE NOT LIKE ('OFF%')
+GROUP BY SLRRDEF.SLRRDEF_BLDG_CODE,
+  SLBRDEF.SLBRDEF_ROOM_NUMBER,
+  SLBRDEF.SLBRDEF_DESC,
+  SLRRDEF.SLRRDEF_RDEF_CODE,
+  SLBRDEF.SLBRDEF_MAXIMUM_CAPACITY
+ORDER BY 2,
+  3,
+  "Capacity",
+  "Description",
+  "Capacity";
+
+---****The script below finds all attributes on rooms that have a capacity of 5 or greater and are not offices. 
+
+Select Distinct SLBRDEF_ROOM_NUMBER as "Room",
+       SLBRDEF_DESC as "Description", 
+       SLRRDEF_RDEF_CODE as "Attribute",
+       SLBRDEF_MAXIMUM_CAPACITY as "Capacity"
+From  SLRRDEF, SLBRDEF
+Where SLRRDEF_BLDG_CODE in ('A','C','D','E','H','K','S','W')
+--and SLRRDEF_RDEF_CODE in :ATTRIBUTE
+--enter attribute code, CMPL is Computer Labs
+and SLBRDEF_ROOM_NUMBER = SLRRDEF.SLRRDEF_ROOM_NUMBER
+and SLBRDEF_MAXIMUM_CAPACITY > = :Capacity
+and SLRRDEF_RDEF_CODE NOT LIKE ('OFF%')
+--enter the size of the room needed
+Order by SLBRDEF_MAXIMUM_CAPACITY, SLBRDEF_DESC, SLBRDEF_MAXIMUM_CAPACITY;
+
+
+--****JUST THE C,W, K buildings greater than 5, no offices.  
+
+Select Distinct SLRRDEF_BLDG_CODE as "Building",
+       SLBRDEF_ROOM_NUMBER as "Room",
+       SLBRDEF_DESC as "Description", 
+       SLRRDEF_RDEF_CODE as "Attribute",
+       SLBRDEF_MAXIMUM_CAPACITY as "Capacity"
+From  SLRRDEF, SLBRDEF
+WHERE SLRRDEF_BLDG_CODE in ('W', 'C', 'K')
+--Where SLRRDEF_BLDG_CODE in ('A','C','D','E','H','K','S','W')
+--and SLRRDEF_RDEF_CODE in :ATTRIBUTE
+--enter attribute code, CMPL is Computer Labs
+and SLBRDEF_ROOM_NUMBER = SLRRDEF.SLRRDEF_ROOM_NUMBER
+and SLBRDEF_MAXIMUM_CAPACITY > = :Capacity
+and SLRRDEF_RDEF_CODE NOT LIKE ('OFF%')
+--enter the size of the room needed
+Order by 1,2, SLBRDEF_MAXIMUM_CAPACITY, SLBRDEF_DESC, SLBRDEF_MAXIMUM_CAPACITY;

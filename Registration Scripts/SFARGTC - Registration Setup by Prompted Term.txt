@@ -1,0 +1,20 @@
+--Author: Kevin Thomas, Assistant Registrar
+--Date:   19-JUN-2020
+--Purpose: This query return the registration setup by prompted term on SFARGTC
+
+
+--desc sfrctrl;
+
+select SFRCTRL_TERM_CODE_HOST Term,
+       SFRCTRL_BEGIN_DATE Begin_Date,
+       SFRCTRL_HOUR_BEGIN Begin_Time,
+       SFRCTRL_END_DATE End_Date,
+       SFRCTRL_HOUR_END End_Time
+
+from sfrctrl
+
+where sfrctrl_term_code_host = :Term_Code
+
+Order by SFRCTRL_BEGIN_DATE;
+       
+       

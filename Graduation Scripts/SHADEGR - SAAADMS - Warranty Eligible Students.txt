@@ -1,0 +1,51 @@
+--AUTHOR:    KEVIN THOMAS, ASSISTANT DIRECTOR OR RECORDS AND REGISTRATION
+--Edited BY: Chuck Hackney (wrote subquery and joined to outer query on PIDM)
+--DATE:      JANUARY 3, 2019
+--PURPOSE:   THIS SCRIPT LOOKS FOR WARRANTY GRADUATES WHO BEGAN NSCC IN 
+--           201880 OR LATER AND HAVE COMPLETED AN ELIGIBLE PROGRAM (cert OR aas).
+--           THE QUERY ONLY LOOKS FOR NEW FIRST TIME FRESHMEN AND NEW TRANSFER STUDENTS.
+--           Some lines have been commented out to have less output.  However, to verify that the 
+--           result set is correct simply "un-comment out" those lines.  
+--	     Edited out unnecessary certificate codes, left only 'AAS', 'CRT1', 'CRT2' AK 1/15/20
+
+
+SELECT SPRIDEN.SPRIDEN_ID AS "STUDENT ID",
+  SPRIDEN.SPRIDEN_LAST_NAME AS "LAST_NAME",
+  SPRIDEN.SPRIDEN_FIRST_NAME AS "FIRST_NAME",
+  --SHRDGMR.SHRDGMR_USER_ID AS "AWARDED_BY",
+  min_hist_term AS "FIRST_TERM",
+  SHRDGMR.SHRDGMR_TERM_CODE_GRAD AS "GRADUATION_TERM",
+  SHRDGMR.SHRDGMR_DEGS_CODE AS "DEGREE_STATUS",
+  SHRDGMR.SHRDGMR_PROGRAM AS "PROGRAM_OF_STUDY",
+-- SHRDGMR.SHRDGMR_MAJR_CODE_CONC_1,
+         --INCLUDE IF NECESSARY TO CONFIRM STUDENT HAS SEPARATE CONCENTRATIONS WITHIN MORE THAN ONE DEGREE TYPE
+  --SHRDGMR.SHRDGMR_GRST_CODE AS "GRAD_STATUS",
+  --SHRDGMR.SHRDGMR_GRAD_DATE AS "GRAD_DATE",
+  SHRDGMR.SHRDGMR_ACTIVITY_DATE AS "DATE AWARDED",
+  --SHRDGMR.SHRDGMR_TERM_CODE_COMPLETED,
+  --SHRDGMR.SHRDGMR_TERM_CODE_CTLG_1 AS "CATALOG"
+  spraddr_atyp_code as "Address Type",
+  spraddr_street_line1 || ' ' || spraddr_city || ', '|| spraddr_stat_code || ' ' || spraddr_zip as " Address"
+  
+FROM SHRDGMR,
+  spraddr,
+  SPRIDEN,
+  (select shrtckn_pidm as hist_pidm
+     ,    min(shrtckn_term_code) as min_hist_term
+   from shrtckn
+   group by shrtckn_pidm )  
+WHERE SPRIDEN.SPRIDEN_PIDM           = SHRDGMR.SHRDGMR_PIDM
+AND SPRIDEN.SPRIDEN_PIDM             = SPRADDR_PIDM
+AND SPRADDR_ATYP_Code                = 'LO'   --in ('LO', 'PR')
+AND SPRADDR_TO_DATE                  is Null
+AND SHRDGMR.SHRDGMR_TERM_CODE_GRAD   >=  201880
+AND SHRDGMR.SHRDGMR_DEGS_CODE        = 'AW'
+AND SHRDGMR.SHRDGMR_GRST_CODE       IN ('GR', 'RTS')
+AND SHRDGMR.SHRDGMR_DEGC_CODE       IN ('AAS', 'CRT1', 'CRT2')
+AND SPRIDEN.SPRIDEN_CHANGE_IND      IS  NULL
+AND SHRDGMR.SHRDGMR_MAJR_CODE_1 NOT IN ('UTP', 'UNPA')
+and SHRDGMR.SHRDGMR_TERM_CODE_GRAD = :Graduation_Term
+and hist_pidm = spriden_pidm
+and min_hist_term >= '201880'
+ORDER BY SPRIDEN.SPRIDEN_LAST_NAME,
+  SPRIDEN.SPRIDEN_FIRST_NAME;

@@ -1,0 +1,138 @@
+
+-- Created By: Kevin Thomas, Assistant Registrar
+--       Date: January 25, 2019
+--    Purpose: This query looks for Graduates and potential graduates to send to Jostens
+--             They requested a list of students that graduated in the 201880 semester and 
+--             are potential graduates for 201910, and 201950.
+--       Note: This script doesn't include studens with a GRN grad status...kt...3.18.21
+
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       shrdgmr_term_code_grad as "Grad Term",
+       shrdgmr_degs_code as "Award Status",
+       shrdgmr_grst_code as "Grad Code",
+       shrdgmr_grad_date as "Grad Date",
+       shrdgmr_acyr_code_bulletin as "Catalog",
+       shrdgmr_program as "Program Code",
+       shrdgmr_degc_code as "Degree",
+       shrdgmr_majr_code_1 as "Major",
+       shrdgmr_majr_code_conc_1 as "Conc",
+       goremal_emal_code as Email,
+       GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+       
+from spriden,shrdgmr,goremal
+where spriden_change_ind IS NULL
+and   spriden_pidm = shrdgmr_pidm
+and shrdgmr_pidm = spriden_pidm
+--and   shrdgmr_term_code_grad = :Grad_Term
+and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+--and   shrdgmr_term_code_grad IN ('201580','201610','201650')
+--and   shrdgmr_grst_code = 'GR'
+--and   shrdgmr_grst_code = :Grad_Code
+and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')
+and   shrdgmr_grst_code IS NOT NULL
+--and   shrdgmr_program = :Program_Code
+--and   shrdgmr_program = 'AAS_ECED'
+and shrdgmr_degs_code IN ('PN', 'AW')
+and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
+--and   shrdgmr_degc_code = :Degree
+and spriden_pidm = GOREMAL_PIDM
+and goremal_emal_code IN ('CAMP','PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+order by spriden_last_name,spriden_first_name,shrdgmr_degc_code,shrdgmr_program;
+
+
+----sub blocks for PR and LO addresses plus CAMP and Preferred PERS email address ....by Chuck Hackney
+
+
+
+
+select distinct spriden_id as "ID",
+      spriden_first_name as "First Name",
+       spriden_last_name as "Last Name",
+       
+      /* shrdgmr_term_code_grad as "Grad Term",
+       shrdgmr_degs_code as "Award Status",
+       shrdgmr_grst_code as "Grad Code",
+       shrdgmr_grad_date as "Grad Date",
+       shrdgmr_acyr_code_bulletin as "Catalog",
+       shrdgmr_program as "Program Code",
+      shrdgmr_degc_code as "Degree",
+       shrdgmr_majr_code_1 as "Major",
+       shrdgmr_majr_code_conc_1 as "Conc", */
+       lo_street1 as "Primary Address",
+      lo_street2 as "Primary Address (cont)",
+      lo_city as "City",
+      lo_state as "State",
+      lo_zip as "Zip",
+      lo_country as "Country",
+      camp_email as "Email Address",
+       pr_street1 as "Secondary Address",
+      pr_street2 as "Secondary Address (cont)",
+      pr_city as "Secondary City",
+      pr_state as "Secondary State",
+      pr_zip as "Secondary Zip",
+      pr_country as "Secondary Country",
+      pers_email as "Secondary Email"
+                    
+from spriden
+,    shrdgmr
+/*campus email subquery*/
+,    (select goremal_pidm as camp_email_pidm
+      ,      goremal_email_address as camp_email
+      from goremal
+      where goremal_emal_code = 'CAMP'
+      and goremal_status_ind = 'A')  
+/*pers email subquery*/
+,    (select goremal_pidm as pers_email_pidm
+      ,      goremal_email_address as pers_email                 
+      from goremal
+      where goremal_emal_code = 'PERS'
+      and goremal_status_ind = 'A'
+      and goremal_preferred_ind = 'Y')  
+/*PR address subquery*/
+,    (select spraddr_pidm as pr_pidm
+      ,      spraddr_street_line1 as pr_street1
+      ,      spraddr_street_line2 as pr_street2
+      ,      spraddr_city as pr_city
+      ,      spraddr_stat_code as pr_state
+      ,      spraddr_zip as pr_zip
+      ,      spraddr_natn_code as pr_country
+      from spraddr
+      where spraddr_atyp_code = 'PR'
+      and spraddr_status_ind is null
+      and spraddr_to_date is null) 
+/*LO address subquery*/
+,    (select spraddr_pidm as lo_pidm
+      ,      spraddr_street_line1 as lo_street1
+      ,      spraddr_street_line2 as lo_street2
+      ,      spraddr_city as lo_city
+      ,      spraddr_stat_code as lo_state
+      ,      spraddr_zip as lo_zip
+      ,      spraddr_natn_code as lo_country
+      from spraddr
+      where spraddr_atyp_code = 'LO'
+      and spraddr_status_ind is null
+      and spraddr_to_date is null)      
+where spriden_change_ind is null
+and spriden_pidm = shrdgmr_pidm
+and camp_email_pidm (+) = spriden_pidm 
+and pers_email_pidm (+) = spriden_pidm
+and pr_pidm (+) = spriden_pidm
+and lo_pidm (+) = spriden_pidm
+/*and   shrdgmr_term_code_grad = :Grad_Term*/
+and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+/*and   shrdgmr_term_code_grad IN ('201580','201610','201650')
+and   shrdgmr_grst_code = 'GR'
+and   shrdgmr_grst_code = :Grad_Code*/
+and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')  --Excludes GRN Students
+and   shrdgmr_grst_code IS NOT NULL
+/*and   shrdgmr_program = :Program_Code
+and   shrdgmr_program = 'AAS_ECED'*/
+and shrdgmr_degs_code IN ('PN', 'AW')
+and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
+/*and   shrdgmr_degc_code = :Degree*/
+order by spriden_last_name,spriden_first_name;
+

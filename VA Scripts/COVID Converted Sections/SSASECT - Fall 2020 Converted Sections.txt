@@ -1,0 +1,21 @@
+-- Author: Kevin Thomas, Interim Registrar
+--   Date: 24-AUG-2020
+--Purpose: This query returns sections that have been converted to virtual 
+--         due to the corona virus pandemic.  The VA approves these sections
+--         to count as residential for MHA/BAH
+
+
+--desc ssbsect;
+
+Select 'Fall 2020' as "Term",
+        SSBSECT_CRN as "CRN",
+        SSBSECT_SUBJ_CODE as "Subject",
+        SSBSECT_CRSE_NUMB as "Course",
+        SSBSECT_INSM_CODE as "Instructional Method",
+        GTVINSM_DESC as "Description"
+
+From ssbsect, gtvinsm
+Where ssbsect_insm_code = gtvinsm_code
+      and SSBSECT_INSM_CODE  in ('NCM', 'OWY')--, 'HYB')
+
+Order by    SSBSECT_SUBJ_CODE,    SSBSECT_CRSE_NUMB;

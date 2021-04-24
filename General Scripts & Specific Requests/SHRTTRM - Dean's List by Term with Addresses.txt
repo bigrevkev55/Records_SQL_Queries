@@ -1,0 +1,42 @@
+ --Author:  Drew Kovacs, Technical Clerk
+--   Date:  04-FEB-2020
+--Purpose:  The query returns students that should be on the Dean's list (>= 3.5 GPA, Degree seeking, half time at minimum, only for college level courses) for the Marketing Department.
+--Includes students' local address
+ --  Note:  Dean's list indicator is used because it guarantees that the student is degree seeking. 
+ --  Note:  The list is sorted by last name then first name.
+
+
+select distinct spriden_id as "A Number",
+                spriden_last_name as "Last",
+                spriden_first_name as "First",
+                SPBPERS_CONFID_IND as "Confid.",
+               -- SHRTTRM_TERM_CODE as "Term",
+                --trunc (shrtgpa_gpa, 2) as "Term GPA",
+                 -- spraddr_atyp_code as "Address Type",
+  spraddr_street_line1 || ' ' || spraddr_city || ', '|| spraddr_stat_code || ' ' || spraddr_zip as " Address"
+--               CASE When trunc (shrtgpa_gpa, 2) < '4.0'  --dont' have to worry about someone with less than 3.5GPA because of Dean's List attribute on SHAINST
+--                     then 'Deans List'
+--                     when trunc (shrtgpa_gpa, 2) > '3.9999999999'
+--                     then 'Presidents List'
+--                     Else null
+--                     End as "Academic Standing"    Only needed if President's list is added
+              
+from spriden, shrttrm, shrtgpa, spraddr, spbpers
+
+where   spriden_pidm = shrttrm_pidm 
+   and  spriden_pidm = shrtgpa_pidm
+   and  spriden_pidm = spraddr_pidm (+)
+   and  spriden_pidm = spbpers_pidm
+   and  spriden_change_ind is NULL
+   --and SPBPERS_CONFID_IND <>'Y'
+   and (SPBPERS_CONFID_IND is null or SPBPERS_CONFID_IND = 'N')
+   AND SPRADDR_ATYP_Code  (+)              = 'LO'  --in ('LO', 'PR')
+   AND SPRADDR_TO_DATE     (+)             is Null
+   AND SPRADDR_STATUS_IND (+) is NULL 
+   and  shrttrm_term_code = :Term
+   and  shrttrm_term_code = shrtgpa.SHRTGPA_TERM_CODE
+   and  SHRTTRM_ASTD_CODE_DL = 'DL'
+   and shrtgpa_levl_code = 'UG'
+  -- and  trunc (shrtgpa_gpa,2)  < =  '4.0'  --commented out because there is no need to check GPA due to Dean's List Attribute on SHAINST
+   and  shrtgpa_gpa_type_ind = 'I'  --I = Institutional GPA and T = Transfer GPA
+   order by 4, 2,3;

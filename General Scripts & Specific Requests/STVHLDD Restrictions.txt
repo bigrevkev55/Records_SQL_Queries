@@ -1,0 +1,17 @@
+--Author:  Kevin Thomas, Interim Registrar
+--Date:    25-JAN-2021
+--Purpose: This query returns hold codes and description by the modules they impact
+
+--DESC STVHLDD;
+
+SELECT stvhldd_code Code,
+       stvhldd_desc Description,
+       STVHLDD_REG_HOLD_IND as "Registration Restricted",
+       STVHLDD_TRANS_HOLD_IND as "Transcript Restricted",
+       STVHLDD_GRAD_HOLD_IND as "Graduation Restricted"
+
+From stvhldd
+
+Where STVHLDD_Code is NOT NULL
+
+Order by STVHLDD_REG_HOLD_IND, STVHLDD_TRANS_HOLD_IND, STVHLDD_GRAD_HOLD_IND;

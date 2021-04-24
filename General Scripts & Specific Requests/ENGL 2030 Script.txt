@@ -1,0 +1,42 @@
+--Author:   Kevin Thomas, Assistant Registrar
+--          Chuck Hackney, Systems Analyst I (Wrote subquery)
+--Date:     12-MAR-2019
+--Purpose:  This script pulls a list of students that have taken ENGL 2030 more than one time
+
+
+
+
+SELECT spriden.SPRIDEN_ID AS "Student ID",
+  MAX(spriden.SPRIDEN_LAST_NAME)
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME AS "Full Name",
+  shrtckn.SHRTCKN_TERM_CODE     AS "Term",
+  shrtckn.SHRTCKN_SUBJ_CODE
+  || ' '
+  || shrtckn.SHRTCKN_CRSE_NUMB      AS "Rubric",
+  shrtckn.SHRTCKN_CRSE_TITLE        AS "Title",
+  shrtckn.SHRTCKN_REPEAT_COURSE_IND AS "Repeat"
+FROM shrtckn,
+  spriden
+WHERE spriden.SPRIDEN_PIDM = shrtckn.SHRTCKN_PIDM
+AND spriden.SPRIDEN_ID LIKE 'A00%'
+AND shrtckn.SHRTCKN_SUBJ_CODE   = 'ENGL'
+AND shrtckn.SHRTCKN_CRSE_NUMB   = '2030'
+AND spriden.SPRIDEN_CHANGE_IND IS NULL
+AND (SELECT COUNT(*)
+  FROM shrtckn
+  WHERE shrtckn.SHRTCKN_PIDM    = spriden.SPRIDEN_PIDM
+  AND shrtckn.SHRTCKN_SUBJ_CODE = 'ENGL'
+  AND shrtckn.SHRTCKN_CRSE_NUMB = '2030') > 1
+GROUP BY spriden.SPRIDEN_ID,
+  shrtckn.SHRTCKN_TERM_CODE,
+  shrtckn.SHRTCKN_SUBJ_CODE
+  || ' '
+  || shrtckn.SHRTCKN_CRSE_NUMB,
+  shrtckn.SHRTCKN_CRSE_TITLE,
+  shrtckn.SHRTCKN_REPEAT_COURSE_IND,
+  spriden.SPRIDEN_FIRST_NAME,
+  shrtckn.SHRTCKN_SUBJ_CODE,
+  shrtckn.SHRTCKN_CRSE_NUMB
+ORDER BY "Repeat" DESC Nulls Last, "Full Name",
+  "Term";

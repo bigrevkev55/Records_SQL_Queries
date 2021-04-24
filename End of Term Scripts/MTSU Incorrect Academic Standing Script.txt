@@ -1,0 +1,426 @@
+-- Author:  Theresa Thomas, MTSU Director of Enrollment Management
+--   Date:  16-DEC-2020
+--Purpose:  Finds students whose Academic Standing was not calculated correctly
+--          due to ellucian Banner defect in 202080 Q3 release.
+
+
+
+
+ 
+
+--50> & Good Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '50' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours >= 50
+and a.shrlgpa_gpa < 1.9995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours >= 50
+and b.shrlgpa_gpa > 1.9994
+and b.shrlgpa_pidm = sfrstcr_pidm)
+
+UNION
+--30 <50 & Good Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '30' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours >= 30
+and a.shrlgpa_gpa_hours < 50
+and a.shrlgpa_gpa < 1.7995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours >= 30
+and b.shrlgpa_gpa_hours < 50
+and b.shrlgpa_gpa > 1.7994
+and b.shrlgpa_pidm = sfrstcr_pidm)
+
+UNION
+-- <30 & Good Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '00' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours < 30
+and a.shrlgpa_gpa < 1.4995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours < 30
+and b.shrlgpa_gpa > 1.4994
+and b.shrlgpa_pidm = sfrstcr_pidm)  --desc shrlgpa
+
+UNION
+
+--50> & Below Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '50' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours >= 50
+and a.shrlgpa_gpa > 1.9995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours >= 50
+and b.shrlgpa_gpa < 1.9994
+and b.shrlgpa_pidm = sfrstcr_pidm)
+
+UNION
+--30 <50 & Below Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '30' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours >= 30
+and a.shrlgpa_gpa_hours < 50
+and a.shrlgpa_gpa > 1.7995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours >= 30
+and b.shrlgpa_gpa_hours < 50
+and b.shrlgpa_gpa < 1.7994
+and b.shrlgpa_pidm = sfrstcr_pidm)
+
+UNION
+-- <30 & Below Standing
+select distinct spriden_pidm, spriden_id, SPRIDEN_LAST_NAME||', '||SPRIDEN_FIRST_NAME||' '||SPRIDEN_MI AS NAME,
+case when sfrstcr_pidm is not null then '00' end Rule
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is null 
+and sfrstcr_term_code = '202080'
+and exists
+(select * from shrtgpa
+where shrtgpa_pidm = sfrstcr_pidm
+and shrtgpa_term_code = sfrstcr_term_code
+and shrtgpa_gpa_type_ind = 'C'
+and shrtgpa_levl_code = 'UG'
+and shrtgpa_gpa_hours > 0
+and shrtgpa_gpa < 2.0)
+and exists
+(select * from shrlgpa a
+where a.shrlgpa_gpa_type_ind = 'O'
+and a.shrlgpa_levl_code = 'UG'
+and a.shrlgpa_gpa_hours < 30
+and a.shrlgpa_gpa > 1.4995
+and a.shrlgpa_pidm = sfrstcr_pidm)
+and exists
+(select * from shrlgpa b
+where b.shrlgpa_gpa_type_ind = 'A'
+and b.shrlgpa_gpa_hours < 30
+and b.shrlgpa_gpa < 1.4994
+and b.shrlgpa_pidm = sfrstcr_pidm)
+order by rule, name;
+
+ 
+/*
+ 
+
+Argos Report looking for incorrect academic standing which might result from grade changes:
+
+SELECT SHRTTRM_TERM_CODE AS TERM, SPRIDEN_ID,
+
+spriden_last_name ||  ', ' ||spriden_first_name || ' ' ||spriden_mi as name,
+
+C.SGBSTDN_TERM_CODE_ASTD AS ASTD_TERM2,
+
+C.SGBSTDN_ASTD_CODE AS ASTD2,
+
+SHRTTRM_TERM_CODE AS LAST_ASTD_TERM,
+
+SHRTTRM_ASTD_CODE_END_OF_TERM AS LAST_ASTD,
+
+SHRTGPA_GPA_HOURS,
+
+SHRTGPA_GPA,
+
+SHRLGPA_GPA_HOURS,
+
+SHRLGPA_GPA,
+
+SHTTRAN_PRINT_DATE AS TRANSCRIPT_MAILED,
+
+CASE WHEN INCOMPLETE.SHRTCKG_PIDM IS NOT NULL THEN 'Y' ELSE '' END REMAINING_I_GRD
+
+ 
+
+FROM SHRTCKG C, SPRIDEN, SGBSTDN C, SHRTGPA, SHRLGPA, SHRTTRM, SHTTRAN, SGBSTDN A,
+
+(SELECT * FROM SHRTCKG A
+
+WHERE A.SHRTCKG_GRDE_CODE_FINAL = 'I'
+
+AND A.SHRTCKG_SEQ_NO =
+
+(SELECT MAX(B.SHRTCKG_SEQ_NO)
+
+   from shrtckg B
+
+     WHERE B.SHRTCKG_PIDM = A.SHRTCKG_PIDM
+
+     AND B.SHRTCKG_TCKN_SEQ_NO = A.SHRTCKG_TCKN_SEQ_NO
+
+     AND B.SHRTCKG_TERM_CODE = A.SHRTCKG_TERM_CODE))INCOMPLETE
+
+ 
+
+WHERE SHRTTRM_PIDM = SPRIDEN_PIDM
+
+AND SPRIDEN_CHANGE_IND Is NULL
+
+AND SHRTTRM_PIDM = A.SGBSTDN_PIDM
+
+AND SHRTTRM_PIDM = C.SGBSTDN_PIDM (+)
+
+AND SHRTTRM_TERM_CODE = C.SGBSTDN_TERM_CODE_ASTD (+)
+
+AND SHRTTRM_PIDM = INCOMPLETE.SHRTCKG_PIDM (+)
+
+AND SHRTTRM_TERM_CODE = INCOMPLETE.SHRTCKG_TERM_CODE (+)
+
+AND SHRTTRM_PIDM = SHRTGPA_PIDM
+
+AND SHRTTRM_TERM_CODE = SHRTGPA_TERM_CODE
+
+AND SHRTTRM_PIDM = SHRLGPA_PIDM
+
+AND SHRTTRM_PIDM = c.SHRTCKG_PIDM
+
+AND A.SGBSTDN_LEVL_CODE = 'UG'
+
+AND A.SGBSTDN_TERM_CODE_EFF =
+
+(SELECT MAX(B.SGBSTDN_TERM_CODE_EFF)
+
+   FROM SGBSTDN B
+
+  WHERE B.SGBSTDN_PIDM = A.SGBSTDN_PIDM
+
+      AND B.SGBSTDN_TERM_CODE_EFF  <= :TERM)
+
+AND shrlgpa_levl_code = 'UG'
+
+AND shrtgpa_levl_code = 'UG'
+
+AND SHRTGPA_GPA_TYPE_IND ='C'
+
+AND SHRLGPA_GPA_TYPE_IND ='A'
+
+AND SHRTTRM_TERM_CODE = :TERM
+
+AND SHRTTRM_PIDM = SHTTRAN_PIDM (+)
+
+AND SHRTTRM_TERM_CODE = SHTTRAN_TERM (+)
+
+GROUP BY SHRTTRM_TERM_CODE, SPRIDEN_ID,
+
+spriden_last_name, spriden_first_name, spriden_mi, INCOMPLETE.SHRTCKG_PIDM,
+
+C.SGBSTDN_TERM_CODE_ASTD, C.SGBSTDN_ASTD_CODE,
+
+SHRTTRM_TERM_CODE, SHRTTRM_ASTD_CODE_END_OF_TERM, SHRTGPA_GPA_HOURS, SHRTGPA_GPA, SHRLGPA_GPA_HOURS, SHRLGPA_GPA, SHTTRAN_PRINT_DATE
+
+HAVING
+
+(SHRTTRM_TERM_CODE = :TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM  Like 'P%' Or SHRTTRM_ASTD_CODE_END_OF_TERM Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0 AND SHRTGPA_GPA >= 1.9995)
+
+AND (SHRLGPA_GPA_HOURS < 30 AND SHRLGPA_GPA < 1.4995))
+
+OR
+
+(SHRTTRM_TERM_CODE  = :TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM  Like 'P%' Or SHRTTRM_ASTD_CODE_END_OF_TERM Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0 AND SHRTGPA_GPA >= 1.9995)
+
+AND (SHRLGPA_GPA_HOURS >=30
+
+And SHRLGPA_GPA_HOURS < 50 AND SHRLGPA_GPA < 1.7995))
+
+OR
+
+(SHRTTRM_TERM_CODE =:TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM Like 'P%' Or
+
+SHRTTRM_ASTD_CODE_END_OF_TERM Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0 AND SHRTGPA_GPA >= 1.9995)
+
+AND (SHRLGPA_GPA_HOURS >= 50 AND SHRLGPA_GPA < 1.9995))
+
+OR
+
+(SHRTTRM_TERM_CODE =:TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM Like 'P%' Or SHRTTRM_ASTD_CODE_END_OF_TERM Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0)
+
+AND (SHRLGPA_GPA_HOURS < 30 AND SHRLGPA_GPA >= 1.4995))
+
+OR
+
+(SHRTTRM_TERM_CODE =:TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM Like 'P%' Or SHRTTRM_ASTD_CODE_END_OF_TERM Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0)
+
+AND (SHRLGPA_GPA_HOURS >= 30
+
+And SHRLGPA_GPA_HOURS < 50)
+
+AND SHRLGPA_GPA >= 1.7995)
+
+OR
+
+(SHRTTRM_TERM_CODE =:TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM  Like 'P%' Or SHRTTRM_ASTD_CODE_END_OF_TERM  Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0)
+
+AND (SHRLGPA_GPA_HOURS >= 50 AND SHRLGPA_GPA >= 1.9995))
+
+OR
+
+(SHRTTRM_TERM_CODE = :TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM  Not Like 'P%'
+
+And SHRTTRM_ASTD_CODE_END_OF_TERM Not Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0)
+
+AND (SHRTGPA_GPA < 1.9995)
+
+AND (SHRLGPA_GPA_HOURS < 30 AND SHRLGPA_GPA < 1.4995))
+
+OR
+
+(SHRTTRM_TERM_CODE =:TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM Not Like 'P%' And SHRTTRM_ASTD_CODE_END_OF_TERM Not Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0 AND SHRTGPA_GPA < 1.9995)
+
+AND (SHRLGPA_GPA_HOURS >=30
+
+And SHRLGPA_GPA_HOURS < 50 AND SHRLGPA_GPA < 1.7995))
+
+OR
+
+(SHRTTRM_TERM_CODE = :TERM
+
+AND (SHRTTRM_ASTD_CODE_END_OF_TERM  Not Like 'P%'
+
+And SHRTTRM_ASTD_CODE_END_OF_TERM Not Like 'S%')
+
+AND (SHRTGPA_GPA_HOURS <> 0 AND SHRTGPA_GPA < 1.9995)
+
+AND (SHRLGPA_GPA_HOURS >= 50 AND SHRLGPA_GPA < 1.9995))
+
+ORDER BY REMAINING_I_GRD desc, NAME;
+
+ 
+
+--Term Parameter Variable:
+
+SELECT MAX(STVTERM.STVTERM_CODE) AS TERM
+
+FROM SATURN.STVTERM STVTERM
+
+WHERE STVTERM.STVTERM_START_DATE < ADD_MONTHS(SYSDATE,12)
+
+AND (STVTERM.STVTERM_END_DATE) < SYSDATE
+
+*/
+
+*/

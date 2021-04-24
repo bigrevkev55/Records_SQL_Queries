@@ -1,0 +1,65 @@
+
+-- Author: Kevin Thomas, Assitant Director of Records and Registration
+--   Date: 28-OCT-2019
+--Purpose:  This script will return a list of all students receiving VA benefits that have enrollment status changes on SFAREGS/SFASTCA.
+--   Note:  This script was written to assist in working the daily SYRDVET report.  When prompted for a date
+--          enter the last day VA once enrollment status changes were made.
+--  Edits:  1. Added the following line in the select statement:  SFRSTCA_MESSAGE as "Message",
+--          which will allow us to see any messages given (including final grade updates)...kt...12/9/19
+--          2. Added DESC STVCAMP, Campus Code, Campus Description, and changed the script to only look for 
+--             SFRSTCA_RSTS_CODE not like 'R%'  (courses that students have dropped or withdrawn from.)..kt..12/9/2020   
+--          3. Added subquery to exclude entered grades from showing and clogging up the report...kt...3/25/2021
+
+-- Script:
+
+--desc ssbsect;
+--desc sfrstca;
+--dsec STVCAMP;
+select SFRSTCA_TERM_CODE as "Term",
+       spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SFRSTCA_CAMP_CODE as "Campus",
+       stvcamp_desc as "Description",
+       SFRSTCA_CRN as "CRN",
+       SSBSECT_PTRM_CODE as "Part of Term",
+       SFRSTCA_CREDIT_HR AS "Hours",
+       SSBSECT_SUBJ_CODE Subject,
+       SSBSECT_CRSE_NUMB Course,
+       SSBSECT_SEQ_NUMB Section,  
+       SFRSTCA_RSTS_CODE as "Registration Code",
+       SFRSTCA_MESSAGE as "Message",
+       SFRSTCA_ACTIVITY_DATE as "Activity Date",
+       sgrvetn_vetc_code as "Veteran Type",
+       SFRSTCA_USER as "User"      
+from spriden, SFRSTCA, sgrvetn, ssbsect, stvcamp
+Where spriden_change_ind is NULL
+and (spriden_id = :A_Number or spriden_id like :A_Number)
+and spriden_pidm = sgrvetn_pidm
+and sgrvetn_pidm = SFRSTCA_pidm
+and sfrstca_camp_code = stvcamp_code
+and SSBSECT_CRN = SFRSTCA_CRN
+and sgrvetn_vetc_code IN ('T','U','1', '5', 'C', 'D', 'H', 'L' ,'7')
+and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+--and SFRSTCA_RSTS_CODE not like 'R%'
+and ssbsect_term_code = sgrvetn_term_code_va
+and sgrvetn.sgrvetn_term_code_VA = SFRSTCA_TERM_CODE
+--and (SFRSTCA_RSTS_CODE like 'D%' or SFRSTCA_RSTS_CODE like 'W%')
+and SFRSTCA_SOURCE_CDE = 'BASE'
+and SFRSTCA_ACTIVITY_DATE >= :DD_MON_YYYY
+and SFRSTCA_PIDM not in(
+     SELECT SFRSTCA_PIDM 
+     FROM SFRSTCA
+     WHERE SFRSTCA_TERM_CODE = :Term
+      and SFRSTCA_MESSAGE = any(
+      'Final grade updated to A',
+      'Final grade updated to B',
+      'Final grade updated to C',
+      'Final grade updated to D',
+      'Final grade updated to F'
+      ))    
+Order by SFRSTCA_ACTIVITY_DATE DESC, spriden_last_name,spriden_first_name;
+
+
+
+

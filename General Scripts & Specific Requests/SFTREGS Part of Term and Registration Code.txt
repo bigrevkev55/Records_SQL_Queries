@@ -1,0 +1,14 @@
+--Written by Drew Kovacs, Technical Clerk
+--Purpose: Identidy students with a specific course registration code from a specific term and part of term.
+select distinct spriden_id as "A Number",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       sftregs_rsts_code as "DC"
+       
+from sftregs, spriden
+
+where spriden_pidm = SFTREGS_PIDM
+and spriden_change_ind IS NULL
+and SFTREGS_TERM_CODE = '202010'
+and SFTREGS_PTRM_CODE = '7'
+and SFTREGS_RSTS_CODE = 'DC';

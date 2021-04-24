@@ -1,0 +1,25 @@
+
+--Created by Time Ewell to pull student debt students from SOAHOLD.
+
+
+
+select SPRIDEN_ID,
+       SPRIDEN_LAST_NAME,
+       SPRIDEN_FIRST_NAME,
+       STVHLDD_DESC,
+       case when (select COUNT(sfrstcr_pidm)
+           from sfrstcr
+           where sfrstcr_rsts_code <> 'DC'
+                 and sfrstcr_pidm =SPRIDEN_PIDM
+                                and sfrstcr_term_code in (select stvterm_code
+                                           from stvterm
+                                           where sysdate between stvterm_start_date and stvterm_end_date)) = 0
+           then 'No' Else 'Yes' End CurrentlyEnrolled
+  from SPRHOLD,
+       SPRIDEN,
+       STVHLDD
+where ( SPRHOLD_PIDM = SPRIDEN_PIDM
+         and STVHLDD_CODE = SPRHOLD_HLDD_CODE)
+   and ( SPRIDEN_CHANGE_IND is null
+         and ( SPRHOLD_HLDD_CODE = 'XO'
+           or SPRHOLD_HLDD_CODE = 'XR' ) )

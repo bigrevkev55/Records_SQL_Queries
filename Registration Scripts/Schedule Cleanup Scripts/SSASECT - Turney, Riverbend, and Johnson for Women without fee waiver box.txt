@@ -1,0 +1,32 @@
+--Author:  Kevin Thomas
+--Date: 14-JAN-2021
+--Description: This query returns prision sections that do not have the fee waiver box checked  
+--             on SSASECT.  Per the Bursar, all prision sections must have this box checked.  
+ 
+ 
+ --desc stvcamp
+select ssbsect_term_code as "Term",
+       ssbsect_camp_code as "Campus",
+       STVCAMP_DESC as "Campus Name",
+       ssbsect_ptrm_code as "Part of Term",
+       ssbsect_crn as "CRN",
+       ssbsect_subj_code as "SUBJ",
+       ssbsect_crse_numb as "NUMBER",
+       ssbsect_seq_numb as "Section Number",
+       ssbsect_tuiw_ind as "Tuition Waiver"
+
+from ssbsect--,  
+inner join stvcamp on stvcamp_code = ssbsect_camp_code
+where (ssbsect_term_code IN :Term
+--and   ssbsect_ptrm_code in ('R', 'RA1', 'RA2') --comment out to to see all parts of term
+--and   (ssbsect_tuiw_ind != 'Y' or ssbsect_tuiw_ind is NULL)
+--and   SSBSECT_TUIW_IND = 'Y'  --Uncomment this line and commment out the line above to see courses that do have the box checked
+and ssbsect_camp_code = 'H2J') 
+
+or 
+
+(ssbsect_term_code IN :Term
+--and   ssbsect_ptrm_code in ('R', 'RA1', 'RA2') --comment out to to see all parts of term
+--and   (ssbsect_tuiw_ind != 'Y' or ssbsect_tuiw_ind is NULL)
+--and   SSBSECT_TUIW_IND = 'Y'  --Uncomment this line and commment out the line above to see courses that do have the box checked
+and ssbsect_seq_numb like 'X%');

@@ -1,0 +1,24 @@
+--Author:     Kevin Thomas, Assitant Director of Records and Registration
+--Date:       18-MARCH-2019
+--Purpose:    This script queries SSASECT for Saturday 
+--             courses (and the only meeting day is Saturday) by prompted 
+--            term and part of term.
+
+
+
+select SSBSECT_TERM_CODE AS Term,
+       SSBSECT_CRN AS CRN,
+       SSBSECT_SUBJ_CODE AS Subject,
+       SSBSECT_CRSE_NUMB AS Course,
+       SSBSECT_CRSE_NUMB AS "Number",
+       SSBSECT_PTRM_CODE AS "Part of Term",
+       SSRMEET_SAT_DAY   AS "Saturday",
+       SSBSECT_CAMP_CODE AS Campus,
+       SSBSECT_SEATS_AVAIL AS "Available Seats" 
+FROM SSBSECT, SSRMEET
+WHERE SSBSECT_TERM_CODE = :Term
+      AND SSBSECT_PTRM_CODE = :Part_of_Term
+      AND SSRMEET_TERM_CODE = SSBSECT_TERM_CODE
+      AND SSRMEET_CRN = SSBSECT_CRN
+      AND SSRMEET_SAT_DAY = 'S'
+ORDER BY 3,4;

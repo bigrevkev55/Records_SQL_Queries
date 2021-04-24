@@ -1,0 +1,19 @@
+--Author:     Kevin Thomas, Assitant Director of Records and Registration
+--Date:       18-JUNE-2020
+--Purpose:    This query returns sections of courses that have the MTSU RODE code (R24) for 202010, 202050, 202080
+
+--desc ssbsect;
+--desc stvcamp;
+
+SELECT SSBSECT_TERM_CODE  Term,
+       SSBSECT_CRN  CRN,
+       SSBSECT_SUBJ_CODE  Subject,
+       SSBSECT_CRSE_NUMB  Course,
+       SSBSECT_CAMP_CODE  Campus,
+       STVCAMP_DESC  Description
+FROM SSBSECT
+Inner Join STVCAMP on STVCAMP_code = SSBSECT_CAMP_CODE    
+WHERE 
+       SSBSECT_TERM_CODE in ('202010', '202050', '202080')
+       AND SSBSECT_CAMP_CODE = '24R' 
+ORDER BY SSBSECT_TERM_CODE,SSBSECT_SUBJ_CODE;

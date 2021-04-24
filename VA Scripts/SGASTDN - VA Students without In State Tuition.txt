@@ -1,0 +1,35 @@
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    15-JAN-2020
+--Purpose: This query returns VA students who have a residency code on 
+--         SGASTDN that does not charge in-state tuition.  
+
+
+--desc stvresd; --select * from STVRESD
+--desc spriden;
+--desc sgbstdn;
+
+select spriden_id as "ID",
+     SGBSTDN_TERM_CODE_EFF as "Max SGASTDN Term", 
+     spriden_last_name as "Last Name",
+     spriden_first_name as "First Name",
+     SGBSTDN_RESD_CODE as "Residency Code", 
+     stvresd_desc as "Residency Code Description",
+     stvvetc_desc as "Veteran Type"
+     
+from spriden, stvresd, sgrvetn, stvvetc, sgbstdn
+
+where spriden_pidm = sgrvetn_pidm
+      and spriden_pidm = sgbstdn_pidm 
+      And SPRIDEN_CHANGE_IND IS NULL
+      and STVRESD_IN_STATE_IND <> 'I'
+      and stvresd_code = sgbstdn_resd_code
+      and SGRVETN_term_code_va = :Term
+      and SGBSTDN_TERM_CODE_EFF = (select max (SGBSTDN_TERM_CODE_EFF) 
+                                    from sgbstdn
+                                    where sgbstdn_pidm = spriden_pidm)
+      and SGRVETN_VETC_CODE is NOT NULL
+      and stvvetc_code = sgrvetn_vetc_code
+      and sgbstdn_resd_code = stvresd_code
+Order by  spriden_last_name, spriden_first_name;   
+      

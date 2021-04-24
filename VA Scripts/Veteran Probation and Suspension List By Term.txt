@@ -1,0 +1,60 @@
+-- Send output from this script and the script below in separate files
+-- to the VA Coordinator; this script provides a list of students on suspension
+-- as they have to be input into VA-Once manually by the VA Coordinator.
+select distinct sgrvetn_term_code_va as "Term",
+       shrttrm_astd_code_end_of_term as "Academic Standing",
+       spriden_id                    as "ID",
+       spriden_last_name             as "Last Name",
+       spriden_first_name            as "First Name",
+       sgrvetn_vetc_code             as "VA Chapter",
+       sgrvetn_cert_hours            as "VA Cert Hours",
+       sgrvetn_cert_date             as "VA Cert Date"
+from spriden,sgrvetn,shrttrm
+where spriden_change_ind IS NULL
+and   spriden_pidm = sgrvetn_pidm
+and   spriden_pidm = shrttrm_pidm
+--and   sgrvetn_term_code_va IN ('200780','200810','200850','200880','200910','200950')
+and   sgrvetn_term_code_va = :Term
+and   sgrvetn_term_code_va = shrttrm_term_code
+and   sgrvetn_vetc_code IS NOT NULL
+and   shrttrm_astd_code_end_of_term IN ('SU','2S','3S','4S') -- Suspension Only
+order by shrttrm_astd_code_end_of_term,sgrvetn_vetc_code,spriden_last_name,spriden_first_name;
+
+-- Created By: Lance Woodard, Registrar
+--       Date: July 29, 2014
+--    Purpose: Reformatted script above to create a file that VA Coordinator can  
+--             upload without having to report each student via VA-Once. This
+--             script only pulls students on probation.
+select stvvetc_desc       as "Benefit Chapter",
+       spbpers_ssn        as "SSN/File Number",
+       ''                 as "Payee",
+       spriden_last_name  as "Last Name",
+       spriden_first_name as "First Name",
+       'FC 1-4-9051-42'   as "Facility Code",
+       '08-AUG-2017'      as "Start Date Academic Probation", -- Input Grade Deadline as the start date for probation
+       spraddr_zip        as "Zip Code Current Address"
+from spriden,sgrvetn,shrttrm,stvastd,stvvetc,spbpers,spraddr c,
+      (select spraddr_pidm
+      ,      min(spraddr_atyp_code) as minatyp 
+      from   spraddr 
+      where  spraddr_status_ind is null 
+      and    spraddr_to_date is null
+      and    spraddr_atyp_code in ('LO','PR')
+      group by spraddr_pidm) b
+where spriden_change_ind IS NULL
+and   c.spraddr_pidm = spriden_pidm
+and   c.spraddr_pidm = b.spraddr_pidm 
+and   c.spraddr_atyp_code = b.minatyp
+and   c.spraddr_status_ind is null
+and   c.spraddr_to_date is null
+and   spriden_pidm = sgrvetn_pidm
+and   spriden_pidm = shrttrm_pidm
+--and   sgrvetn_term_code_va IN ('200780','200810','200850','200880','200910','200950')
+and   spriden_pidm = spbpers_pidm
+and   sgrvetn_term_code_va = :Term
+and   sgrvetn_term_code_va = shrttrm_term_code
+and   sgrvetn_vetc_code IS NOT NULL
+and   sgrvetn_vetc_code = stvvetc_code
+and   shrttrm_astd_code_end_of_term = stvastd_code
+and   shrttrm_astd_code_end_of_term IN ('P1','PS') -- Probation Only
+order by shrttrm_astd_code_end_of_term,sgrvetn_vetc_code,spriden_last_name,spriden_first_name;

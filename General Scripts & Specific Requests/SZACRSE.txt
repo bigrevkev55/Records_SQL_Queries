@@ -1,0 +1,34 @@
+--Author:  Kevin Thoams, Interim Registrar
+--Date:    24-SEP-2020
+--Purpose: This query returns a specific group of students 
+--         that did not have the Tels Exclude box check on SZACRSE
+
+--desc szrcrse;
+--desc SHRTRIT;
+--desc SHRTRCE;
+--desc shrtrcr;
+--desc sb
+
+select SPRIDEN_ID  A_NUMBER,
+       shrtrit_SBGI_CODE as "Code",
+       STVSBGI_DESC as "Description",
+       Spriden_Last_name LAST,
+       Spriden_First_Name FIRST,
+       SHRTRCR_TERM_CODE TERM,
+       SHRTRCR_TRANS_COURSE_NAME as "SUBJ",
+       SHRTRCR_TRANS_COURSE_NUMBERS as "COURSE", 
+       SHRTRCR_TRANS_GRADE as "GRADE",
+       SHRTRCR_ACTIVITY_DATE as "DATE",
+       SHRTRCR_EXCLUDE_TELS_GPA_IND as "TELS_EXCLUDE"
+            
+From SHRTRCR, SPRIDEN, SHRTRIT, STVSBGI     
+where SPRIDEN_PIDM = SHRTRCR_PIDM
+      and STVSBGI_CODE = shrtrit_SBGI_CODE
+      and spriden_pidm = SHRTRIT_PIDM
+      and spriden_change_ind is NULL
+      --and SHRTRCR_USER_ID = 'MOORE_C'
+      and SHRTRIT_SBGI_CODE in ('999901', '999902', '999905')
+      and SHRTRCR_EXCLUDE_TELS_GPA_IND IS NULL --Select distinct SHRTRCR_EXCLUDE_TELS_GPA_IND from shrtrcr;
+      and SHRTRCR_TRANS_GRADE = 'P'
+      and SHRTRCR_ACTIVITY_DATE  > '01-JUL-2020'
+Order by SHRTRCR_ACTIVITY_DATE DESC ;	--select * from shrtrcr;	

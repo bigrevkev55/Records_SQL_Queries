@@ -1,0 +1,31 @@
+Author:  Kevin Thomas, Assistant Registrar
+Date:    22-May-2019
+Purpose: The query finds graduates from the AAS_HSTR program by prompted term.   
+
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME  AS "Name",
+  sorlcur.SORLCUR_PROGRAM        AS "Program",
+  shrdgmr.SHRDGMR_GRST_CODE      AS "Graduation Status",
+  shrdgmr.SHRDGMR_TERM_CODE_GRAD AS "Graduation Term"
+FROM spriden,
+  sorlcur,
+  shrdgmr
+WHERE (spriden.SPRIDEN_ID LIKE 'A00%'
+AND sorlcur.SORLCUR_PROGRAM   = 'AAS_HSTR'
+AND shrdgmr.SHRDGMR_GRST_CODE = 'GR'
+AND spriden.SPRIDEN_PIDM      = sorlcur.SORLCUR_PIDM
+AND shrdgmr.SHRDGMR_PIDM      = spriden.SPRIDEN_PIDM
+AND shrdgmr_pidm = sorlcur_pidm)
+/*OR (spriden.SPRIDEN_ID LIKE 'A00%'
+--AND sorlcur.SORLCUR_PROGRAM   = 'CERT_PSTA'
+AND shrdgmr.SHRDGMR_GRST_CODE = 'GR'
+AND spriden.SPRIDEN_PIDM      = sorlcur.SORLCUR_PIDM
+AND shrdgmr.SHRDGMR_PIDM      = spriden.SPRIDEN_PIDM
+AND shrdgmr_pidm = sorlcur_pidm)*/
+AND shrdgmr.SHRDGMR_TERM_CODE_GRAD = :Graduation_Term
+--and sorlcur.SORLCUR_Term_code = '201910'
+ORDER BY 2

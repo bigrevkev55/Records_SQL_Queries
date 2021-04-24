@@ -1,0 +1,55 @@
+
+--Authors:  Kevin Thomas, Assistant Director of Records and Registration
+          Drew Kovacs, Records Office Technical Clerk
+--Date:     06-SEP-2019
+--Purpos:   This query returns Dual Enrollment Students by high school
+
+
+
+--desc sfrstcr;
+--desc sorlcur;
+--desc sorhsch;
+--desc stvsbgi;
+
+
+SELECT distinct spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME as "Last Name",
+  spriden.SPRIDEN_FIRST_NAME AS "First Name",
+  SORHSCH_SBGI_CODE as "High School Code",
+  STVSBGI_DESC as "High School",
+ --SFRSTCR_CRN as "CRN",
+ -- SFRSTCR_BILL_HR AS "Credit Hrs",
+ -- sgbstdn.sgbstdn_rate_code AS "Rate Code",
+  SORLCUR_ADMT_CODE as "Admit Type"
+  
+FROM spriden,
+    sgbstdn,
+    sfrstcr,
+    sorlcur,
+    sorhsch,
+    stvsbgi
+   
+WHERE spriden.SPRIDEN_PIDM = sgbstdn.SGBSTDN_PIDM
+      AND spriden.SPRIDEN_PIDM = SFRSTCR.SFRSTCR_PIDM
+      AND SGBSTDN.SGBSTDN_PIDM = spriden.SPRIDEN_PIDM
+      AND sorlcur.sorlcur_PIDM = spriden.SPRIDEN_PIDM
+      and stvsbgi_code = SORHSCH_SBGI_CODE
+      and SORHSCH_PIDM = spriden_pidm
+      AND SPRIDEN_CHANGE_IND is NULL
+      --AND SGBSTDN.SGBSTDN_RATE_CODE = 'DUAL'                  
+     AND SORLCUR.SORLCUR_ADMT_CODE = any ('DE', 'DM')
+     AND sgbstdn.sgbstdn_term_code_eff = :Term_code
+     AND spriden_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code = :Term_code)
+     AND SFRSTCR_TERM_CODE = :Term_code 
+     AND SORLCUR_TERM_CODE = :Term_code
+
+ORDER BY STVSBGI_DESC,spriden.SPRIDEN_LAST_NAME;
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+
+
+--Author:  Kevin Thomas, Assistant Director of Records and Registration
+--Date:  19-AUG-2019
+--Purpose:  This query returns a headcount of students by prompted term with at least one credit hour - including audit students
+
+
+
+select (select COUNT (Distinct SFRSTCR_PIDM)  from SFRSTCR where SFRSTCR_TERM_Code = :Term_Code and SFRSTCR_CREDIT_HR > '0') AS "Term Hecadcount"
+
+from dual;*/

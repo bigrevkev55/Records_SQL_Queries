@@ -1,0 +1,86 @@
+--Author:   Kevin Thomas, Assistant Director of Records and Registration
+--Date:     10-APR-2020
+--Purpose:  This query compares the first week of Summer and Fall Registration for 2019 and 2020.  Edit lines 16,28,40,53 SFRSTCR_RSTS_DATES
+
+
+--desc sfrstcr;
+
+
+select 
+
+
+(select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='201950'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '02-APR-2019'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '202050'
+                                             and sfrstcr_rsts_code in 'AU')) AS "201950 First Day Hecadcount" ,
+
+--202050 First Week Registration Count 
+(select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='202050'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '07-APR-2020'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '202050'
+                                             and sfrstcr_rsts_code in 'AU')) AS "202050 First Day Hecadcount" ,
+                                             
+--202150 First Week Registration Count
+(select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='202150'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '06-APR-2021'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '202050'
+                                             and sfrstcr_rsts_code in 'AU')) AS "202150 First Day Hecadcount" ,
+
+--2021980 First Week Registratin Count
+(select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='201980'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '02-APR-2019'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '201980'
+                                             and sfrstcr_rsts_code in 'AU')) AS "201980 First Day Hecadcount" ,
+
+
+--202080 First Week Registratin Count
+(select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='202080'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '07-APR-2020'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '202080'
+                                             and sfrstcr_rsts_code in 'AU')) AS "202080 First Day Hecadcount" ,
+                                             
+ --202180 First Week Registration Count
+ (select COUNT (Distinct SFRSTCR_PIDM)  
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='202180'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '07-APR-2021'    --201950, 201980 Week 1 dates = 4/1/19 - 4/7/19
+                                                       --202050, 202080 Week 1 dates = 4/6/20 - 4/12/20
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '202180'
+                                             and sfrstcr_rsts_code in 'AU')) AS "202180 First Day Hecadcount" 
+                                             
+                                             
+from dual;
+

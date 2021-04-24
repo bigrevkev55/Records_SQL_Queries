@@ -1,0 +1,39 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    29-JUL-2019
+--Purpose: 201980 online CRNs that do not have X_% on SSAPREQ
+
+
+desc ssrrare;
+desc ssbsect;
+
+Select ssbsect_term_code as "Term",
+       SSBSECT_INSM_CODE as "Instructional Method",
+       SSBSECT_CRN as "CRN",
+       SSBSECT_PTRM_CODE as "Part of Term",
+       SSBSECT_SUBJ_CODE as "Subject",
+       SSBSECT_CRSE_NUMB as "Course"
+from ssbsect
+where ssbsect_term_code in '201980'
+      and SSBSECT_INSM_CODE in ('HYB','WEB','RCE','RD1','RD2','RD3')--See GTVINSM - Instructional Method Validation Table
+      and SSBSECT_CRN not in
+        (select SSRRARE_CRN
+         From SSRRARE 
+         Where ssrrare_term_code in '201980'
+               and SSRRARE_AREA like 'X%')
+order by 4,5,3;
+
+
+
+
+---------Courses that have Concurrent Enrollment box checked on SMAAREA (?Compare against SCAPREQ then script above to get list of curses that don't have X_% on SSAPREQ BUT SHOULD?)
+
+desc SMRACAA
+
+select distinct SMRACAA_AREA,
+       SMRACAA_TERM_CODE_EFF,
+       SMRACAA_CONCURRENCY_IND
+       
+from smracaa
+where SMRACAA_CONCURRENCY_IND = 'Y'
+      and smracaa_area like ('Z%')
+order by 1;

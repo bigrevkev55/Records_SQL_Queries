@@ -1,0 +1,14 @@
+-- Created By: Lance Woodard, Registrar
+--       Date: April 24, 2012
+--    Purpose: Script to pull the students for a prompted term with eRate attribute.
+select spriden_id as "ID",
+       sgrsatt_term_code_eff as "Term",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       sgrsatt_atts_code as "Attribute"
+from spriden,sgrsatt
+where spriden_change_ind IS NULL
+and   spriden_pidm = sgrsatt_pidm
+and   sgrsatt_term_code_eff = '&Term'
+and   sgrsatt_atts_code = 'WERT'
+order by spriden_last_name,spriden_first_name;

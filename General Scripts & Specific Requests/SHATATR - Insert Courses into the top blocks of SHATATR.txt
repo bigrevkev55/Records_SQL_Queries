@@ -1,0 +1,33 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    17-MAR-2020
+--Purpose: This script will instert records into SHATAR.  It is for the TBR equivalencies to be placed on on the TBR CC's.  
+
+
+
+
+----Run in TSTX first before PROD
+
+
+
+
+
+
+--desc shbtatc;
+-- select * from shbtatc;
+
+Insert all 
+
+   into shbtatc (SHBTATC_SBGI_CODE,   SHBTATC_PROGRAM, SHBTATC_TLVL_CODE, SHBTATC_SUBJ_CODE_TRNS, SHBTATC_CRSE_NUMB_TRNS, SHBTATC_TERM_CODE_EFF_TRNS, SHBTATC_ACTIVITY_DATE,    SHBTATC_TRNS_TITLE,     SHBTATC_TRNS_LOW_HRS,    SHBTATC_TRNS_HIGH_HRS)       
+             Values  ('00274'     ,  '......',               'UG',           'HMGT',                  '2280'  ,                 '000000' ,                 SYSDATE,               'Hotel Operations' ,         '3'    ,                      '3'      )
+   
+   into shbtatc (SHBTATC_SBGI_CODE,   SHBTATC_PROGRAM, SHBTATC_TLVL_CODE, SHBTATC_SUBJ_CODE_TRNS, SHBTATC_CRSE_NUMB_TRNS, SHBTATC_TERM_CODE_EFF_TRNS, SHBTATC_ACTIVITY_DATE,    SHBTATC_TRNS_TITLE,     SHBTATC_TRNS_LOW_HRS,    SHBTATC_TRNS_HIGH_HRS)       
+             Values  ('000319'     ,  '......',               'UG',           'HMGT',                  '2280' ,                  '000000'  ,                SYSDATE,               'Hotel Operations' ,         '3'    ,                      '3'      )
+   
+  into shbtatc (SHBTATC_SBGI_CODE,   SHBTATC_PROGRAM, SHBTATC_TLVL_CODE, SHBTATC_SUBJ_CODE_TRNS, SHBTATC_CRSE_NUMB_TRNS, SHBTATC_TERM_CODE_EFF_TRNS, SHBTATC_ACTIVITY_DATE,    SHBTATC_TRNS_TITLE,     SHBTATC_TRNS_LOW_HRS,    SHBTATC_TRNS_HIGH_HRS)       
+             Values  ('000453'     ,  '......',               'UG',           'HMGT',                  '2280' ,                  '000000'  ,                SYSDATE,               'Hotel Operations' ,         '3'    ,                      '3'      ) 
+             
+  into shbtatc (SHBTATC_SBGI_CODE,   SHBTATC_PROGRAM, SHBTATC_TLVL_CODE, SHBTATC_SUBJ_CODE_TRNS, SHBTATC_CRSE_NUMB_TRNS, SHBTATC_TERM_CODE_EFF_TRNS, SHBTATC_ACTIVITY_DATE,    SHBTATC_TRNS_TITLE,     SHBTATC_TRNS_LOW_HRS,    SHBTATC_TRNS_HIGH_HRS)       
+             Values  ('000850'     ,  '......',               'UG',           'HMGT',                  '2280'  ,                 '000000'  ,                SYSDATE,               'Hotel Operations' ,         '3'    ,                      '3'      ) 
+             
+             
+ Select * from Dual; 

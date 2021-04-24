@@ -1,0 +1,40 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    01-MAY-2020
+--Purpose: This query returns vets that need to be recertified for the section 107 of 
+--         the Colmery Act (201880 - 201980 that took at least once course at a non-Davidson County Campus).   
+
+
+
+--desc sgbstdn;
+--desc sfrstcr; 
+
+--select * from sfrstcr order by 2;
+
+select distinct spriden_id as "ID",
+       SFRSTCR_TERM_CODE as "Term",
+       SGRVETN_VETC_CODE as "Vet Code",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name"--, 
+     --  sfrstcr_camp_code as "Campus Code",
+     --  STVCAMP_DESC as "Campus",
+     --  sum (SFRSTCR_CREDIT_HR) as "Hours"
+from  spriden, sfrstcr, sgrvetn, stvcamp
+where SFRSTCR_TERM_CODE = :Term
+      and SGRVETN_TERM_CODE_VA = :Term   
+      and spriden_ID  in (select  distinct spriden_ID--, spriden_last_name, spriden_first_name
+                               from sfrstcr, spriden 
+                               where spriden_pidm = sfrstcr_pidm 
+                               and sfrstcr_term_code = :Term 
+                               and (sfrstcr_camp_code not in  ('90M', 'HKQ', 'H2T') and sfrstcr_camp_code not in (select stvcamp_code 
+                                                                                                                 from stvcamp 
+                                                                                                                 where  stvcamp_desc = 'TN eCampus'))
+                               and spriden_change_ind is null)                        
+      and SGRVETN_VETC_CODE is NOT NULL
+      and spriden_pidm = SFRSTCR_PIDM 
+      and spriden_pidm = sgrvetn_pidm
+      and sfrstcr_camp_code = stvcamp_code
+      and SGRVETN_VETC_CODE = any ('T', 'U')
+      and spriden_change_ind is  NULL     
+group by spriden_id, spriden_last_name, spriden_first_name, SGRVETN_VETC_CODE, SFRSTCR_TERM_CODE, 
+sfrstcr_camp_code, STVCAMP_DESC
+Order by  spriden_last_name, spriden_first_name;

@@ -1,0 +1,189 @@
+
+--Author:  Kevin Thomas, Intermim Registrar
+--Date:  28-FEB-2021
+--Purpose:  Use this for Python program to create Stage Clip Participants File
+
+
+--GPA has been truncated after the 2nd degit past the decimal
+
+--desc sorccon
+--desc SHRDGMR;
+
+
+/*
+
+SELECT SPRIDEN_ID AS STUDENT_ID, 
+       SPRIDEN_FIRST_NAME AS "FIRST NAME",
+       SPRIDEN_LAST_NAME AS "LAST NAME", 
+       --SHRDGMR_DEGC_CODE AS "DEGREE Code",
+         
+         CASE
+           When SHRDGMR_DEGC_CODE = 'AA'
+               then 'Associate of Arts'
+           When SHRDGMR_DEGC_CODE = 'AS'
+               then 'Associate of Science'
+           When SHRDGMR_DEGC_CODE = 'AST'
+               then 'Associate of Science in Teaching'
+           When SHRDGMR_DEGC_CODE = 'AFA'
+               then 'Associate of Fine Arts'
+           When SHRDGMR_DEGC_CODE in ('CRT1', 'CRT2')
+               then 'Certificate'  
+           When SHRDGMR_DEGC_CODE = 'AAS'
+               then 'Associate of Applied Science'
+           Else '?'
+        End  || ' ' || 
+
+      -- SHRDGMR_SEQ_NO AS DEG_SEQ, 
+      -- SHRDGMR_TERM_CODE_GRAD AS GRAD_TERM, 
+      -- SHRDGMR_GRST_CODE AS GRAD_STATUS, 
+       --SHRDGMR_MAJR_CODE_1 AS MAJOR_1,
+       --STVMAJR_DESC as "Description", 
+         
+        
+       
+       --STVMAJR_DESC as "Degree",
+       Stvmajr_desc || ' ' ||
+       
+       --SHRDGMR_MAJR_CODE_CONC_1 AS CONC_1,
+       
+       SORCCON_DESC as "Degree", 
+       --SORCCON_DESC  || ' ' || as "Degree",
+       
+       
+--       SHRDGMR_MAJR_CODE_2 AS MAJOR_2, SHRDGMR_MAJR_CODE_CONC_2 AS CONCENTRATION_2 
+      -- SGRSATT_ATTS_CODE AS MILLITARY
+             --shrlgpa_gpa_type_ind as GPA_TYPE,
+      -- trunc (SHRLGPA_GPA,2) AS "TRUNCATED GPA",--*3.5–3.74 cum laude 
+                                                  --  3.75–3.89 magna cum laude
+                                                  --  3.90–4.00 summa cum laude 
+            CASE 
+                when trunc (SHRLGPA_GPA,2) >= 3.5 and trunc (SHRLGPA_GPA,2) < 3.75
+                            then 'cum laude'
+                when trunc (SHRLGPA_GPA,2) >= 3.75 and trunc (SHRLGPA_GPA,2) < 3.90
+                            then 'magna cum laude'
+                when trunc (SHRLGPA_GPA,2) >= 4
+                            then 'summa cum laude'
+                Else NULL
+            End as "Honors"
+                
+FROM SHRDGMR, SOVLCUR OUTTER, SPRIDEN, SHRLGPA, stvmajr, sorccon--, SGRSATT
+WHERE 
+      SHRDGMR_TERM_CODE_GRAD IN (:Term_1, :Term_2, :Term_3) 
+      --SHRDGMR_TERM_CODE_GRAD = ':Term_1'
+      --SHRDGMR_TERM_CODE_GRAD IN (:Term_1, :Term_2)  
+  AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
+  AND SHRDGMR_PIDM = SPRIDEN_PIDM 
+  AND SHRDGMR_PIDM = SHRLGPA_PIDM
+ -- AND SHRDGMR_PIDM = SGRSATT_PIDM
+  AND STVMAJR_CODE = SHRDGMR_MAJR_CODE_1
+ -- and stvmajr_code = SHRDGMR_MAJR_CODE_CONC_1
+  and SORCCON_MAJR_CODE_CONC = SHRDGMR_MAJR_CODE_CONC_1
+  --and SORCCON_TERM_CODE_EFF = (select max(sorccon_term_code_eff) from sorccon where SORCCON_CCON_RULE is not null)
+  --and SORCCON_TERM_CODE_EFF = '202080'
+  AND SPRIDEN_CHANGE_IND IS NULL
+  AND SHRDGMR_GRST_CODE IS NOT NULL  --Excludes students with GRNs.
+--AND SHRDGMR_GRST_CODE = 'RTS'
+  --Added GPA Information; Type = I (Institutional), T (Transfer), or O for Overall (UG Combined (T and I))
+  and   shrlgpa_levl_code = 'UG'
+  and   shrlgpa_gpa_type_ind = 'O'
+  --Added Next Line of Code to exclude the new academic certificates on 4/10/12...LLW 
+  and   SHRDGMR_DEGC_CODE NOT IN ('ACRT1','ACRT2')
+--  and   SHRDGMR_DEGC_CODE = Degree
+--  and   SHRDGMR_MAJR_CODE_1 = :Major
+  --and SHRDGMR_MAJR_CODE_2 is not null
+ -- and SGRSATT_ATTS_CODE = 'MILT'
+ORDER BY SHRDGMR_DEGC_CODE,SPRIDEN_LAST_NAME,SPRIDEN_FIRST_NAME, SHRDGMR_MAJR_CODE_1;
+
+
+*/
+
+
+
+--Author:  Kevin Thomas, Intermim Registrar
+--Date:  28-FEB-2021
+--Purpose:  Use this for Python program to create Stage Clip Participants File
+
+
+--GPA has been truncated after the 2nd degit past the decimal
+
+--desc sorccon
+--desc SHRDGMR;
+
+
+select --spriden_id as "ID",
+       --SORLCUR_SITE_CODE as Campus,
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --shrdgmr_term_code_grad as "Grad Term",
+       --shrdgmr_degs_code as "Award Status",
+       --shrdgmr_grst_code as "Grad Code",
+      -- shrdgmr_grad_date as "Grad Date",
+      -- shrdgmr_acyr_code_bulletin as "Catalog",
+      -- shrdgmr_program as "Program Code",
+       --shrdgmr_degc_code as "Degree",
+        CASE
+           When SHRDGMR_DEGC_CODE = 'AA'
+               then 'Associate of Arts'
+           When SHRDGMR_DEGC_CODE = 'AS'
+               then 'Associate of Science'
+           When SHRDGMR_DEGC_CODE = 'AST'
+               then 'Associate of Science in Teaching'
+           When SHRDGMR_DEGC_CODE = 'AFA'
+               then 'Associate of Fine Arts'
+           When SHRDGMR_DEGC_CODE in ('CRT1', 'CRT2')
+               then 'Certificate'  
+           When SHRDGMR_DEGC_CODE = 'AAS'
+               then 'Associate of Applied Science'
+           Else '?'
+        End   
+        || ' ' ||
+       shrdgmr_majr_code_1 || ' ' ||
+       --Stvmajr_desc || ' ' ||
+       --shrdgmr_majr_code_conc_1 as "Conc",
+       STVMAJR_DESC as "Degree",
+       --shrlgpa_gpa_type_ind as GPA_TYPE, 
+       --trunc (SHRLGPA_GPA,2) AS "TRUNCATED GPA",--*3.5–3.74 cum laude 
+                                                  --  3.75–3.89 magna cum laude
+                                                  --  3.90–4.00 summa cum laude 
+            CASE 
+                when trunc (SHRLGPA_GPA,2) >= 3.5 and trunc (SHRLGPA_GPA,2) < 3.75
+                            then 'cum laude'
+                when trunc (SHRLGPA_GPA,2) >= 3.75 and trunc (SHRLGPA_GPA,2) < 3.90
+                            then 'magna cum laude'
+                when trunc (SHRLGPA_GPA,2) >= 4
+                            then 'summa cum laude'
+                Else NULL
+            End as "Honors"
+    --   goremal_emal_code as Email,
+    --   GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+       
+from spriden,shrdgmr, SHRLGPA, SOVLCUR, STVMAJR outer--sorlcur --,goremal
+--join stvmajr on stvmajr_code = shrdgmr_majr_code_conc_1
+where spriden_change_ind IS NULL
+AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
+and   spriden_pidm = shrdgmr_pidm
+--and   spriden_pidm = sorlcur_pidm
+and shrdgmr_pidm = spriden_pidm
+AND SHRDGMR_PIDM = SHRLGPA_PIDM
+--and b.stvmajr_code = shrdgmr_majr_code_1 
+and stvmajr_code (+) = shrdgmr_majr_code_conc_1
+and   shrdgmr_term_code_grad in ('202080', '202110', '202150')--:Grad_Term
+--and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+--and   shrdgmr_term_code_grad IN ('201910') --, '201950')
+--and   shrdgmr_grst_code = 'GR'
+--and   shrdgmr_grst_code = :Grad_Code
+and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')
+and   shrdgmr_grst_code IS NOT NULL
+--and   shrdgmr_program = :Program_Code
+--and   shrdgmr_program = 'AAS_ECED'
+--and shrdgmr_degs_code IN ('PN', 'AW')
+and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
+--and   shrdgmr_degc_code = :Degree
+--and spriden_pidm = GOREMAL_PIDM
+--and goremal_emal_code IN ('CAMP','PERS')
+--and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+--and SORLCUR_SITE_CODE in ('H43')
+  --Added GPA Information; Type = I (Institutional), T (Transfer), or O for Overall (UG Combined (T and I))
+and   shrlgpa_levl_code = 'UG'
+and   shrlgpa_gpa_type_ind = 'O'
+order by shrdgmr_degc_code, shrdgmr_majr_code_1, spriden_last_name,spriden_first_name;

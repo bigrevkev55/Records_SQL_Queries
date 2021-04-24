@@ -1,0 +1,68 @@
+--      Author:  Kevin Thomas, Assistant Registrar
+--        Date:  08-JUN-2019
+--     Purpose:  This script searches SHATATR equivalency block (bottom block) by prompted transfer school code, 
+--               NSCC subject code, and NSCC course code.  It returns all the transfer courses that that course 
+--               has been equated to at that school. This script searches SHATATR by bottom Block (INSTUTIONAL EQUIVALENCY). 
+
+--        Note:  USE THIS SCRIPT TO SEARCH FOR OLD NSCC COURSE RUBRICS IN THE BOTTOM BLOCK OF SHATATR THAT NEED TO BE CHANGED TO 
+--               UPDATED COURSE RUBRICS, OR TO SEE WHICH COURSES AT THE TRANFERS SCHOOL EQUATES TO NSCC COURSES
+
+--        Edit:  Joined STVSBGI and shrtatc on school code to pull in the school name as "Description"...kt...3/11/21
+
+--Instructions:  When prompted, enter the transfer school code and the NSCC Subject and Course codes.  
+--  
+
+
+            
+--desc shbtatc;  --Transfer College Course Info on SHATATR; top block
+--desc shrtatc;  --Institutional Transfer Table; middle block
+select shrtatc_sbgi_code          as "Transfer School Code",
+
+/*
+CASE When SHBTATC_SBGI_CODE = '001028' Then 'APSU'                   ----need to just join in DESC from STVSBGI
+     When SHBTATC_SBGI_CODE = '001198' Then 'ETSU'
+     When SHBTATC_SBGI_CODE = '001466' Then 'MTSU'
+     When SHBTATC_SBGI_CODE = '001803' Then 'TSU'
+     When SHBTATC_SBGI_CODE = '001804' Then 'TTU'
+     When SHBTATC_SBGI_CODE = '001459' Then 'Memphis'
+     When SHBTATC_SBGI_CODE = '001084' Then 'Chattanooga State'
+     When SHBTATC_SBGI_CODE = '002848' Then 'Cleveland State'
+     When SHBTATC_SBGI_CODE = '001081' Then 'Columbia State'
+     When SHBTATC_SBGI_CODE = '007323' Then 'Dyersberg State'
+     When SHBTATC_SBGI_CODE = '002266' Then 'Jackson State'
+     When SHBTATC_SBGI_CODE = '001543' Then 'Motlow State'
+     When SHBTATC_SBGI_CODE = '000453' Then 'Northeast State'
+     When SHBTATC_SBGI_CODE = '000319' Then 'Pellissippi State'
+     When SHBTATC_SBGI_CODE = '001656' Then 'Roane State'
+     When SHBTATC_SBGI_CODE = '000274' Then 'Southwest State'
+     When SHBTATC_SBGI_CODE = '001881' Then 'Volunteer State'
+     When SHBTATC_SBGI_CODE = '001893' Then 'Walters State'
+     When SHBTATC_SBGI_CODE = '99916' Then 'Shelby State'
+     When SHBTATC_SBGI_CODE = '001843' Then 'UTK'
+     When SHBTATC_SBGI_CODE = '001831' Then 'UTC'
+   ELSE 'Non-TBR'
+   END AS "Transfer School", 
+*/
+       STVSBGI_DESC as "Description",
+       shrtatc_term_code_eff_trns as "Eff Term",
+       shbtatc_subj_code_trns     as "Transfer Sub Code",
+       shbtatc_crse_numb_trns     as "Transfer Crse Numb",
+       shbtatc_trns_low_hrs       as "Transfer Hours",
+       shrtatc_subj_code_inst     as "NSCC Subj Code",
+       shrtatc_crse_numb_inst     as "NSCC Crse Numb",
+       shrtatc_inst_title         as "Title",
+       shrtatc_inst_credits_used  as "Inst Hours"
+from shrtatc,shbtatc, stvsbgi
+where shrtatc_sbgi_code = :Transfer_school_code
+--Where shrtatc_sbgi_code in ('001084', '002848', '001081')
+and    shrtatc_sbgi_code = shbtatc_sbgi_code
+and    STVSBGI_CODE = shrtatc_sbgi_code 
+and    shrtatc.SHRTATC_SUBJ_CODE_inst = :OLD_NSCC_SUBJ_CODE
+and    shrtatc.SHRTATC_CRSE_NUMB_inst = :OLD_NSCC_CRSE_numb
+and    shrtatc_subj_code_trns = shbtatc_subj_code_trns
+and    shrtatc_crse_numb_trns = shbtatc_crse_numb_trns
+--and    shrtatc_subj_code_inst IS NULL -Pull course with a course subject code
+--and    shrtatc_inst_title IS NOT NULL --Pull courses where title NOT NULL
+--and    shrtatc_inst_credits_used IS NULL --Pull courses with no institutional hours
+--and rownum <= 500
+order by shrtatc_sbgi_code,shbtatc_subj_code_trns,shbtatc_crse_numb_trns;

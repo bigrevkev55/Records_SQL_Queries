@@ -1,0 +1,73 @@
+--This script will only pull graduates who have a campus code like D% on SGASADD
+--as well as preferred email addresses.  
+
+--desc goremal
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "Student ID",
+  spriden.SPRIDEN_FIRST_NAME       AS "First Name",
+  spriden.SPRIDEN_MI               AS "Middle Name",
+  spriden.SPRIDEN_LAST_NAME        AS "Last Name",
+  shrdgmr.SHRDGMR_TERM_CODE_GRAD   AS "Term",
+  shrdgmr.SHRDGMR_DEGC_CODE        AS "Degree 1",
+  shrdgmr.SHRDGMR_MAJR_CODE_1      AS "Major 1",
+  shrdgmr.SHRDGMR_MAJR_CODE_CONC_1 AS "Concentration",
+  NVL(honr_code, ' ')              AS "Honor 1",
+  c.SPRADDR_STREET_LINE1           AS "Address 1",
+  c.SPRADDR_STREET_LINE2           AS "Address 2",
+  c.SPRADDR_CITY                   AS "City",
+  stvstat.STVSTAT_DESC             AS "State/Province",
+  c.SPRADDR_ZIP                    AS "Postal Code",
+  sgrsatt.SGRSATT_ATTS_CODE        AS "Campus Code",
+  goremal_emal_code                AS  "Email",
+  GOREMAL_EMAIL_ADDRESS            AS  "NSCC Email"
+FROM spriden, goremal,
+  stvstat,
+  spraddr c,
+  shrdgmr,
+  sgrsatt,
+  (SELECT shrdgih.SHRDGIH_PIDM
+    || shrdgih.SHRDGIH_DGMR_SEQ_NO honr_key,
+    stvhonr.STVHONR_CODE honr_code
+  FROM shrdgih,
+    stvhonr
+  WHERE shrdgih.SHRDGIH_HONR_CODE = stvhonr.STVHONR_CODE
+  ),
+  sovlcur a,
+  (SELECT spraddr.SPRADDR_PIDM,
+    MIN(spraddr.SPRADDR_ATYP_CODE) AS minatyp
+  FROM spraddr
+  WHERE spraddr.SPRADDR_STATUS_IND IS NULL
+  AND spraddr.SPRADDR_TO_DATE      IS NULL
+  AND spraddr.SPRADDR_ATYP_CODE    IN ('LO', 'PR')
+  GROUP BY spraddr.SPRADDR_PIDM
+  ) b
+WHERE c.SPRADDR_PIDM               = shrdgmr.SHRDGMR_PIDM
+AND c.SPRADDR_PIDM                 = spriden.SPRIDEN_PIDM
+AND c.spraddr_PIDM                 = sgrsatt.SGRSATT_PIDM
+AND SGRSATT_ATTS_CODE      Like ('D%')
+AND c.SPRADDR_PIDM                 = a.SOVLCUR_PIDM
+AND c.SPRADDR_PIDM                 = b.SPRADDR_PIDM
+AND c.SPRADDR_ATYP_CODE            = b.minatyp
+AND c.SPRADDR_STAT_CODE            = stvstat.STVSTAT_CODE
+AND shrdgmr.SHRDGMR_TERM_CODE_GRAD = :Grad_Term
+AND spriden.SPRIDEN_CHANGE_IND    IS NULL
+AND spriden.SPRIDEN_ENTITY_IND     = 'P'
+AND c.SPRADDR_STATUS_IND          IS NULL
+AND c.SPRADDR_TO_DATE             IS NULL
+AND shrdgmr.SHRDGMR_PIDM
+  || shrdgmr.SHRDGMR_SEQ_NO      = honr_key(+)
+AND shrdgmr.SHRDGMR_GRST_CODE   IN ('GR', 'RTS')
+AND shrdgmr.SHRDGMR_PROGRAM NOT IN ('CERT_AAS_GE', 'CERT_UNPA_GE')
+AND a.SOVLCUR_SEQNO              =
+  (SELECT MAX(sovlcur.SOVLCUR_SEQNO)
+  FROM sovlcur
+  WHERE sovlcur.SOVLCUR_PIDM = a.SOVLCUR_PIDM
+  )
+and spriden_pidm = GOREMAL_PIDM
+and goremal_emal_code IN ('CAMP', 'PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'N')
+and  GOREMAL_PREFERRED_IND = 'Y'
+ORDER BY sgrsatt.SGRSATT_ATTS_CODE,
+  "Last Name",
+  "First Name"

@@ -1,0 +1,83 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    31-AUG-2020
+--Request:
+/*
+Good morning Kevin. 
+
+Can you send me a list of all courses in the BMAH division that are coded as a HIP?
+
+To make a virtual appointment please use the following link: https://calendly.com/professormize/meeting
+
+Warm regards, 
+
+Roslyn Mize
+Assistant Professor
+Business, Management and Hospitality Division
+
+Clement Building, C-237J
+
+615-353-3693
+
+*/
+
+--desc ssrfees;
+--desc ssbsect;
+--desc SSRATTR;
+--desc scbcrse;
+select ssbsect_crn as "CRN",
+       ssbsect_subj_code as "Subject",
+       SSBSECT_CRSE_NUMB as "Number",
+       ssbsect_term_code as "Term",
+       SSBSECT_PTRM_CODE as "Part of Term",
+          Case
+          when SSBSECT_PTRM_CODE = '6'
+          Then 'First 7 Weeks'
+          when SSBSECT_PTRM_CODE = '7'
+          then 'Second 7 Weeks'
+          When SSBSECT_PTRM_CODE = '9'
+          then '10 Weeks'
+          When SSBSECT_PTRM_CODE = '1'
+          then 'Full Term'
+          When SSBSECT_PTRM_CODE = '8'
+          then 'Weekend'
+          When SSBSECT_PTRM_CODE = 'RA1'
+          then 'TN eCampus First 7 Weeks'
+          When SSBSECT_PTRM_CODE = 'RA2'
+          then 'TN eCampus Second 7 Weeks'
+          When SSBSECT_PTRM_CODE = 'R'
+          then 'TN eCampus'
+          Else 'Other'
+          End as "Part of Term Description",
+       SSRATTR_ATTR_CODE as "Attribute",
+       STVATTR_DESC as "Description"
+       
+      
+       
+       
+from ssbsect, SSRATTR, stvattr
+where --ssbsect_term_code = :Term_Code
+      --and 
+      ssbsect_crn = SSRATTR_CRN
+      and STVATTR_CODE = SSRATTR_ATTR_CODE
+
+/*subquery to look by prompted term
+
+      and ssbsect_term_code = SSRATTR_TERM_CODE 
+      and ssbsect_CRN in 
+                            (select SSRATTR_CRN  
+                             From ssrattr
+                             Where SSRATTR_ATTR_CODE is NOT NULL
+                              and SSRATTR_TERM_CODE = :Term_Code)
+ 
+*/                             
+      
+      and SSRATTR_ATTR_CODE like 'W%'
+      and ssbsect_ptrm_code like '%'
+      --and ssbsect_ptrm_code = :Part_of_Term
+      --and SSBSECT_PTRM_CODE in ('6','7','9')
+      and ssbsect_subj_code in (select distinct SCBCRSE_SUBJ_CODE from scbcrse where scbcrse_divs_code = 'BMAH')
+Order by ssbsect_subj_code, SSBSECT_CRSE_NUMB, ssbsect_term_code
+
+
+
+

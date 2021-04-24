@@ -1,0 +1,25 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    07-OCT-2019
+--Purpose: This query returns Dual Enrollment 
+--         courses (by prompted term) in SSASECT that DO have the
+--         voice response and self service box checked.
+--         We do not want these sections to have this box checked 
+--         as a check in this box allows sections to be seen in 
+--         self-service Banner.  
+
+
+
+--desc ssbsect; 
+--desc SIRASGN;  --select * from sirasgn;
+--desc ssrmeet; 
+
+select SSBSECT_TERM_CODE as "Term",
+       SSBSECT_SEQ_NUMB Section,
+       SSBSECT_CRN CRN,
+       SSBSECT_SUBJ_CODE Subject,
+       SSBSECT_CRSE_NUMB Course,
+       SSBSECT_VOICE_AVAIL as "Self Service Available"
+From ssbsect 
+where SSBSECT_VOICE_AVAIL = 'Y'
+      and ssbsect_term_code = :Term_Code
+      and SSBSECT_SEQ_NUMB Like 'S%';

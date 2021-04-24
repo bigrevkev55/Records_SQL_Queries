@@ -1,0 +1,54 @@
+-- Created By: Kevin Thomas, Assistant Registrar
+--       Date: February 12, 2019
+--    Purpose: This query looks for students that have submitted an Intent to 
+--             Graduate packet.  Be sure to adjust the term as needed.  Also,
+--             the student's email and addresses have been edited out but can 
+--             be put back in. Can also edit by campus code.   
+--             Note: This script doesn't include studens with a GRN grad status...kt...3.18.21
+
+
+select spriden_id as "ID",
+       --SORLCUR_SITE_CODE as Campus,
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       shrdgmr_term_code_grad as "Grad Term",
+       shrdgmr_degs_code as "Award Status",
+       shrdgmr_grst_code as "Grad Code",
+      -- shrdgmr_grad_date as "Grad Date",
+      -- shrdgmr_acyr_code_bulletin as "Catalog",
+       shrlgpa_gpa_type_ind as GPA_TYPE,
+       trunc (SHRLGPA_GPA,2) AS "TRUNCATED GPA",
+       shrdgmr_program as "Program Code",
+       shrdgmr_degc_code as "Degree",
+       shrdgmr_majr_code_1 as "Major",
+       shrdgmr_majr_code_conc_1 as "Conc"
+    --   goremal_emal_code as Email,
+    --   GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+       
+from spriden,shrdgmr, sovlcur, SHRLGPA--goremal
+where spriden_change_ind IS NULL
+AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
+AND SHRDGMR_PIDM = SHRLGPA_PIDM
+ --Added GPA Information; Type = I (Institutional), T (Transfer), or O for Overall (UG Combined (T and I))
+and   shrlgpa_levl_code = 'UG'
+and   shrlgpa_gpa_type_ind = 'O'
+and   spriden_pidm = shrdgmr_pidm
+--and   spriden_pidm = sorlcur_pidm
+--and shrdgmr_pidm = spriden_pidm
+and   shrdgmr_term_code_grad in ('202080', '202110', '202150')--:Grad_Term
+--and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+--and   shrdgmr_term_code_grad IN ('201910') --, '201950')
+--and   shrdgmr_grst_code = 'GR'
+--and   shrdgmr_grst_code = :Grad_Code
+and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')  --excludes students with GRN grad status.
+--and   shrdgmr_grst_code IS NOT NULL
+--and   shrdgmr_program = :Program_Code
+--and   shrdgmr_program = 'AAS_ECED'
+--and shrdgmr_degs_code IN ('PN', 'AW')
+and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
+--and   shrdgmr_degc_code = :Degree
+--and spriden_pidm = GOREMAL_PIDM
+--and goremal_emal_code IN ('CAMP','PERS')
+--and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+--and SORLCUR_SITE_CODE in ('H43')
+order by spriden_last_name,spriden_first_name,shrdgmr_degc_code,shrdgmr_program;

@@ -1,0 +1,20 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    07-OCT-2019
+--Purpose: This query returns courses (by prompted term) in SSASECT that do not have an assigned instructor.  
+
+
+
+--desc ssbsect; 
+--desc SIRASGN;  select * from sirasgn;
+--desc ssrmeet; 
+
+select SSBSECT_TERM_CODE as "Term",
+       SSBSECT_CRN CRN,
+       SSBSECT_SUBJ_CODE,
+       SSBSECT_CRSE_NUMB
+From ssbsect 
+where ssbsect_term_code = :Term_Code
+      and  SSBSECT_CRN not in 
+             (select distinct sirasgn_crn 
+              from sirasgn
+              where sirasgn_term_code = :Term_Code);

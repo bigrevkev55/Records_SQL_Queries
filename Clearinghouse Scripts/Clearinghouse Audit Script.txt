@@ -1,0 +1,26 @@
+--Author: Kevin Thomas, Assistant Registrar
+--Date:   05-30-2017
+--Purpose:
+
+--Clearinghouse Audit Script
+--Run this script the before the first submission of every term and add 
+--"CHEX" attribute in SGASADD for students that are auditing 
+--all courses.  
+
+
+select sfrstcr_term_code as TERM,
+       spriden_id as ID,
+       spriden_last_name as LAST_NAME,
+       spriden_first_name as FIRST_NAME,
+       sfrstcr_crn as CRN, 
+       sfrstcr_credit_hr as CREDIT_HR, 
+       sfrstcr_rsts_code as RSTS_Code, 
+       sfrstcr_rsts_date as SFAREGS_DATE,
+       sfrstcr_user
+from sfrstcr, spriden
+where sfrstcr_pidm = spriden_pidm
+and spriden_change_ind is NULL
+and sfrstcr_term_code = :Term
+and sfrstcr_rsts_code = :Reg_Code
+--and sfrstcr_rsts_code in ('AU','W2','W5','WC','WD','WF','WW')
+order by spriden_last_name, spriden_first_name

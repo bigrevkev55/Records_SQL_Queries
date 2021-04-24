@@ -1,0 +1,59 @@
+--Author: Kevin Thomas, Assistant Registrar
+--Date:  30-APR-2019
+--Purpose:  This script counts the number of transcripts processed by each member of the Records Office.
+--Edit:      Added SHATTRAN_USER = 'ETRANSCRIPT' to the select block in the total processed script....kt...4/10/2020
+
+
+
+--select distinct SHTTRAN_USER from shttran;
+
+
+Select (Select Count (SHTTRAN_USER) from shttran where shttran_user = 'THOMAS_K') as "Kevin's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MOORE_C') as "Cyndi's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'FLATLEY_N') as "Nicole's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HAYES_A') as "Ryan's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HUNTER_J') as "Jalen's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'KOVACS_A') as "Drew's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'FALIN_G') as "Gwen's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MEEKS_M') as "Misti's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'PAULEY_M') as "Melissa's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'SHAW_L') as "Lisa's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HACKNEY_R') as "Rosemary's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'BERNARD_G') as "Sue's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MCKISSACK_K') as "Kimberly's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'WILSON_K') as "Kenny's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'SETTLES_M') as "2.0's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'WOODARD_L') as "Lances's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'ETRANSCRIPT') as "ETRANS Count",
+(Select Count (SHTTRAN_USER) from shttran) as "Total Processed All Time"
+
+From Dual; 
+
+
+
+/*
+--Use the query below to see the total for a specific day (edit the date at needed in each sub-query)
+
+--Author: Kevin Thomas, Assistant Registrar
+--Date:  30-APR-2019
+--Purpose:  This script counts the number of transcripts processed by each member of the Records Office.
+
+Select (Select Count (SHTTRAN_USER) from shttran where shttran_user = 'THOMAS_K' and trunc(shttran_activity_date) = '07-AUG-2019') as "Kevin's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MOORE_C' and trunc(shttran_activity_date) = '07-AUG-2019') as "Cyndi's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'FLATLEY_N') as "Nicole's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HAYES_A' and trunc(shttran_activity_date) = '07-AUG-2019') as "Ryan's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HUNTER_J' and trunc(shttran_activity_date) = '07-AUG-2019') "Jalen's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'KOVACS_A' and trunc(shttran_activity_date) = '07-AUG-2019')  "Drew's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MEEKS_M'  and trunc(shttran_activity_date) = '07-AUG-2019')  "Misti's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'PAULEY_M' and trunc(shttran_activity_date) = '07-AUG-2019' ) as "Melissa's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'SHAW_L' and trunc(shttran_activity_date) = '07-AUG-2019')  "Lisa's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'HACKNEY_R' and trunc(shttran_activity_date) = '07-AUG-2019')  "Rosemary's Count",
+(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'BERNARD_G' and trunc(shttran_activity_date) = '07-AUG-2019') as "Sue's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'MCKISSACK_K') as "Kimberly's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'WILSON_K') as "Kenny's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'SETTLES_M') as "2.0's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'WOODARD_L') as "Lances's Count",
+--(Select Count (SHTTRAN_USER) from shttran where shttran_user = 'ETRANSCRIPT') as "ETRANS Count",
+(Select Count (SHTTRAN_USER) from shttran where trunc(shttran_activity_date) = '07-AUG-2019') as "Total Processed May 9 Count"
+
+From DUAL;  */

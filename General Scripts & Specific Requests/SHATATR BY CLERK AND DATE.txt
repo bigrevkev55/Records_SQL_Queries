@@ -1,0 +1,135 @@
+
+--Author: Kevin Thomas, Assistant Registrar	
+--Date:   01-MAR-2019
+--Purpose: This query pulls a list of SHATATR Courses and their equivalencies by School Code, User Name, and Date.
+
+--Note:  See note on second script below
+
+--desc shbtatc;  --Transfer College Course Info on SHATATR; top block
+--desc shrtatc;  --Institutional Transfer Table; middle block
+
+SELECT shbtatc.SHBTATC_USER_ID "SHATATR ID",
+shbtatc.SHBTATC_ACTIVITY_DATE "SHATATR Transfer Activity Date",
+  shbtatc.SHBTATC_SBGI_CODE      AS "Transfer School Code",
+CASE When SHBTATC_SBGI_CODE = '001028' Then 'APSU'
+     When SHBTATC_SBGI_CODE = '001198' Then 'ETSU'
+     When SHBTATC_SBGI_CODE = '001466' Then 'MTSU'
+     When SHBTATC_SBGI_CODE = '001803' Then 'TSU'
+     When SHBTATC_SBGI_CODE = '001804' Then 'TTU'
+     When SHBTATC_SBGI_CODE = '001459' Then 'Memphis'
+     When SHBTATC_SBGI_CODE = '001084' Then 'Chattanooga State'
+     When SHBTATC_SBGI_CODE = '002848' Then 'Cleveland State'
+     When SHBTATC_SBGI_CODE = '001081' Then 'Columbia State'
+     When SHBTATC_SBGI_CODE = '007323' Then 'Dyersberg State'
+     When SHBTATC_SBGI_CODE = '002266' Then 'Jackson State'
+     When SHBTATC_SBGI_CODE = '001543' Then 'Motlow State'
+     When SHBTATC_SBGI_CODE = '000453' Then 'Northeast State'
+     When SHBTATC_SBGI_CODE = '000319' Then 'Pellissippi State'
+     When SHBTATC_SBGI_CODE = '001656' Then 'Roane State'
+     When SHBTATC_SBGI_CODE = '000274' Then 'Southwest State'
+     When SHBTATC_SBGI_CODE = '001881' Then 'Volunteer State'
+     When SHBTATC_SBGI_CODE = '001893' Then 'Walters State'
+     When SHBTATC_SBGI_CODE = '99916' Then 'Shelby State'
+     When SHBTATC_SBGI_CODE = '001843' Then 'UTK'
+     When SHBTATC_SBGI_CODE = '001831' Then 'UTC'
+   ELSE 'Non-TBR'
+   END AS "Transfer School",
+  shbtatc.SHBTATC_SUBJ_CODE_TRNS AS "Transfer Subject",
+  shbtatc.SHBTATC_CRSE_NUMB_TRNS AS "Transfer Course",
+  shbtatc.SHBTATC_TRNS_TITLE     AS "Transfer Title",
+  shrtatc.SHRTATC_SBGI_CODE,
+  shrtatc.SHRTATC_SUBJ_CODE_INST    AS "NSCC Subj",
+  shrtatc.SHRTATC_CRSE_NUMB_INST    AS "NSCC Course",
+  shrtatc.SHRTATC_INST_CREDITS_USED AS Credits,
+  shrtatc.SHRTATC_INST_TITLE        AS "NSCC Title",
+  shrtatc.SHRTATC_ACTIVITY_DATE     AS "SHATATR Equivalency Date"
+FROM shbtatc,
+  shrtatc
+WHERE shbtatc.SHBTATC_SBGI_CODE   = shrtatc.SHRTATC_SBGI_CODE
+and shbtatc_subj_code_trns = shrtatc_subj_code_trns
+and shbtatc_crse_numb_trns = shrtatc_crse_numb_trns
+AND shbtatc.SHBTATC_USER_ID     = 'MEEKS_M'
+--AND shbtatc.SHBTATC_ACTIVITY_DATE > '24-FEB-2019'
+--AND shrtatc.SHRTATC_ACTIVITY_DATE > '24-FEB-2019'
+--AND SHBTATC_SBGI_CODE = '001573';
+
+Order by 1,5,6;
+
+
+
+/*
+SELECT shbtatc.SHBTATC_USER_ID "SHATATR ID",
+  shbtatc.SHBTATC_ACTIVITY_DATE "SHATATR Transfer Activity Date",
+  shbtatc.SHBTATC_SBGI_CODE AS "Transfer School Code",
+  CASE
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001028'
+    THEN 'APSU'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001198'
+    THEN 'ETSU'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001466'
+    THEN 'MTSU'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001803'
+    THEN 'TSU'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001804'
+    THEN 'TTU'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001459'
+    THEN 'Memphis'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001084'
+    THEN 'Chattanooga State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '002848'
+    THEN 'Cleveland State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001081'
+    THEN 'Columbia State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '007323'
+    THEN 'Dyersberg State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '002266'
+    THEN 'Jackson State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001543'
+    THEN 'Motlow State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '000453'
+    THEN 'Northeast State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '000319'
+    THEN 'Pellissippi State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001656'
+    THEN 'Roane State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '000274'
+    THEN 'Southwest State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001881'
+    THEN 'Volunteer State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001893'
+    THEN 'Walters State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '99916'
+    THEN 'Shelby State'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001843'
+    THEN 'UTK'
+    WHEN shbtatc.SHBTATC_SBGI_CODE = '001831'
+    THEN 'UTC'
+    ELSE 'Non-TBR'
+  END                            AS "Transfer School",
+  shbtatc.SHBTATC_SUBJ_CODE_TRNS AS "Transfer Subject",
+  shbtatc.SHBTATC_CRSE_NUMB_TRNS AS "Transfer Course",
+  shbtatc.SHBTATC_TRNS_TITLE     AS "Transfer Title",
+  --shrtatc.SHRTATC_SBGI_CODE,
+  shrtatc.SHRTATC_SUBJ_CODE_INST    AS "NSCC Subj",
+  shrtatc.SHRTATC_CRSE_NUMB_INST    AS "NSCC Course",
+  shrtatc.SHRTATC_INST_CREDITS_USED AS Credits,
+  shrtatc.SHRTATC_INST_TITLE        AS "NSCC Title",
+  shrtatc.SHRTATC_ACTIVITY_DATE     AS "SHATATR Equivalency Date"
+FROM shbtatc,
+  shrtatc
+WHERE shbtatc.SHBTATC_SBGI_CODE    = shrtatc.SHRTATC_SBGI_CODE
+AND shbtatc.SHBTATC_SUBJ_CODE_TRNS = shrtatc.SHRTATC_SUBJ_CODE_TRNS
+AND shbtatc.SHBTATC_CRSE_NUMB_TRNS = shrtatc.SHRTATC_CRSE_NUMB_TRNS
+-- AND shbtatc.SHBTATC_USER_ID = 'MEEKS_M'
+-- AND shbtatc.SHBTATC_USER_ID = 'HAYES_A'
+--AND shbtatc.SHBTATC_USER_ID        = 'HUNTER_J'
+and shbtatc.shbtatc_user_id        = 'KOVACS_A'
+AND shbtatc.SHBTATC_ACTIVITY_DATE  > '01-JAN-2019'
+--AND shbtatc.shbtatc_sbgi_code in ('000453', '000319', '001656') -- Misti
+--AND shbtatc.SHBTATC_SBGI_CODE     IN ('001084', '002848', '001081')--RYAN
+--AND shbtatc.SHBTATC_SBGI_CODE     IN ('007323', '002266', '001543')--Jalen
+AND shbtatc.SHBTATC_SBGI_CODE     IN ('000274', '001881', '001893')--Drew
+AND shbtatc.SHBTATC_SUBJ_CODE_TRNS = any('ART', 'ASTR','HLTH','BIOL','CHEM','CIT','CITC','CULA','ECON','EDUC','ENGL','GEOG','GEOL','HIST','MATH',
+'MUS','PHIL',
+
+*/

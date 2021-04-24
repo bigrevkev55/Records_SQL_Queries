@@ -1,0 +1,60 @@
+--Author:   Kevin Thomas, Assistant Director of Records and Registration
+--Date:     02-MAY-2020
+--Request: 
+
+/*
+Enrollment and credit hour comparisons - Summer 2019
+
+This message was sent with High importance.
+Clark, Charles
+Fri 5/1/2020 10:23 AM
+Kevin,
+
+TBR is requesting headcount and credit hour data for particular dates for Summer 2019 to conduct comparative analyses. We only have certain days worth of frozen data.
+
+Can you run a report that gives the headcount and total hours enrolled for Summer 2019 term as of the following dates:
+5/3/2019
+5/10/2019
+6/7/2019
+6/14/2019
+6/21/2019
+6/28/2019
+7/5/2019
+7/12/2019
+Thanks for your help!
+
+Have a great weekend and be well.
+
+Best,
+Charles
+
+
+Charles Clark
+Associate Vice President
+Planning and Assessment
+
+Nashville State Community College
+120 White Bridge Road
+Nashville, TN 37209
+Phone: 615-353-3228
+
+
+*/
+
+--desc sfrstcr;
+
+
+
+
+--201950 First Week Registration Count 
+select COUNT (Distinct SFRSTCR_PIDM),
+        sum (sfrstcr_credit_hr),
+        Max (SFRSTCR_RSTS_DATE)
+        from SFRSTCR
+        where SFRSTCR_TERM_Code ='201950'
+              and SFRSTCR_CREDIT_HR > '0'
+              and SFRSTCR_RSTS_DATE < '04-MAY-2019'    
+              and sfrstcr_pidm not in (select distinct sfrstcr_pidm   
+                                       from sfrstcr
+                                       where sfrstcr_term_code = '201950'
+                                             and sfrstcr_rsts_code in 'AU'); 

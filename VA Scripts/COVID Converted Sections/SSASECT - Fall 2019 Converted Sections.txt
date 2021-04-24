@@ -1,0 +1,22 @@
+-- Author: Kevin Thomas, Interim Registrar
+--   Date: 24-AUG-2020
+--Purpose: This query returns Fall 2019 sections that were On-Campus.
+--         The VA has approved these sections for FALL 2020 to count 
+--         as residential courses for the BAH/MHA.
+
+
+--desc ssbsect;
+
+Select 'Fall 2019' as "Term",
+        SSBSECT_CRN as "CRN",
+        SSBSECT_SUBJ_CODE as "Subject",
+        SSBSECT_CRSE_NUMB as "Course",
+        SSBSECT_INSM_CODE as "Instructional Method",
+        GTVINSM_DESC as "Description"
+
+From ssbsect, gtvinsm
+Where ssbsect_insm_code = gtvinsm_code
+      and SSBSECT_TERM_CODE = '201980'
+      and SSBSECT_INSM_CODE in  ('CON', 'HYB')
+
+Order by    SSBSECT_SUBJ_CODE,    SSBSECT_CRSE_NUMB;

@@ -1,0 +1,74 @@
+
+--Author:  Kevin Thomas, Assistant Director of Records and Registration
+--Date:    16-SEP-2019
+--Purpose: This query returns all registered students contact info by prompted term.  
+
+
+
+--desc sfrstcr;
+--desc sgbstdn;
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+        sgbstdn_term_code_eff as "Effective Term of Major",
+       SGBSTDN_DEGC_CODE_1 as "Degree",
+       SGBSTDN_MAJR_CODE_1  as "Major",
+       SGBSTDN_MAJR_CODE_CONC_1 as "Concentration",
+      -- p.goremal_emal_code as "Personal Email Type",
+      -- c.goremal_emal_code as "Campus Email",
+       p.goremal_email_address as "Preferred, Personal Email",
+       c.goremal_email_address as "Campus Email",
+      -- SFRSTCR_BILL_HR as "Hours",
+       spraddr_street_line1 as "Address_1",      
+        spraddr_street_line2 as "Address_2",      
+       spraddr_city as "City",      
+       spraddr_stat_code as "State",      
+       spraddr_zip as "ZIP"
+       
+from Spriden s, sgbstdn,
+   /* Subquery to get preferred,personal email*/
+(select goremal_pidm
+         ,      goremal_email_address
+         from goremal
+         where goremal_emal_code='PERS'
+         and goremal_preferred_ind = 'Y') p,
+
+  /* Subquery to get campus email */
+(Select goremal_pidm, goremal_email_address
+        from goremal
+        Where goremal_emal_code = 'CAMP') c,
+     
+ /*subquery to get Mailing address */    
+      (select spraddr_street_line1,   
+             spraddr_street_line2,
+              spraddr_city,
+              spraddr_stat_code,
+              spraddr_zip,
+              spraddr_pidm
+        from spraddr d
+        where spraddr_status_ind is null
+        and spraddr_to_date is null 
+        and spraddr_atyp_code = (select min(spraddr_atyp_code) 
+                                 from spraddr
+                                 where spraddr_status_ind is null
+                                 and spraddr_to_date is null
+                                 and spraddr_atyp_code in ('LO','PR')
+                                 and spraddr_pidm = d.spraddr_pidm)) b  --subquery to get address. gets LO if available, and PR if not.  Alias as "b" for outer join in the "where statement"
+
+where spriden_pidm in (select distinct sfrstcr_pidm        --subqery of all distinct PIDMs in SFRSTCR for prompted term
+                        from sfrstcr
+                        where sfrstcr_term_code = :Term_Code
+                              and SFRSTCR_RSTS_CODE <> 'AU'
+                              and SFRSTCR_BILL_HR > '0' )  
+      and spriden_entity_ind = 'P'                  
+      and spriden_change_ind is null
+      and spriden_pidm = sgbstdn_pidm 
+      and SGBSTDN_TERM_CODE_EFF = (select max(sgbstdn_term_code_eff)  --subquery to pull in most recent major
+                               from sgbstdn
+                               where sgbstdn_pidm = s.spriden_pidm
+                               and sgbstdn_term_code_eff <= :Term_Code)
+      and   b.spraddr_pidm (+) = S.spriden_pidm --outer join address subquery to main query
+      and   p.goremal_pidm (+) = s.spriden_pidm --outer join preferred, personal email address subquery to main query
+      and   c.goremal_pidm (+) = s.spriden_pidm --outter join campus email to main query
+Order by spriden_last_name, spriden_first_name;

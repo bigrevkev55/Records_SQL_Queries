@@ -1,0 +1,51 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    09-AUG-2019
+--Purpose: This query will return purged students by CRN and prompted term. 
+
+--Note1:    Students may appear more than once as the query is ordered by CRN so the
+--         their will be duplication as students are in more than one CRN.
+
+--Note2:   See comment in the script about purge date prompt
+
+
+
+--desc sfrstca;
+--desc ssbsect;
+select distinct spriden_id as "A Number",
+       SFRSTCA_ACTIVITY_DATE as "Purge Date",
+       sfrstca_term_code as "Term",
+       spriden_last_name "Last Name",
+       spriden_first_name "First Name",
+       SFRSTCA_CRN "CRN",
+       SSBSECT_SUBJ_CODE "Subject",
+       SSBSECT_CRSE_NUMB "Course",
+       SSBSECT_SEATS_AVAIL "Available Seats"
+       
+from spriden
+,    sfrstca
+,    ssbsect
+where spriden_pidm = sfrstca_pidm
+and sfrstca_user = 'SZRRNOP'
+--and sfrstca_crn = '&crn'
+and SFRSTCA_ACTIVITY_DATE > '&Purge_Date'  -- Format is DD-MON-YYYY --Use > purge date because SQL Developer
+--read the time on the date time as 'DD-MON-YYYY-00:00:00'; Other application managers may not do this 
+--and SFRSTCA_ACTIVITY_DATE > '&Day_After_Last_Purge_Date'  --Format is DD-MON-YYYY
+and sfrstca_term_code = '&Term' --'201980'
+and spriden_Change_ind is null
+and ssbsect_crn = sfrstca_crn
+and ssbsect_term_code = sfrstca_term_code
+Order by sfrstca_CRN, SSBSECT_CRSE_NUMB, spriden_last_name;
+
+
+
+
+
+        
+        
+
+
+
+
+
+        
+        

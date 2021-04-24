@@ -1,0 +1,26 @@
+
+-- Created By: Lance Woodard, Registrar
+--       Date: May 31, 2016
+-- Revised by: Kevin Thomas, Assistant Director of Records and Registration
+--       Date: December 6, 2018
+--    Purpose: Pull a list of courses based on a pre-requisite.
+-- NOTE:  Prompted term will look for courses that have the prereq at that term and previous terms 
+
+
+desc smracaa;
+select smracaa_term_code_eff as "Eff Term",
+--(select max(smracaa_term_code_eff) as "Eff Term" from smracaa order by smacaa_area),
+       smracaa_area          as "Course",
+       smracaa_set           as "Set",
+       smracaa_subset        as "Subset",
+       smracaa_rule          as " Rule"
+from smracaa
+where smracaa_rule in ('READ_COMP', 'ENGL_COMP')  --XDR2, XDW2, XDM2, and XDM3
+and   smracaa_term_code_eff <= '&Term'
+and   smracaa_area LIKE 'Z_%'--('X_%','Y_%','Z_%')
+-- X_ = New LS Not Allow Co-Requisite; attach to college-level web sections
+-- Y_ = College Co-Requisite for 2nd Session Courses
+-- Z_ = Regular Pre-requisite
+order by smracaa_area;
+
+

@@ -1,0 +1,30 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    May-22-2019
+--Purpose: This query finds students who have registered with the
+--         Access Center and are Chapter 31 (Voc. Rehab) with VA benefits.
+--Note:    For future use edit the terms field below
+
+
+
+
+select distinct spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       SGRVETN.SGRVETN_TERM_CODE_VA as "Term",
+       sgrvetn_vetc_code as "VET TYPE",
+         case 
+         when sgrvetn_vetc_code = '1'
+         then 'Voc Rehab'
+         ELSE 'Other'
+         End as "Vet Type Description",
+       sgrdisa_disa_code as "Access Center Code"
+from spriden, sgrdisa, sgrvetn
+Where spriden_pidm = sgrvetn_pidm
+and spriden_pidm = sgrdisa_pidm
+and spriden_change_ind is NULL
+and spriden_pidm = sgrvetn_pidm
+and sgrvetn_vetc_code = '1'
+and sgrdisa_disa_code = 'Y'
+and SGRVETN.SGRVETN_TERM_CODE_VA in ('201850', '201880', '201910')
+and sgrdisa_term_code = sgrvetn.SGRVETN_TERM_CODE_VA
+Order by spriden_last_name,spriden_first_name;

@@ -1,0 +1,82 @@
+--Name:    Kevin Thomas, Assistant Registrar
+--Date:    16-APR-2019
+--Purpse:  This script pulls in the Health Sciences students who have acitve registration for 201950 and forward.
+--Note:  You will be prompted to enter the date registration begin for the requested term(s)
+
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME AS "Name",
+  sorlfos.SORLFOS_MAJR_CODE     AS "Concentration",
+ -- sfbetrm.SFBETRM_ESTS_CODE     AS "Enrollment Status",
+  sfbetrm.SFBETRM_TERM_CODE     AS "Enrollment Term"--,
+ -- SORLFOS_CACT_CODE             AS "Program_Status",
+ -- SORLCUR_TERM_CODE_END         AS "Term Code End"
+  --SFTREGS.SFTREGS_CRN          AS "CRN"
+FROM spriden,
+  sorlfos,
+  sfbetrm,
+  sorlcur,
+  sftregs
+WHERE spriden.SPRIDEN_PIDM = sorlfos.SORLFOS_PIDM
+AND spriden.SPRIDEN_PIDM   = sfbetrm.SFBETRM_PIDM
+AND sorlcur.SORLCUR_PIDM   = spriden.SPRIDEN_PIDM
+AND sftregs_pidm = spriden_pidm
+AND spriden.SPRIDEN_ID LIKE ('A00%')
+AND sorlfos.SORLFOS_MAJR_CODE   = 'HTSC'
+AND sfbetrm.SFBETRM_TERM_CODE   > '201910'
+AND spriden.SPRIDEN_CHANGE_IND IS NULL
+and sftregs_crn IS NOT NULL
+and sorlfos_cact_code    = 'ACTIVE'
+--and sfbetrm_term_code   = sorlfos_term_code
+and sorlcur_term_code_end IS NULL
+and sorlfos_lcur_seqno = sorlcur_seqno
+and spriden_pidm IN ( select sfrstcr_pidm
+                                              from sfrstcr where sfrstcr_rsts_date > = :Registration_Begin_Date)--'01-APR-2019' )
+                                                                                                 --format is dd-MON-yyyy
+
+ORDER BY 4,
+  2;
+  
+
+
+  
+ ------ 
+
+
+SELECT DISTINCT spriden.SPRIDEN_ID AS "A Number",
+  spriden.SPRIDEN_LAST_NAME
+  || ', '
+  || spriden.SPRIDEN_FIRST_NAME AS "Name",
+  sorlfos.SORLFOS_MAJR_CODE     AS "Concentration",
+  sfbetrm.SFBETRM_TERM_CODE     AS "Enrollment Term",
+  sorlcur.SORLCUR_END_DATE
+FROM spriden,
+  sorlfos,
+  sfbetrm,
+  sorlcur,
+  sftregs
+WHERE spriden.SPRIDEN_PIDM     = sorlfos.SORLFOS_PIDM
+AND spriden.SPRIDEN_PIDM       = sfbetrm.SFBETRM_PIDM
+AND sorlcur.SORLCUR_PIDM       = spriden.SPRIDEN_PIDM
+AND sftregs.SFTREGS_PIDM       = spriden.SPRIDEN_PIDM
+AND sorlfos.SORLFOS_LCUR_SEQNO = sorlcur.SORLCUR_SEQNO
+AND spriden.SPRIDEN_ID LIKE ('A00%')
+AND sorlfos.SORLFOS_MAJR_CODE      = 'HTSC'
+AND sfbetrm.SFBETRM_TERM_CODE      > '201910'
+AND spriden.SPRIDEN_CHANGE_IND    IS NULL
+AND sftregs.SFTREGS_CRN           IS NOT NULL
+AND sorlfos.SORLFOS_CACT_CODE      = 'ACTIVE'
+--AND sorlcur.SORLCUR_TERM_CODE_END IS NULL
+AND spriden.SPRIDEN_PIDM          IN
+  (SELECT sfrstcr.SFRSTCR_PIDM
+  FROM sfrstcr
+  WHERE sfrstcr.SFRSTCR_RSTS_DATE >= :Registration_Begin_Date
+  )
+AND sorlcur_term_code_end IN (select sorlcur.SORLCUR_TERM_CODE_END from sorlcur where SORLCUR_TERM_CODE_END >= '201910'
+OR sorlcur.SORLCUR_END_DATE IS NOT NULL)
+ORDER BY 4,
+  2;
+

@@ -1,0 +1,29 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    17-MAR-2020
+--Purpose: This query returns students who have failed a first 5 or 7 prereq but are registered for the second 5 or 7 week course.  
+
+--desc sfrstcr;
+--desc ssrrare;
+--desc ssbsect;
+--select * from shrgrde;
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name", 
+       SFRSTCR_PTRM_CODE as "Part of Term",
+       SFRSTCR_CRN as "CRN",
+       ssbsect_subj_code as "SUBJ",
+       SSBSECT_CRSE_NUMB as "Course",
+       SFRSTCR_GRDE_CODE as "Grade"
+       
+From SFRSTCR, spriden, ssbsect
+
+Where SFRSTCR_PIDM = SPRIDEN_PIDM
+      and ssbsect_crn = sfrstcr_crn 
+      and ssbsect.ssbsect_term_code = :TERM
+      and spriden_change_ind is NULL
+      and SFRSTCR_TERM_CODE = :TERM
+      and SFRSTCR_PTRM_CODE = any ('2','6', 'RA1')
+      And SFRSTCR_GRDE_CODE  IN (select SHRGRDE_CODE from shrgrde where SHRGRDE_PASSED_IND <> 'Y')     
+      and SFRSTCR_CRN in (select SSRRARE_CRN from ssrrare where SSRRARE_AREA like 'Y%' and SSRRARE_TERM_CODE = :TERM)
+Order by spriden_last_name, spriden_first_name;

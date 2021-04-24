@@ -1,0 +1,27 @@
+--   Author:  Kevin Thomas, Interim Registrar
+--     Date:  19-NOV-2020
+--  Purpose:  Find students who chose AS_UTP_Undecided
+--            on the 202080 or 202110 NSCC App.
+
+
+
+--desc sgbstdn;
+
+
+Select spriden_ID as "A Number",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+       SGBSTDN_TERM_CODE_EFF as "Effective Term",
+       SGBSTDN_DEGC_CODE_1 as "Degree",
+       SGBSTDN_MAJR_CODE_1 as "Major",
+       SGBSTDN_MAJR_CODE_CONC_1 as "Concentration"
+From SGBSTDN
+Inner Join spriden on spriden_pidm = sgbstdn_pidm
+Where SGBSTDN_DEGC_CODE_1 = 'AS'
+      and spriden_change_ind is NULL
+      and SGBSTDN_MAJR_CODE_1 = 'UTP'
+      and SGBSTDN_MAJR_CODE_CONC_1 ='UNDS'
+      and SGBSTDN_TERM_CODE_EFF = '202110'
+Order by spriden_last_name;
+       
+       

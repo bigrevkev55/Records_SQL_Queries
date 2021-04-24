@@ -1,0 +1,59 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    27-JUN-2019
+--Purpose: This query returns CRNs that have DCM attribute on SSADETL, by prompted term.
+--Note:    The output is ordered by part of term then course rubric. 
+--
+--Revision: Added 8, RA1, RA2, R part of term code descriptions 
+--          to WHEN/THEN/ELSE statement in the 
+--          Select block...kt...10/31/2019 
+
+
+
+
+--desc ssrfees;
+--desc ssbsect;
+select ssbsect_crn as "CRN",
+       ssbsect_subj_code as "Subject",
+       SSBSECT_CRSE_NUMB as "Number",
+       SSBSECT_SEQ_NUMB as "Section Type",
+       ssbsect_term_code as "Term",
+       SSBSECT_PTRM_CODE as "Part of Term",
+          Case
+          when SSBSECT_PTRM_CODE = '6'
+          Then 'First 7 Weeks'
+          when SSBSECT_PTRM_CODE = '7'
+          then 'Second 7 Weeks'
+          When SSBSECT_PTRM_CODE = '9'
+          then '10 Weeks'
+          When SSBSECT_PTRM_CODE = '1'
+          then 'Full Term'
+          When SSBSECT_PTRM_CODE = '8'
+          then 'Weekend'
+          When SSBSECT_PTRM_CODE = 'RA1'
+          then 'TN eCampus First 7 Weeks'
+          When SSBSECT_PTRM_CODE = 'RA2'
+          then 'TN eCampus Second 7 Weeks'
+          When SSBSECT_PTRM_CODE = 'R'
+          then 'TN eCampus'
+          Else 'Other'
+          End as "Part of Term Description",
+       ssrfees_detl_code as "Fee Code",
+       ssrfees_amount as "Amount",
+       SSRFEES_ACTIVITY_DATE  as "Activity Date",
+       SSRFEES_USER_ID as "User Id"
+       
+       
+from ssbsect, ssrfees
+where ssbsect_CRN in 
+      (select 
+       ssrfees_crn  
+      From ssrfees
+      Where ssrfees_detl_code is NOT NULL
+           and ssrfees_term_code = :Term_Code)
+      and ssbsect_term_code = :Term_Code
+      and ssbsect_crn = ssrfees_crn
+      and ssbsect_term_code = ssrfees_term_code
+      and ssbsect_ptrm_code like '%'
+      --and ssbsect_ptrm_code = :Part_of_Term
+      --and SSBSECT_PTRM_CODE in ('6','7','9')
+Order by SSBSECT_PTRM_CODE, 2,3,4;

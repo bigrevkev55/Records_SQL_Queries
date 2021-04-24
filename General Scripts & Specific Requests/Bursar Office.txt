@@ -1,0 +1,177 @@
+-- Author:  Kevin Thomas, Interim Registrar
+--   Date:  07-JUL-2020
+--Request:  
+
+/*
+Hi Kevin, 
+Thank you for doing this for me. I just need the students’ nscc email addresses.
+Also, if it’s not too much trouble can you include the actual script you ran. Once I am up and running, I will probably use it often
+ 
+
+Thanks,
+
+Emily Curtis
+Director of Student Financial Accounts
+Bursar’s Office
+Nashville State Community College
+120 White Bridge Road
+Nashville, TN 37209
+615-353-3312
+
+
+*/
+
+
+
+
+--desc goremal;
+
+
+select spriden_id as "A Number",
+       Spriden_last_name as "Last Name",
+       Spriden_first_name as "First Name",
+       goremal_emal_code as "Email Type",
+       goremal_email_address as "Address"
+       
+From spriden, goremal
+
+Where spriden_pidm = goremal_pidm
+      and spriden_change_ind is NULL
+      and goremal_emal_code = 'CAMP'
+      and spriden_id in  ('A00553194',
+'A00577648',
+'A00570957',
+'A00569064',
+'A00557941',
+'A00558232',
+'A00576983',
+'A00579444',
+'A00490381',
+'A00570451',
+'A00578607',
+'A00511469',
+'A00565466',
+'A00556886',
+'A00570588',
+'A00547159',
+'A00582105',
+'A00541123',
+'A00540976',
+'A00563178',
+'A00541796',
+'A00539361',
+'A00554782',
+'A00577280',
+'A00563993',
+'A00498682',
+'A00495625',
+'A00572561',
+'A00557775',
+'A00545815',
+'A00563962',
+'A00555224',
+'A00460224',
+'A00543371',
+'A00560151',
+'A00547748',
+'A00566786',
+'A00507459',
+'A00451551',
+'A00545919',
+'A00544948',
+'A00553443',
+'A00562975',
+'A00539105',
+'A00540635',
+'A00405578',
+'A00560531',
+'A00577069',
+'A00569688',
+'A00569889',
+'A00534066',
+'A00568909',
+'A00569392',
+'A00454685',
+'A00567518',
+'A00565992',
+'A00003624',
+'A00568210',
+'A00564636',
+'A00574697',
+'A00569760',
+'A00566480',
+'A00546934',
+'A00572331',
+'A00564738',
+'A00542053',
+'A00539765',
+'A00582573',
+'A00568919',
+'A00569103',
+'A00563392',
+'A00503570',
+'A00547864',
+'A00568790',
+'A00547878',
+'A00556420',
+'A00502355',
+'A00520375',
+'A00564766',
+'A00580083',
+'A00574796',
+'A00544891',
+'A00570034',
+'A00568291',
+'A00562526',
+'A00542380',
+'A00566558',
+'A00546612',
+'A00482786',
+'A00578564', 
+'A00402930',
+'A00431167',
+'A00568943',
+'A00550787',
+'A00559273',
+'A00577044',
+'A00547937', 
+'A00565763',
+'A00540997',
+'A00574654',
+'A00551075',
+'A00420556',
+'A00566613',
+'A00564113',
+'A00532445',
+'A00567027',
+'A00576090',
+'A00568954 ',
+'A00563078',
+'A00583273',
+'A00554295',
+'A00504273',
+'A00538019',
+'A00234175',
+'A00559864',
+'A00584383',
+'A00522178',
+'A00559657',
+'A00509085',
+'A00547085',
+'A00548014',
+'A00549293',
+'A00532759',
+'A00532700',
+'A00525809',
+'A00578066',
+'A00518535',
+'A00562461',
+'A00438663',
+'A00539169',
+'A00539738',
+'A00539258',
+'A00481460',
+'A00578618'
+)
+
+order by Spriden_last_name, spriden_first_name;

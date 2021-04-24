@@ -1,0 +1,20 @@
+--Author:  Kevin Thomas, Assitant Registrar
+         Chuck Hackney, Systems Analyst (Wrote sub-query)
+--Date:  07-MAY-2019
+--Purpose:  This query returns all active rooms on the NSCC WBR Campus that are not offices
+--        and that have a capacity greater than "1".  
+
+
+SELECT SLBRDEF_ROOM_NUMBER           AS "Room Number",
+  SLBRDEF_DESC                        AS "Description",
+  SLBRDEF_CAPACITY                    AS "Capacity",
+  SLBRDEF_TERM_CODE_EFF                    AS "Term"
+FROM SLBRDEF s
+WHERE SLBRDEF_CAPACITY > 1
+AND SLBRDEF_BLDG_CODE IN ('E', 'D', 'W', 'S', 'A', 'H', 'K', 'C')
+AND SLBRDEF_RMST_CODE <> 'IN'
+AND SLBRDEF_PRIORITY  <> 'O'
+and SLBRDEF_TERM_CODE_EFF = (select max(slbrdef_term_code_eff)
+                             from slbrdef
+                             where slbrdef_room_number = s.slbrdef_room_number)
+ORDER BY 1;

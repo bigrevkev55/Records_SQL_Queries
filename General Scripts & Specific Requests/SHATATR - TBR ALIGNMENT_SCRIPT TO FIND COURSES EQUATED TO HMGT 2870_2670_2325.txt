@@ -1,0 +1,39 @@
+--  Author:  Kevin Thomas, Assistant Registrar
+--    Date:    17-MAR-2020
+--Purpsose:  This query returns courses from SHATATR that have been equated to NSCC's HMGT 2870, 2670 and BUSN 2325
+--    Note:  This us to update the NSCC equivalency with the new TBR aligned subject code for the AAS HMGT and TC HMGT.
+             After finding these courses replace the equivalency with the updated TBR alingned Course Number.
+
+
+
+
+--desc shrtatc;
+--desc stvsbgi;
+--desc shbtatc;
+
+
+select SHRTATC_SBGI_CODE TRANSFER_SCHOOL_CODE,
+       STVSBGI.STVSBGI_DESC TRANSFER_SCHOOL_NAME,
+       SHRTATC_TERM_CODE_EFF_TRNS EFFECTIVE_TERM,
+       SHRTATC_SUBJ_CODE_TRNS TRANSFER_SUBJECT,
+       SHRTATC_CRSE_NUMB_TRNS TRANSFER_COURSE_NUMBER,
+       SHBTATC_TRNS_TITLE TRANSFER_TITLE,
+       SHRTATC_SUBJ_CODE_INST NSCC_SUBJECT,
+       SHRTATC_CRSE_NUMB_INST NSCC_COURSE_NUMBER,
+       SHRTATC_INST_TITLE NSCC_TITLE,
+       SHRTATC_INST_CREDITS_USED NSCC_HOURS
+
+from shrtatc, stvsbgi, shbtatc
+
+Where SHRTATC_SBGI_CODE = STVSBGI_CODE
+      and SHRTATC_SBGI_CODE = SHBTATC_SBGI_CODE
+      and SHBTATC_SUBJ_CODE_TRNS = SHRTATC_SUBJ_CODE_TRNS
+      and SHBTATC_CRSE_NUMB_TRNS = SHRTATC_CRSE_NUMB_TRNS
+      -- and SHRTATC_SUBJ_CODE_INST = 'HMGT'
+      -- and SHRTATC_CRSE_NUMB_INST = any ('2870', '2670')
+      and SHRTATC_SUBJ_CODE_INST = 'BUSN' 
+      and SHRTATC_CRSE_NUMB_INST = '2325'
+Order by SHRTATC_SBGI_CODE, SHRTATC_CRSE_NUMB_TRNS;
+
+
+

@@ -1,0 +1,24 @@
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    06-APR-2020
+--Purpose: This query returns all transcripts printed by Cyndi Moore on 4/5/2020 as they did not print due to eTranscript testing.  
+           Cyndi will reprint these.
+
+
+
+
+select SHTTRAN_USER as "User",
+        SHTTRAN_REQUEST_DATE request_date,
+       shttran_id A_NUMBER,
+       shttran_addr_name Addressee,
+       shttran_street1 Address_Line_1,
+       shttran_street2 Address_line_2,
+       shttran_city CITY,
+       shttran_stat_code STATE,
+       shttran_ZIP Zip_Code
+from shttran
+where SHTTRAN_USER = 'MOORE_C'
+      and 
+      SHTTRAN_REQUEST_DATE < '06-APR-20'
+      and 
+      SHTTRAN_REQUEST_DATE > '04-APR-20';

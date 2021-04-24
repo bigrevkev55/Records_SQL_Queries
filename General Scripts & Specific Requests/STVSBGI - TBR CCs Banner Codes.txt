@@ -1,0 +1,19 @@
+
+
+
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    17-MAR-2020
+--Purpose: This query returns the TBR CCs with their school code in Banner
+
+
+
+--desc stvsbgi;
+--desc sovsbgv;
+
+
+select STVSBGI_CODE CODE,
+       STVSBGI_DESC as "Abbreviated Institution Name"
+from stvsbgi
+where stvsbgi_code in ('001084','002848','001081','007323', '002266', '001543', '000453', 
+                       '000319', '001656', '000274', 
+                       '001881', '001893', '000850');

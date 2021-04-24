@@ -1,0 +1,17 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:  18-APR-2019
+--Purpose:  This script counts the number of course SCADETL descriptons updated by each staff member after April 15.
+
+
+
+select (select COUNT (scbdesc_user_id) 
+from scbdesc where scbdesc_user_id = 'HAYES_A' and scbdesc_activity_date > '15-APR-2019') AS "Ryan's Count",
+(SELECT COUNT (SCBDESC_USER_ID) 
+FROM SCBDESC WHERE SCBDESC_USER_ID = 'HUNTER_J' and scbdesc_activity_date > '15-APR-2019') AS "Jalen's Count",
+(SELECT COUNT (SCBDESC_USER_ID) 
+FROM SCBDESC WHERE SCBDESC_USER_ID = 'MOORE_C'  and scbdesc_activity_date > '15-APR-2019') AS "Cyndi's Count",
+(SELECT COUNT (SCBDESC_USER_ID) 
+FROM SCBDESC WHERE SCBDESC_USER_ID = 'THOMAS_K'and scbdesc_activity_date > '15-APR-2019' ) AS "Kevin's Count",
+(SELECT COUNT (SCBDESC_USER_ID) 
+FROM SCBDESC WHERE SCBDESC_USER_ID = 'MEEKS_M'and scbdesc_activity_date > '15-APR-2019' ) AS "Misti's Count"
+FROM DUAL;

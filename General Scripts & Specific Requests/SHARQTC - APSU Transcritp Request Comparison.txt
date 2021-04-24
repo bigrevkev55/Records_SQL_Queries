@@ -1,0 +1,18 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    16-JUN-2020
+--Purpose: Comparing transcript request sent to APSU from NSCC April 1, 2019 -June 15, 2019
+--         against the same dates for 2020.
+
+
+select *
+from shttran
+where --SHTTRAN_USER = 'MOORE_C'
+      --and 
+      SHTTRAN_REQUEST_DATE > '01-APR-2020'
+      and 
+      SHTTRAN_REQUEST_DATE < '16-JUN-2020'
+      and (SHTTRAN_ADDR_NAME Like '%AUSTIN%' or SHTTRAN_ADDR_NAME like '%Austin%');
+      
+      
+      
+      

@@ -1,0 +1,20 @@
+--  Author: Kevin Thomas, Interim Registrar
+--    Date: 13-NOV-2020
+-- Purpose: This query returns students that had holds 
+--          put on SOAHOLD with an incorrect "To Date".  
+
+select spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       SPRHOLD_HLDD_code,
+       sprhold_to_date
+
+from spriden, sprhold
+Where spriden_change_ind is NULL
+      and spriden_pidm = sprhold_pidm
+      and sprhold_Hldd_code = 'S1'
+      and sprhold_to_date = '02-NOV-2021'
+      and sprhold_from_date > '13-MAY-2020'
+      and sprhold_from_date < '14-MAY-2020';
+      
+      

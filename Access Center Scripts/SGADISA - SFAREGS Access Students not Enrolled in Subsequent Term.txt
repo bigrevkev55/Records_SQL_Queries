@@ -1,0 +1,115 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--Date:    26-JUN-2019
+--Purpose: This query finds Access Center Students that were enrolled in 201910 but were not enrolled
+--         in 201980 courses.  
+
+
+
+select  distinct spriden_id as "A Number",
+        spriden_last_name as "Last Name",
+        spriden_first_name as "First Name",        
+        SGRDISA_DISA_CODE as "Access Center Code",
+        sftregs.sftregs_rsts_code,
+        sftregs_term_code
+        
+
+from spriden, sftregs, sgrdisa
+
+Where spriden_pidm = sftregs_pidm
+      and spriden_pidm = sgrdisa_pidm
+      and spriden_change_ind is NULL
+      and sgrdisa_disa_code = 'Y'
+     and sftregs_rsts_code  = 'RE' 
+     and sftregs.sftregs_term_code = '201910'
+     and spriden_pidm not in (select sftregs_pidm from sftregs where sftregs_term_code = '201980' and sftregs.sftregs_rsts_code = 'RE') 
+Order by 2, 3;
+
+
+
+------------------2nd Script to include email address, phone----------------
+
+/*
+
+--Author:  Kevin Thomas, Assistant Registrar 
+--Date:    05-JUN-2019
+--Purpose: This query finds Access Center Students that withdrew during the 2018 - 2019 Fiscal Year
+--         for health related reasons.
+
+
+
+select  distinct spriden_id as "A Number",
+        spriden_last_name as "Last Name",
+        spriden_first_name as "First Name",        
+        SGRDISA_DISA_CODE as "Access Center Code",
+        sftregs.sftregs_rsts_code ,
+       -- attempted_hours as "Attempted Hours",
+       -- earned_hours as "Earned Hours",
+        pers_email as "Personal Email",
+        --(select GOREMAL_EMAIL_ADDRESS from goremal where goremal_emal_code in 'PERS' and goremal_preferred_ind = 'Y') AS "Email Address",
+        --goremal_status_ind as "Email Status",
+       -- goremal_preferred_ind 
+       phone_area || '-' ||phone_number as "Preferred Phone"  
+       
+from spriden, sftregs, sgrdisa, shrtgpa,
+/*pers email subquery*/
+    (select goremal_pidm as pers_email_pidm
+      ,      goremal_email_address as pers_email                 
+      from goremal
+      where goremal_emal_code = 'PERS'
+      and goremal_status_ind = 'A'
+      and goremal_preferred_ind = 'Y'),
+
+/*pers area code subquery*/      
+   (select sprtele_pidm as sprtele_phone_area_pidm,
+           sprtele_phone_area as phone_area
+    from sprtele
+    where sprtele_tele_code = 'PR'),
+    
+/*Active Phone Subquery*/
+    (select sprtele_pidm as sprtele_phone_number_pidm,
+            sprtele_phone_number as phone_number
+        from sprtele
+        where sprtele_tele_code = 'PR')--,
+
+/*Attempted Hours Subquery
+     (select shrtgpa_pidm as shrtgpa_attempted_hours_pidm,
+             SHRTGPA_HOURS_ATTEMPTED as attempted_hours
+       from shrtgpa
+       where SHRTGPA_GPA_HOURS > '0'
+            and shrtgpa_term_code = '201910'
+            and shrtgpa_gpa_type_ind = 'I'),
+
+/*Earned Hours Subquery
+   (select shrtgpa_pidm as shrtgpa_earned_hours_pidm,
+           SHRTGPA_HOURS_EARNED as earned_hours
+     from shrtgpa
+    where shrtgpa_term_code = '201910'
+          and SHRTGPA_GPA_TYPE_IND = 'I')*/
+    
+        
+Where spriden_pidm = sftregs_pidm
+      and spriden_pidm = sgrdisa_pidm
+      --AND spriden_pidm = GOREMAL_PIDM
+      and spriden_pidm = shrtgpa_pidm
+      and spriden_change_ind is NULL
+      and sgrdisa_disa_code = 'Y'
+     and sftregs_rsts_code  = 'RE' 
+     and sftregs.sftregs_term_code = '201910'
+     and shrtgpa_term_code = '201910'
+     and shrtgpa_hours_attempted > '0'
+     and spriden_pidm not in (select sftregs_pidm from sftregs where sftregs_term_code = '201980' and sftregs.sftregs_rsts_code = 'RE') 
+     --and goremal_emal_code IN ('PERS')--'CAMP')
+     --and (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+     --and goremal_preferred_ind = 'Y'
+     and pers_email_pidm (+) = spriden_pidm
+     and sprtele_phone_number_pidm (+) = spriden_pidm
+     and sprtele_phone_area_pidm (+) = spriden_pidm
+    -- and shrtgpa_attempted_hours_pidm (+) = spriden_pidm
+    -- and shrtgpa_earned_hours_pidm (+) = spriden_pidm
+Order by 2, 3;
+
+desc sprtele;
+
+desc shrtgpa;
+
+select * from shrtgpa where shrtgpa_gpa_type_ind <> 'I'; */

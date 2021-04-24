@@ -1,0 +1,32 @@
+--Author:  Kevin Thomas, Interim Registrar
+--Date:    03-JUL-2020
+--Purpose: This query returns 202080 Sections that have
+--         incorrect Section Numbers 
+--         on SSASECT (Web Delivery method but section number isn't W%).
+
+--        Use the output to change the section number (and Campus Code if applicable - all Web Sections must be 90M).
+
+
+--desc ssbsect;   select distinct ssbsect_insm_code from ssbsect where ssbsect_term_code = '202080';
+
+select  SSBSECT_TERM_CODE as "Term",
+        SSBSECT_CAMP_CODE as "Campus Code",
+        stvcamp_desc as "Campus",
+        SSBSECT_INSM_CODE as "Instructional Method",
+        GTVINSM.GTVINSM_DESC as "Description",
+        SSBSECT_CRN as "CRN",
+        SSBSECT_PTRM_CODE as "Part of Term",
+        SSBSECT_SUBJ_CODE as "Subject",
+        SSBSECT_CRSE_NUMB as "Course",
+        SSBSECT_SEQ_NUMB as "Section Number"
+             
+from ssbsect, gtvinsm, stvcamp
+where ssbsect_term_code = '202080' 
+      and SSBSECT_INSM_CODE = GTVINSM_CODE
+      and ssbsect_camp_code = stvcamp_code
+      and ssbsect_insm_code = 'WEB'
+      and ssbsect_seq_numb not like 'W%'          
+      and ssbsect_seq_numb not like 'S%'
+Order by SSBSECT_CAMP_CODE, SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB;
+
+

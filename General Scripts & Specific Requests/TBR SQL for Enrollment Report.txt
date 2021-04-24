@@ -1,0 +1,60 @@
+***  ISR_withSessionCode.sql (change term in two places) ***
+
+         SELECT SSBSECT_Term_Code as Term,
+         to_char(sysdate, 'DD-MON-YYYY') as RunDate,
+         to_char(sysdate, 'HH24:MI') as RunTime,
+         
+        SSBSECT_CRN as CRN,
+               ssbsect_ptrm_code as "Session",
+               SSBSECT_SUBJ_CODE AS SUBJECT, 
+               SSBSECT_CRSE_NUMB AS COURSE_NUMBER, 
+               SSBSECT_SEQ_NUMB AS COURSE_SECTION,
+               SPRIDEN_ID AS SCHOOL_ID, 
+               SPRIDEN_LAST_NAME AS LAST_NAME, 
+               SPRIDEN_FIRST_NAME AS FIRST_NAME,
+               SGBSTDN_DEGC_CODE_1 AS DEGREE,
+               SGBSTDN_MAJR_CODE_1 AS MAJOR,
+               SGBSTDN_MAJR_CODE_CONC_1 AS CONCENTRATION,
+               SFRSTCR_RSTS_CODE REG_TYPE,
+               TO_CHAR(SFRSTCR_RSTS_DATE, 'DD-MON-YYYY') AS REGISTERED_DATE,
+               
+               --Register Time
+               --to_char(SFRSTCR_RSTS_DATE, 'HH24:MI') as RegisterTime,
+               
+               
+               SSBSECT_CAMP_CODE AS LOCATION,
+               TO_CHAR(SFRSTCR_CREDIT_HR, '0.0') AS CREDIT_HOURS,
+               sgbstdn_styp_code as StudentType,
+               sgbstdn_admt_code as AdmitType
+        FROM SGBSTDN, SPRIDEN, SSBSECT, SFRAREG aa, SFRAREG bb, SFRSTCR
+        WHERE SGBSTDN_PIDM = SFRSTCR_PIDM
+        AND SGBSTDN_TERM_CODE_EFF =
+           (SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+            FROM SGBSTDN
+            WHERE SGBSTDN_PIDM = SFRSTCR_PIDM
+            AND SGBSTDN_TERM_CODE_EFF <= '201980')
+        AND SSBSECT_TERM_CODE = SFRSTCR_TERM_CODE
+        AND SSBSECT_CRN = SFRSTCR_CRN
+        AND aa.SFRAREG_PIDM(+) = SFRSTCR_PIDM
+        AND aa.SFRAREG_TERM_CODE(+) = SFRSTCR_TERM_CODE
+        AND aa.SFRAREG_CRN(+) = SFRSTCR_CRN
+        AND aa.SFRAREG_EXTENSION_NUMBER(+) = 0
+        AND bb.SFRAREG_PIDM(+) = SFRSTCR_PIDM
+        AND bb.SFRAREG_TERM_CODE(+) = SFRSTCR_TERM_CODE
+        AND bb.SFRAREG_CRN(+) = SFRSTCR_CRN
+        --AND SSBSECT_SUBJ_CODE = 'CIS'
+        AND SPRIDEN_PIDM = SFRSTCR_PIDM
+        AND SPRIDEN_CHANGE_IND IS NULL
+        AND SFRSTCR_TERM_CODE = '201980'
+        AND (SFRSTCR_ERROR_FLAG NOT IN ('F','D')
+             OR SFRSTCR_ERROR_FLAG IS NULL
+             OR SFRSTCR_RSTS_CODE IN
+                (SELECT STVRSTS_CODE
+                   FROM STVRSTS
+                  WHERE STVRSTS_CODE = SFRSTCR_RSTS_CODE
+                    AND STVRSTS_GRADABLE_IND = 'Y'))
+        ORDER BY 1,3,4;
+
+
+
+

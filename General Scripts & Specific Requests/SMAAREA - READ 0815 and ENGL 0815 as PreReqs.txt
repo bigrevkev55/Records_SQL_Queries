@@ -1,0 +1,20 @@
+
+
+
+-- Created By: Kevin Thomas, Assistant Director of Records and Registration (With Michael Rholing, NSCC Systems Analyst II)
+--       Date: January 2, 2019
+--    Purpose: Pull a list of courses that have the ENGL_COMP and READ_COMP Prereq on SMAAREA.  
+
+
+select    SMRACAA_AREA as "Course",
+          SMRACAA_TERM_CODE_EFF as "Effective Term",
+          SMRACAA_RULE as "Prerequisite",
+          SMRACAA_ACTIVITY_DATE as "Activity Date"
+from      smracaa x
+where   smracaa_area like 'Z%'
+and        smracaa_rule in ('READ_COMP','ENGL_COMP')
+and        smracaa_term_code_eff =
+             (select  max(smracaa_term_code_eff)
+                from smracaa y    
+                where y.smracaa_area = x.smracaa_area
+                and smracaa_rule in ('READ_COMP','ENGL_COMP'));

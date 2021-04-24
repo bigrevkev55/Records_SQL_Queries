@@ -1,0 +1,74 @@
+--Author:  Kevin Thomas, Interim Resistrar
+--Date:    12-MAR-2021
+--Purpose: This is a for the 2020-2021 VA Audit
+
+
+
+
+
+
+--desc sfrstca
+--desc stvrsts
+--desc sobptrm
+
+
+select --distinct spriden_id as "ID",
+       --sgrvetn_vetc_code as "Veteran Type",
+       STVVETC_DESC as "Benefit",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --SFRSTCA_CRN CRN,
+       --SFRSTCA_TERM_CODE as "Term",
+       --STVTERM_DESC as "Term",
+       --SSBSECT_PTRM_CODE as "Part of Term",
+      -- SSBSECT_CAMP_CODE as "Facility",
+         CASE
+           WHEN SSBSECT_CAMP_CODE = '90M'
+           Then '14905142'
+           WHEN SSBSECT_CAMP_CODE like '%R'
+           Then '14905142'
+           WHEN SSBSECT_CAMP_CODE = 'HC8'
+           Then '14X03442'
+           WHEN SSBSECT_CAMP_CODE = 'HKQ'
+           Then '14X03742'
+           WHEN SSBSECT_CAMP_CODE = 'HPB'
+           Then '14X04642'
+           WHEN SSBSECT_CAMP_CODE = 'HPC'
+           Then '14X03642'
+           
+           Else 'Other'
+           
+        End as "Facility Code",
+       SOBPTRM_START_DATE as "Term Start Date",
+       SOBPTRM_END_DATE as "Term End Date",
+       --SSBSECT_SUBJ_CODE Subject,
+       --SSBSECT_CRSE_NUMB Course,
+       --SSBSECT_SEQ_NUMB Section,
+       SFRSTCA_BILL_HR as "Bill Hours",
+       SFRSTCA_CREDIT_HR as "Credit Hours",
+       SFRSTCA_ACTIVITY_DATE as "Activity Date",  
+       --SFRSTCA_RSTS_CODE as "Registration Code",
+       STVRSTS_DESC as "Registration Code Description",
+       SFRSTCA_MESSAGE as "Message"--,
+       --SGRVETN.SGRVETN_TERM_CODE_VA Term,
+      --SFRSTCA_USER as "User ID"
+from spriden, SFRSTCA, sgrvetn, ssbsect, stvrsts, stvterm, sobptrm, stvvetc
+Where spriden_change_ind is NULL
+and STVRSTS_CODE = SFRSTCA_RSTS_CODE
+and (spriden_id = :A_Number or spriden_id like :A_Number)
+and spriden_pidm = sgrvetn_pidm
+and sgrvetn_pidm = SFRSTCA_pidm
+and SSBSECT_CRN = SFRSTCA_CRN
+and stvterm_code = SFRSTCA_TERM_CODE
+and SOBPTRM_TERM_CODE = sfrstca_term_code
+and SOBPTRM_PTRM_CODE = SSBSECT_PTRM_CODE 
+and stvvetc_code = sgrvetn_vetc_code
+and sgrvetn_vetc_code IN ('T','U','1', '5', 'C', 'D', 'H', 'L', '7')
+and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+and ssbsect_term_code = sgrvetn_term_code_va
+and sgrvetn.sgrvetn_term_code_VA = SFRSTCA_TERM_CODE
+--and (SFRSTCA_RSTS_CODE like 'D%' or SFRSTCA_RSTS_CODE like 'W%')
+and SFRSTCA_SOURCE_CDE = 'BASE'
+and SFRSTCA_ACTIVITY_DATE >= :DD_MON_YYYY
+and SFRSTCA_ACTIVITY_DATE < '01-DEC-2020'
+Order by SFRSTCA_ACTIVITY_DATE DESC, spriden_last_name,spriden_first_name
