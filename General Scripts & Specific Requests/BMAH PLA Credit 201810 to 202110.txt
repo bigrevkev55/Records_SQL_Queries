@@ -1,0 +1,54 @@
+-- Crated By: Kevin Thomas, Interim Registrar
+--      Date: 26-APR-2021
+--   Request: Request from Laurie Swanson,see below:
+
+/*  
+
+ Would you possibly have information on how many hours of PLA were
+ awarded to students in the BMAH division from spring 2018-spring 2021?
+
+*/
+
+
+
+--desc shrtrit;
+--desc shrtrcr;
+--desc shrtrce;
+--desc shrtram;
+--desc stvsbgi;
+--select SUM(SHRTRCE_CREDIT_HOURS) from shrtrce where shrtrce_pidm = '126633';
+
+
+select sum(shrtrce_credit_hours) as "Hours"
+,       shrtram_term_code_entered as "Term"
+,      spriden_id                as "ID"
+,      spriden_last_name         as "Last Name"
+,      spriden_first_name        as "First Name"
+,      shrtrit_sbgi_code         as "School Code"
+,      stvsbgi_desc              as "Institution"
+,      SHRTRCE_SUBJ_CODE         as "Subject"
+--,      SHRTRCE_CRSE_NUMB         as "Number"
+from shrtrce
+,    shrtram
+,    spriden
+,    shrtrit
+,    stvsbgi
+where spriden_pidm = shrtrce_pidm
+and shrtrit_pidm = shrtrce_pidm
+and shrtrit_pidm = shrtram_pidm
+and shrtrit_seq_no = shrtrce_trit_seq_no
+and shrtrit_seq_no = shrtram_trit_seq_no
+and shrtrit_sbgi_code = stvsbgi_code
+and spriden_change_ind is null
+--and spriden_id = '&id'
+and shrtrit_sbgi_code IN (select STVSBGI_CODE
+                                  From stvsbgi
+                                  Where STVSBGI_ADMR_CODE is NULL)
+and SHRTRCE_SUBJ_CODE = 'BUSN'                                  
+and shrtram_term_code_entered >'201880'
+and shrtram_term_code_entered <'202150'
+group by shrtram_term_code_entered,spriden_id,spriden_last_name,spriden_first_name, shrtrit_sbgi_code, stvsbgi_desc,SHRTRCE_SUBJ_CODE--, SHRTRCE_CRSE_NUMB 
+Order by shrtrit_sbgi_code, spriden_last_name,spriden_first_name ;
+
+
+   
