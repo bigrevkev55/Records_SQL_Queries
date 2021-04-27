@@ -1,0 +1,20 @@
+--Author:  Noraa Ataher, Systems Analyst II
+--Date:    27-APR-2021
+--Purpose: Returns VA Students that have changed their major, by prompted term.
+
+
+
+select spriden_id Student_Id,
+      f_format_name(spriden_pidm,'LFMI') Name,
+      SGBSTDN_majr_code_1 Major,
+     case when SGBSTDN_majr_code_conc_1 is not null then SGBSTDN_majr_code_conc_1 else 'null' end Concentration,
+        sgbstdn_degc_code_1 Degree
+        from sgbstdn, spriden, sgrvetn 
+
+where spriden_pidm = sgbstdn_pidm
+and spriden_pidm = sgrvetn_pidm
+and spriden_change_ind is null
+and sgrvetn_vetc_code is not null
+and SGBSTDN_TERM_CODE_EFF = :Term
+and sgrvetn_term_code_va = SGBSTDN_TERM_CODE_EFF
+order by 2
