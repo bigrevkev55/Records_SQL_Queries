@@ -10,7 +10,7 @@
 --           2.  Added a script at the top that does a better job of looking for courses that should be an FN.  
 --           Previously, we were only looking for F grades that should be FN but this script looks for LDA 
 --           that does not have a grade of FN.  ...kt...1/7/2021
-
+--           3.  Changed the sort order on all queries and added additional queries...kt...5/12/21
 
 
 --Script to find grades that should be FN (LDA the day before class starts)
@@ -30,15 +30,16 @@ and   spriden_pidm = sfrstcr_pidm
 and   sfrstcr_term_code = ssbsect_term_code
 and   sfrstcr_crn = ssbsect_crn
 and   sfrstcr_term_code = :Term
-and   sfrstcr_ptrm_code = :Part_of_Term
---and   sfrstcr_ptrm_code IN ('6','RA1')
+--and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code IN ('6','RA1', '1', 'R', 'O')
+and   sfrstcr_ptrm_code IN ('7', 'RA2')
 --and   ssbsect_subj_code = 'ENGL'
 --and   ssbsect_crse_numb IN ('1010','1020')
 --and   sfrstcr_grde_code = :Grade
 and   sfrstcr_grde_code not in  ('FN', 'W') --Do not look for W grades as its possible to never attend
                                             --but withdraw from the class, thus resulting in a W grade.
 and   sfrstcr_last_attend = :Day_Before_First_Date
-order by ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb,spriden_last_name,spriden_first_name;
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
 
 
 
@@ -60,17 +61,19 @@ and   spriden_pidm = sfrstcr_pidm
 and   sfrstcr_term_code = ssbsect_term_code
 and   sfrstcr_crn = ssbsect_crn
 and   sfrstcr_term_code = :Term
-and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code IN ('1', 'R', 'O')
 --and   sfrstcr_ptrm_code IN ('6','RA1')
+and   sfrstcr_ptrm_code IN ('7', 'RA2')
 --and   ssbsect_subj_code = 'ENGL'
 --and   ssbsect_crse_numb IN ('1010','1020')
 --and   sfrstcr_grde_code = :Grade
 and   sfrstcr_grde_code = 'F'
 and   sfrstcr_last_attend <= :Enter_Date -- Date Format: DD-MON-YYYY
 and   sfrstcr_last_attend >= :First_Day_of_Term --The previous script finds grades that need to be FN so this prompt was added to not return LDA before the term begins.
-order by ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb,spriden_last_name,spriden_first_name;
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
 
---Script to Find "FA" Grades that should be "F" Grades
+--Script to Find "FA" Grades that should be "F" Grades as LDA is after last day to earn FA
 select spriden_id as "ID",
        spriden_last_name as "Last Name",
        spriden_first_name as "First Name",
@@ -87,18 +90,20 @@ and   spriden_pidm = sfrstcr_pidm
 and   sfrstcr_term_code = ssbsect_term_code
 and   sfrstcr_crn = ssbsect_crn
 and   sfrstcr_term_code = :Term
-and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code IN ('1', 'R', 'O')
 --and   sfrstcr_ptrm_code IN ('6','RA1')
+and   sfrstcr_ptrm_code IN ('7', 'RA2')
 --and   ssbsect_subj_code = 'ENGL'
 --and   ssbsect_crse_numb IN ('1010','1020')
 --and   sfrstcr_grde_code = :Grade
 and   sfrstcr_grde_code = 'FA'
 and   sfrstcr_last_attend > :Enter_Date -- Date Format: DD-MON-YYYY
-order by ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb,spriden_last_name,spriden_first_name;
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
 
 --desc sfrstcr;
 
-
+/*
 --Script to find grades that should be FN (LDA the day before class starts)
 select spriden_id as "ID",
        spriden_last_name as "Last Name",
@@ -124,4 +129,78 @@ and   sfrstcr_ptrm_code = :Part_of_Term
 and   sfrstcr_grde_code not in ('FN', 'W')
 --and   sfrstcr_last_attend > :Enter_Date -- Date Format: DD-MON-YYYY
 and   sfrstcr_last_attend = :Day_Before_First_Date
-order by ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb,spriden_last_name,spriden_first_name;
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
+
+*/
+
+--Script to find students with null engagement or reported as not engaged but have a grade other than FN
+--DESC SZRATND;
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       ssbsect_crn as "CRN",
+       sfrstcr_ptrm_code as "Part-Of-Term",
+       ssbsect_subj_code as "Subject",
+       ssbsect_crse_numb as "Crse Numb",
+       ssbsect_seq_numb as "Section",
+       sfrstcr_grde_code as "Grade",
+       sfrstcr_last_attend as "LDA",
+       SZRATND_ATTENDING_IND as "Reported Engagement"
+from spriden,ssbsect,sfrstcr, SZRATND
+where spriden_change_ind IS NULL
+and  spriden_pidm = szratnd_pidm
+and  SZRATND_CRN = ssbsect_crn
+and   spriden_pidm = sfrstcr_pidm
+and   sfrstcr_term_code = ssbsect_term_code
+and   sfrstcr_crn = ssbsect_crn
+and   sfrstcr_term_code = :Term
+--and   sfrstcr_term_code = szratnd_term_code
+--and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code IN ('6','RA1')
+--and   ssbsect_subj_code = 'ENGL'
+--and   ssbsect_crse_numb IN ('1010','1020')
+--and   sfrstcr_grde_code = :Grade
+and   sfrstcr_grde_code not in ('FN', 'W')
+and  (SZRATND_ATTENDING_IND not in ('Y', 'S') or SZRATND_ATTENDING_IND IS NULL)
+
+--and   sfrstcr_last_attend > :Enter_Date -- Date Format: DD-MON-YYYY
+--and   sfrstcr_last_attend = :Day_Before_First_Date
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
+
+
+--Script to find students not reported attending but have a grade of FN
+--DESC SZRATND;
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       ssbsect_crn as "CRN",
+       sfrstcr_ptrm_code as "Part-Of-Term",
+       ssbsect_subj_code as "Subject",
+       ssbsect_crse_numb as "Crse Numb",
+       ssbsect_seq_numb as "Section",
+       sfrstcr_grde_code as "Grade",
+       sfrstcr_last_attend as "LDA",
+       SZRATND_ATTENDING_IND as "Reported Engagement"
+from spriden,ssbsect,sfrstcr, SZRATND
+where spriden_change_ind IS NULL
+and  spriden_pidm = szratnd_pidm
+and  SZRATND_CRN = ssbsect_crn
+and   spriden_pidm = sfrstcr_pidm
+and   sfrstcr_term_code = ssbsect_term_code
+and   sfrstcr_crn = ssbsect_crn
+and   sfrstcr_term_code = :Term
+--and   sfrstcr_term_code = szratnd_term_code
+--and   sfrstcr_ptrm_code = :Part_of_Term
+--and   sfrstcr_ptrm_code IN ('6','RA1')
+--and   ssbsect_subj_code = 'ENGL'
+--and   ssbsect_crse_numb IN ('1010','1020')
+--and   sfrstcr_grde_code = :Grade
+and   sfrstcr_grde_code  in ('FN')
+and  SZRATND_ATTENDING_IND = 'Y'
+
+--and   sfrstcr_last_attend > :Enter_Date -- Date Format: DD-MON-YYYY
+--and   sfrstcr_last_attend = :Day_Before_First_Date
+order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
+
+
+
