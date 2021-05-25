@@ -1,0 +1,23 @@
+--Author:  Kevin Thomas, Interim Registrar
+--Date:    25-MAY-2021
+--Purpose: This script provides a list of transcripts that have been marked as reviewed on SOAPCOL by prompted term
+
+
+select --spriden_id as "A Number",
+       --spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --sorpcol_sbgi_code as "School Code",
+       stvsbgi_desc as "School",
+       --goremal_emal_code as "Email Type",
+       GOREMAL_EMAIL_ADDRESS as "Email Address"--,
+       --goremal_preferred_ind preferred_ind
+from spriden, sorpcol, stvsbgi, goremal
+where sorpcol_trans_rev_date = :DD_MON_YYYY
+      and sorpcol_sbgi_code = stvsbgi_code
+      and sorpcol_pidm = spriden_pidm
+      and spriden_change_ind is NULL
+      and spriden_pidm = goremal_pidm
+      and goremal_emal_code = 'PERS'
+      and goremal_preferred_ind = 'Y'
+      
+Order by spriden_last_name;
