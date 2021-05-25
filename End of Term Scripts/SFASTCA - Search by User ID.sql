@@ -23,8 +23,8 @@ where spriden_change_ind IS NULL
 and   spriden_pidm = sfrstca_pidm
 and   sfrstca_pidm = goremal_pidm
 and   sfrstca_term_code = :TERM
-and   sfrstca_user = 'THOMAS_K'
-and   sfrstca_activity_date > = '08-MAY-2019' 
+and   sfrstca_user in ('THOMAS_K', 'KOVACS_A')
+and   sfrstca_activity_date > = '13-MAY-2021' 
 and   sfrstca_rsts_code = 'DD'
 and   sfrstca_source_cde = 'BASE'
 and   goremal_emal_code = 'CAMP'

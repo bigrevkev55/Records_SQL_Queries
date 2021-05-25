@@ -133,7 +133,7 @@ order by spriden_last_name,spriden_first_name, sfrstcr_ptrm_code, ssbsect_subj_c
 
 */
 
---Script to find students with null engagement or reported as not engaged but have a grade other than FN
+--Script to find students reported as not engaged but have a grade other than FN
 --DESC SZRATND;
 select spriden_id as "ID",
        spriden_last_name as "Last Name",
@@ -161,7 +161,7 @@ and   sfrstcr_term_code = :Term
 --and   ssbsect_crse_numb IN ('1010','1020')
 --and   sfrstcr_grde_code = :Grade
 and   sfrstcr_grde_code not in ('FN', 'W')
-and  (SZRATND_ATTENDING_IND not in ('Y', 'S') or SZRATND_ATTENDING_IND IS NULL)
+and  SZRATND_ATTENDING_IND not in ('Y', 'S')
 
 --and   sfrstcr_last_attend > :Enter_Date -- Date Format: DD-MON-YYYY
 --and   sfrstcr_last_attend = :Day_Before_First_Date
