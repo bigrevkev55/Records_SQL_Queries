@@ -5,6 +5,7 @@
 --Edits:  1. Added Degree Status Program, Email, and Phone number columns
 --        commented out attachment and cancelled indicators...kt...25-JAN-2021
 --        2. Added graduation status so we can see GRN students.  
+--        3. Added a prompt for graduation term as we only need to update based on prompted term.
 
 --DESC shrteos;
 --DESC shrteod;
@@ -26,6 +27,8 @@ SHRDGMR_GRST_CODE  Graduation_Status,
 --SHBTEOT_CANCEL_IND CANCELLED,
 SHRTEOD_RECIPIENT_NAME RECIPIENT,
 shrteod.shrteod_hold_degree_curriculum as "STUDENT_REPORTED_PoS",  --Student chooses from drop down list of currently enrolled programs when placing the order
+--SHRDGMR_SEQ_NO as "Sequence NO",
+SHRDGMR_TERM_CODE_GRAD as "Graduating Term",
 SHRDGMR_DEGC_CODE || '_' || SHRDGMR_MAJR_CODE_1 || '_' || SHRDGMR_MAJR_CODE_CONC_1 as "Degree Status Program"
 
 FROM shrteos--, spriden--, shrteod, shbteot 
@@ -35,8 +38,10 @@ INNER JOIN shrdgmr
 on shrteos_pidm = shrdgmr_pidm
 iNNER JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
 --inner join spriden on shrteos_pidm = spriden_pidm
+and SHRDGMR_TERM_CODE_GRAD = :Term
 and shrteos_etst_code = 'AD'
 ---and spriden_pidm = shrteos_pidm
 and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code = 'RG') --Subquery to filter out former AD status requests that have been processed already.
 and SHBTEOT_CANCEL_IND <> 'Y'
+
 ORDER BY shbteot_last_name, shbteot_first_name;
