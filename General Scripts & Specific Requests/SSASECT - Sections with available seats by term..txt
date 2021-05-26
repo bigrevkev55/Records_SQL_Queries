@@ -1,7 +1,7 @@
 --Author:     Kevin Thomas, Assitant Director of Records and Registration
 --Date:       January 14, 2019
 --Purpose:    This script queries SSASECT by prompted term for sections that have available seats.
-
+--Edits:      Added columns to see if sections are viewable in SSB or Need Approval
 
 
 
@@ -36,10 +36,20 @@ select SSBSECT_TERM_CODE AS Term,
             else null
             end as "Part of Term",
        SSBSECT_CRSE_NUMB AS "Number",
-       SSBSECT_CAMP_CODE AS Campus,
-       SSBSECT_SEATS_AVAIL AS "Available Seats" 
-FROM SSBSECT
+       --SSBSECT_CAMP_CODE AS "Campus Code",
+       stvcamp_desc as "Campus",
+       SSBSECT_SSTS_CODE as "Section Status",
+       SSBSECT_VOICE_AVAIL as "Viewable in SSB",
+       --SSBSECT_SAPR_CODE as "Approval Required",
+         CASE 
+         when SSBSECT_SAPR_CODE = 'DE'
+         then 'Dean'
+         else NULL
+         End as "Approval Required",
+       SSBSECT_SEATS_AVAIL AS "Available Seats"
+FROM SSBSECT,stvcamp
 WHERE SSBSECT_SEATS_AVAIL > 0
+      and stvcamp_code = ssbsect_camp_code
       AND SSBSECT_TERM_CODE = :Term
      -- AND SSBSECT_PTRM_CODE NOT IN ('7', 'RA2')
-ORDER BY 3,5;
+ORDER BY ssbsect_ptrm_code, SSBSECT_SUBJ_CODE,SSBSECT_CRSE_NUMB;
