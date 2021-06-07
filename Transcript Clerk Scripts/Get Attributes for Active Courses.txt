@@ -1,0 +1,30 @@
+--Author:	Javon Yokley, Records Clerk
+--Date:  	5/25/21
+--Purpose:      This query selects all attributes tied to a specific course.  
+
+--Script:
+
+SELECT a.scrattr_subj_code AS "Subject Code",
+       a.scrattr_crse_numb AS "Course Number",
+       b.scbcrse_title AS "Course Title",
+       LISTAGG(DISTINCT a.scrattr_attr_code, ', ') 
+       WITHIN GROUP (ORDER BY a.scrattr_attr_code) AS "Attributes"
+FROM scrattr a, scbcrse b
+WHERE (b.scbcrse_subj_code = a.scrattr_subj_code
+and    b.scbcrse_crse_numb = a.scrattr_crse_numb)
+and a.scrattr_subj_code = 'CITC'		--Change subject or remove line to get all courses
+GROUP BY a.scrattr_subj_code, a.scrattr_crse_numb, b.scbcrse_title
+
+
+-------------------------------------------------------------------------------------
+Checking for Attribute Updates
+-------------------------------------------------------------------------------------
+
+SELECT a.scrattr_subj_code AS "Subject Code",
+       a.scrattr_crse_numb AS "Course Number",
+       b.scbcrse_title AS "Course Title",
+       LISTAGG(DISTINCT a.scrattr_attr_code, ', ') 
+       WITHIN GROUP (ORDER BY a.scrattr_attr_code) AS "Attributes"
+FROM scrattr a
+WHERE a.scrattr_activity_date >= '01-JAN-2021'	--Change monthly
+GROUP BY a.scrattr_subj_code, a.scrattr_crse_numb, b.scbcrse_title
