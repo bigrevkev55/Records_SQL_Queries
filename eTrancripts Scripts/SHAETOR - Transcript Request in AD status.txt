@@ -6,6 +6,7 @@
 --        commented out attachment and cancelled indicators...kt...25-JAN-2021
 --        2. Added graduation status so we can see GRN students.  
 --        3. Added a prompt for graduation term as we only need to update based on prompted term.
+--        4. Changed sort to sort by descending order date.
 
 --DESC shrteos;
 --DESC shrteod;
@@ -44,4 +45,4 @@ and shrteos_etst_code = 'AD'
 and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code = 'RG') --Subquery to filter out former AD status requests that have been processed already.
 and SHBTEOT_CANCEL_IND <> 'Y'
 
-ORDER BY shbteot_last_name, shbteot_first_name;
+ORDER BY SHRTEOS_ETST_DATE desc, shbteot_last_name, shbteot_first_name;

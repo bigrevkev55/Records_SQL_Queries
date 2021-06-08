@@ -1,6 +1,9 @@
 -- Crated By: Kevin Thomas, Interim Registrar
 --      Date: 26-APR-2021
 --   Request: Request from Laurie Swanson,see below:
+-- Edited by: Javon Yokley, Records Clerk
+-- Edit Date: 7-JUN-2021
+--    Change: Added additional subjects to script
 
 /*  
 
@@ -44,7 +47,7 @@ and spriden_change_ind is null
 and shrtrit_sbgi_code IN (select STVSBGI_CODE
                                   From stvsbgi
                                   Where STVSBGI_ADMR_CODE is NULL)
-and SHRTRCE_SUBJ_CODE = 'BUSN'                                  
+and SHRTRCE_SUBJ_CODE in ('ACCT', 'ADMN', 'BUSN', 'ECON', 'ENTR', 'FIN', 'HCMT', 'HMGT', 'LOGI')
 and shrtram_term_code_entered >'201880'
 and shrtram_term_code_entered <'202150'
 group by shrtram_term_code_entered,spriden_id,spriden_last_name,spriden_first_name, shrtrit_sbgi_code, stvsbgi_desc,SHRTRCE_SUBJ_CODE--, SHRTRCE_CRSE_NUMB 
