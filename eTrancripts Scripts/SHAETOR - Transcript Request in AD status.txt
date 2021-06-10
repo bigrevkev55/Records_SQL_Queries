@@ -6,7 +6,7 @@
 --        commented out attachment and cancelled indicators...kt...25-JAN-2021
 --        2. Added graduation status so we can see GRN students.  
 --        3. Added a prompt for graduation term as we only need to update based on prompted term.
---        4. Changed sort to sort by descending order date.
+--        4. Changed sort to sort by descending order date and added 'FO' status to subquery filter...kt...6.10.21
 
 --DESC shrteos;
 --DESC shrteod;
@@ -42,7 +42,7 @@ iNNER JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
 and SHRDGMR_TERM_CODE_GRAD = :Term
 and shrteos_etst_code = 'AD'
 ---and spriden_pidm = shrteos_pidm
-and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code = 'RG') --Subquery to filter out former AD status requests that have been processed already.
+and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code in ('RG', 'FO')) --Subquery to filter out former AD status requests that have been processed already.
 and SHBTEOT_CANCEL_IND <> 'Y'
 
 ORDER BY SHRTEOS_ETST_DATE desc, shbteot_last_name, shbteot_first_name;
