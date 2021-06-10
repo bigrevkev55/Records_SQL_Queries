@@ -1,0 +1,45 @@
+--Author:     Kevin Thomas, Assitant Director of Records and Registration
+--Date:       January 14, 2019
+--Purpose:    This script queries SSASECT by prompted term for sections that have available seats.
+
+
+
+
+select SSBSECT_TERM_CODE AS Term,
+       SSBSECT_CRN AS CRN,
+       SSBSECT_SUBJ_CODE AS Subject,
+       SSBSECT_CRSE_NUMB AS Course,
+       --SSBSECT_PTRM_CODE AS "Part of Term",
+       Case 
+       when ssbsect_ptrm_code = '1'
+            then 'Full Term'
+            when ssbsect_ptrm_code = '2'
+            then 'First 5-Week Summer Session'
+            when ssbsect_ptrm_code = '3'
+            then 'Second 5-Week Summer Session'
+            when ssbsect_ptrm_code = '4'
+            then 'Weekend Full Term Summer'
+            when ssbsect_ptrm_code = 'O'
+            then 'Open Session'
+            when ssbsect_ptrm_code = 'R' 
+            then 'TN eCampus Full session'
+            when ssbsect_ptrm_code = '6'
+            then '1st 7 Week Session'
+            when ssbsect_ptrm_code = '7'
+            then 'Second 7 Week Session'
+            when ssbsect_ptrm_code = '8'
+            then 'Weekend Full Term'
+            when ssbsect_ptrm_code = 'RA1'
+            then 'TN eCampus 1st 7 Weeks'
+            when ssbsect_ptrm_code = 'RA2'
+            then 'TN eCampus 2nd 7 Weeks'
+            else null
+            end as "Part of Term",
+       SSBSECT_CRSE_NUMB AS "Number",
+       SSBSECT_CAMP_CODE AS Campus,
+       SSBSECT_SEATS_AVAIL AS "Available Seats" 
+FROM SSBSECT
+WHERE SSBSECT_SEATS_AVAIL > 0
+      AND SSBSECT_TERM_CODE = :Term
+     -- AND SSBSECT_PTRM_CODE NOT IN ('7', 'RA2')
+ORDER BY 3,5;
