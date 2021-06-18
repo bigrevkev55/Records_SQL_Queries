@@ -1,0 +1,63 @@
+--Author:  Kevin Thomas, Interim Registrar
+--Date:    18-JUN-2021
+--Source:  From Trey Dalton's edits below.  Edited just to find VA Students to have FA or FN. 
+--         This script isn't concerned with incongruent attendance/grade reporting.
+--Purpose: This query returns VA students who have a FA or FN current grade, by prompted term.
+
+
+
+/*
+This report attempts to find students whose reported grade for a class isn't    ----edited by Trey Dalton, Systems Analyst II 6.10.21
+compatible with their reported engagement for that class i.e. they received 
+an FN grade, but were marked as attending that class, or they have a B grade, 
+and were marked as not attending.
+*/
+
+
+select  distinct spriden_id student_id
+        , sgrvetn_vetc_code vet_code
+        , spriden_last_name last_name
+        , spriden_first_name first_name
+        , sfvstms_crn crn
+        , sfvstms_ptrm_code part_of_term
+        , sfvstms_subj_code subject
+        , sfvstms_crse_numb course_number
+        , sfvstms_seq_numb section 
+        , shrtckg_grde_code_final grade
+        , sfvstms_last_attend lda
+        , sfvstms_attending_ind reported_engagement        
+from    spriden
+        , sfvstms 
+        , shrtckg
+        , shrtckn,
+        sgrvetn
+where   spriden_change_ind is null
+and     spriden_pidm = sgrvetn_pidm
+and     sfvstms_pidm = spriden_pidm
+and     shrtckg_pidm = spriden_pidm
+and     shrtckn_pidm = spriden_pidm
+and     sfvstms_term_code = :term_code
+and     shrtckg_term_code = :term_code
+and     shrtckn_term_code = :term_code
+and     sgrvetn_term_code_VA = :term_code
+and     sgrvetn_vetc_code is not null
+and     shrtckn_crn = sfvstms_crn
+and     ((
+                shrtckg_grde_code_final = 'FN'
+                --and sfvstms_attending_ind not in ('Y','S')
+        )
+or      (
+                shrtckg_grde_code_final in 'FA'
+                --and sfvstms_attending_ind in ('Y','S')
+        ))
+and     shrtckn_term_code = :term_code
+and     shrtckn_seq_no = shrtckg_tckn_seq_no
+and     shrtckg_seq_no = (
+                                select max(a.shrtckg_seq_no)
+                                from shrtckg a
+                                where a.shrtckg_pidm = shrtckg.shrtckg_pidm
+                                and a.shrtckg_term_code = shrtckg.shrtckg_term_code
+                                and a.shrtckg_tckn_seq_no = shrtckg.shrtckg_tckn_seq_no
+                         )
+order by sgrvetn_vetc_code, spriden_last_name, spriden_first_name, sfvstms_last_attend
+;
