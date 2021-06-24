@@ -1,0 +1,43 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     24-JUN-2021
+--Purpose:  Requested by Kevin Thomas. The first block reports the Spring 2021 students whose 
+--          cumulative GPA is below a 2.0. The second block returns the total number of rows   
+--          from first block's criteria 
+
+--desc shrtgpa
+--desc shrlgpa
+
+--Get student information/GPAs for spring 21 students for spot-checking purposes
+
+SELECT spriden_id as "A Number"
+,      spriden_last_name as "Last Name"
+,      spriden_first_name as "First Name"
+,      shrlgpa_levl_code as "Level"
+,      shrlgpa_gpa_type_ind as "GPA Type"
+,      shrtgpa_term_code as "Term Code"
+,      shrlgpa_gpa as "GPA"
+FROM spriden, shrtgpa, shrlgpa
+WHERE spriden_pidm = shrtgpa_pidm
+AND shrlgpa_pidm = shrtgpa_pidm
+AND spriden_change_ind is NULL
+AND shrtgpa_term_code = '202110'
+AND shrlgpa_gpa_type_ind = 'C' 
+AND shrtgpa_gpa_type_ind = 'I'
+AND shrlgpa_gpa < 2.0
+AND shrlgpa_levl_code = 'UG'
+AND shrtgpa_levl_code = 'UG'
+order by 2
+
+--Get total number of students below a cumulative 2.0 gpa
+
+SELECT COUNT(spriden_id)
+FROM spriden, shrtgpa, shrlgpa
+WHERE spriden_pidm = shrtgpa_pidm
+AND shrlgpa_pidm = shrtgpa_pidm
+AND spriden_change_ind is NULL
+AND shrtgpa_term_code = '202110'
+AND shrlgpa_gpa < 2.0
+AND shrlgpa_gpa_type_ind = 'C' --Returns Overall Combined GPA
+AND shrtgpa_gpa_type_ind = 'I'
+AND shrlgpa_levl_code = 'UG'
+AND shrtgpa_levl_code = 'UG'
