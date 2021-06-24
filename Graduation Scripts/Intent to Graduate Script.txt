@@ -4,7 +4,7 @@
 --             Graduate packet.  Be sure to adjust the term as needed.  Also,
 --             the student's email and addresses have been edited out but can 
 --             be put back in. Can also edit by campus code.   
---             Note: This script doesn't include studens with a GRN grad status...kt...3.18.21
+--             Note: This script doesn't include students with a GRN grad status...kt...3.18.21
 
 
 select spriden_id as "ID",
