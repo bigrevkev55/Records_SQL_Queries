@@ -1,7 +1,7 @@
 -- Author:  Kevin Thomas, Assistant Registrar
 --   Date:  19-MAR-2020
---Purpose: This query students who have failed a first 5 or 7 week course. Use this to make sure they are not enrolled in the 2nd 7 week concurrent course.   
-
+--Purpose: This query students who have failed a first 5 or 7 week course. Use this to make sure they are not enrolled in the 2nd 5/7 week concurrent course.   
+--         Only need to check courses that have a 2nd 5/7 week concurrent course.  
 
 
 --desc ssbsect;  select distinct SSBSECT_SSTS_CODE from ssbsect;
