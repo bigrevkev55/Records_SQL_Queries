@@ -3,6 +3,7 @@
 --Purpose:  Requested by Kevin Thomas. The first block reports the Spring 2021 students whose 
 --          cumulative GPA is below a 2.0. The second block returns the total number of rows   
 --          from first block's criteria 
+--Edit:     Updated spot check script to look at previous Academic Academic Standing. 
 
 --desc shrtgpa
 --desc shrlgpa
@@ -16,17 +17,22 @@ SELECT spriden_id as "A Number"
 ,      shrlgpa_gpa_type_ind as "GPA Type"
 ,      shrtgpa_term_code as "Term Code"
 ,      shrlgpa_gpa as "GPA"
-FROM spriden, shrtgpa, shrlgpa
+,      SGBSTDN_ASTD_CODE as "ASTD"
+,      sgbstdn_term_code_eff as "SGBSTDN TERM"
+--,      (Select max (sgbstdn_term_code_eff)from sgbstdn, spriden where spriden_pidm = b.spriden_pidm) as "Last ASTD"
+FROM spriden, shrtgpa, shrlgpa, sgbstdn a
 WHERE spriden_pidm = shrtgpa_pidm
+and sgbstdn_pidm = spriden_pidm
 AND shrlgpa_pidm = shrtgpa_pidm
 AND spriden_change_ind is NULL
 AND shrtgpa_term_code = '202110'
-AND shrlgpa_gpa_type_ind = 'C' 
+AND shrlgpa_gpa_type_ind = 'C'
 AND shrtgpa_gpa_type_ind = 'I'
 AND shrlgpa_gpa < 2.0
 AND shrlgpa_levl_code = 'UG'
 AND shrtgpa_levl_code = 'UG'
-order by 2
+and sgbstdn_term_code_eff = (select max(sgbstdn_term_code_eff) from sgbstdn where sgbstdn_pidm = spriden_pidm) --and sgbstdn_Term_code_eff < '202110')
+order by 8,2,3, sgbstdn_term_code_eff desc;
 
 --Get total number of students below a cumulative 2.0 gpa
 
@@ -40,4 +46,4 @@ AND shrlgpa_gpa < 2.0
 AND shrlgpa_gpa_type_ind = 'C' --Returns Overall Combined GPA
 AND shrtgpa_gpa_type_ind = 'I'
 AND shrlgpa_levl_code = 'UG'
-AND shrtgpa_levl_code = 'UG'
+AND shrtgpa_levl_code = 'UG';
