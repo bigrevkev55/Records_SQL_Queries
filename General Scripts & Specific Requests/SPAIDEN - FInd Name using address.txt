@@ -1,0 +1,11 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    27-JUL-2021
+--Purpose: This is a query to look up a student by address
+
+--SQL:
+
+select spraddr_pidm, spriden_id, spriden_last_name, spriden_first_name, SPRADDR_ATYP_CODE, spraddr_street_line1    
+from spraddr, spriden
+where spriden_pidm = spraddr_pidm
+      and spraddr_street_line1 like '102 Batya%'
+      and spriden_change_ind IS NULL;
