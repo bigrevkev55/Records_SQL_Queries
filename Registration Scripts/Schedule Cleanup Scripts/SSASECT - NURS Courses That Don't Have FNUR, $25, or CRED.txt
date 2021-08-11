@@ -1,3 +1,9 @@
+--Author:  Javon Yokley, Records Clerk
+--Date:    11-AUG-2021
+--Purpose: This query finds NURS courses that do not have a 
+--	   detail code of FNUR, amount of $25, or type of CRED
+--	   on SSADETL
+
 select ssrfees_term_code as "Term Code",
        ssbsect_crn as "CRN",
        ssbsect_subj_code as "Subject Code",
