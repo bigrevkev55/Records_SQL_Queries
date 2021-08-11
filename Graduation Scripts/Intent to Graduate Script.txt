@@ -21,9 +21,9 @@ select spriden_id as "ID",
        shrdgmr_program as "Program Code",
        shrdgmr_degc_code as "Degree",
        shrdgmr_majr_code_1 as "Major",
-       shrdgmr_majr_code_conc_1 as "Conc"
-    --   goremal_emal_code as Email,
-    --   GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+       shrdgmr_majr_code_conc_1 as "Conc",
+    goremal_emal_code as Email,
+    GOREMAL_EMAIL_ADDRESS as "NSCC Email"
        
 from spriden,shrdgmr, sovlcur, SHRLGPA--goremal
 where spriden_change_ind IS NULL
@@ -48,7 +48,7 @@ and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')  --excludes students with G
 and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
 --and   shrdgmr_degc_code = :Degree
 --and spriden_pidm = GOREMAL_PIDM
---and goremal_emal_code IN ('CAMP','PERS')
---and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+and goremal_emal_code IN ('CAMP','PERS')
+and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
 --and SORLCUR_SITE_CODE in ('H43')
 order by spriden_last_name,spriden_first_name,shrdgmr_degc_code,shrdgmr_program;

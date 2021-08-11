@@ -1,0 +1,15 @@
+select ssrfees_term_code as "Term Code",
+       ssbsect_crn as "CRN",
+       ssbsect_subj_code as "Subject Code",
+       ssbsect_crse_numb as "Course Number",
+       ssrfees_detl_code as "Detail Code",
+       ssrfees_amount as "Amount",
+       ssrfees_ftyp_code as "Type"
+from ssrfees, ssbsect
+where ssrfees_crn = ssbsect_crn
+and ssbsect_term_code = ssrfees_term_code
+and ssrfees_term_code = :term_code
+and ssbsect_subj_code = 'NURS'
+and (ssrfees_detl_code not in 'FNUR' 
+    or ssrfees_amount not in 25
+    or ssrfees_ftyp_code not in 'CRED')
