@@ -4,7 +4,7 @@
 --         amount the fee is suppossed to be.  
 --  Edits: 1.  Added correct fees, instructional method, campus, and section code to output to prevent referencing SSASECT manually...kt...15-JAN-2021
 --         2.  Corrected issue where previous terms would appear in the output...kt...15-JAN-2021
---         3.  Added Current DCM Fee, Subject, campus, and Course columns as well setting the output to return the actual current DCM...kt...20-AUG-2021
+--         3.  Added Current DCM Fee, Subject, campus, and Course columns and changed first query to a full outer join to return proper data...kt...20-AUG-2021
 
 
 --desc ssrfees;
@@ -14,7 +14,7 @@
 Select SSBSECT_CRN CRN, SSBSECT_TERM_CODE TERM, SSRFEES_AMOUNT as "Current DCM Fee", :CORRECT_DCM_FEE Correct_Fee, SSBSECT_INSM_CODE Instructional_Method, SSBSECT_CAMP_CODE Campus, SSBSECT_SEQ_NUMB Section,
 ssbsect_subj_code as "Subject", ssbsect_crse_numb as "Course"
 from SSBSECT
-inner join ssrfees on ssrfees_crn=ssbsect_crn and ssrfees_term_code = ssbsect_term_code 
+full outer join ssrfees on ssrfees_crn=ssbsect_crn --and ssrfees_term_code = ssbsect_term_code 
 where SSBSECT_TERM_CODE = :TERM
       and SSBSECT_CRN not in (Select DISTINCT SSRFEES_CRN from SSRFEES --Subquery that finds all CRNS with DCM fees
                               where SSRFEES_TERM_CODE = :TERM)
