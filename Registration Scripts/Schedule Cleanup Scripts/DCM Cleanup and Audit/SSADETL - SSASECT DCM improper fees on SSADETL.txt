@@ -4,7 +4,7 @@
 --         amount the fee is suppossed to be.  
 --  Edits: 1.  Added correct fees, instructional method, campus, and section code to output to prevent referencing SSASECT manually...kt...15-JAN-2021
 --         2.  Corrected issue where previous terms would appear in the output...kt...15-JAN-2021
---         3.  Added Current DCM Fee, Subject, campus, and Course columns
+--         3.  Added Current DCM Fee, Subject, campus, and Course columns as well setting the output to return the actual current DCM...kt...20-AUG-2021
 
 
 --desc ssrfees;
