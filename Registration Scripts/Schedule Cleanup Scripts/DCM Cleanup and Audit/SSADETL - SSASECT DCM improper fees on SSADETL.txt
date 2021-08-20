@@ -14,7 +14,7 @@
 Select SSBSECT_CRN CRN, SSBSECT_TERM_CODE TERM, SSRFEES_AMOUNT as "Current DCM Fee", :CORRECT_DCM_FEE Correct_Fee, SSBSECT_INSM_CODE Instructional_Method, SSBSECT_CAMP_CODE Campus, SSBSECT_SEQ_NUMB Section,
 ssbsect_subj_code as "Subject", ssbsect_crse_numb as "Course"
 from SSBSECT
-full outer join ssrfees on ssrfees_crn=ssbsect_crn --and ssrfees_term_code = ssbsect_term_code 
+full outer join ssrfees on ssrfees_crn=ssbsect_crn --full outer join to return records with null in SSRFEES_AMOUNT 
 where SSBSECT_TERM_CODE = :TERM
       and SSBSECT_CRN not in (Select DISTINCT SSRFEES_CRN from SSRFEES --Subquery that finds all CRNS with DCM fees
                               where SSRFEES_TERM_CODE = :TERM)
