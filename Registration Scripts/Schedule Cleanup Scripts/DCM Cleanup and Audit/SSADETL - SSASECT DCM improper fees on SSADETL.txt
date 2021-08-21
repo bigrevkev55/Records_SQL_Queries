@@ -37,3 +37,13 @@ Where (ssrfees_CRN  in (select ssbsect_CRN   --Subquery to find SSASECT sections
                            and SSBSECT_TERM_CODE = :TERM)                
      and SSRFEES_AMOUNT != :CORRECT_DCM_FEE)
      and SSRFEES_TERM_CODE = :TERM;
+   
+/*   Query to find SSADETL Fees by section code
+     
+select ssbsect_crn, ssbsect_subj_code, ssbsect_crse_numb, SSBSECT_SEQ_NUMB, ssrfees_amount 
+from ssbsect
+full outer join ssrfees on ssrfees_crn = ssbsect_crn and ssrfees_term_code = ssbsect_term_code
+where SSBSECT_SEQ_NUMB like 'L%' 
+      and ssbsect_term_code = ':TERM';
+      
+*/ 
