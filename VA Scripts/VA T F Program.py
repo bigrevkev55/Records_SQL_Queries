@@ -1,4 +1,24 @@
 
+
+
+#Author:     Kevin Thomas, Registrar
+#Date:        21-AUG-2021
+#Purpose:  This program assist the VA SCOs request tuition and fees from the VA
+
+## GUI
+"""
+import tkinter
+from tkinter.constants import *
+
+tk = tkinter.Tk()
+
+frame = tkinter.Frame(tk, relief=RIDGE, borderwidth=2)
+
+tk.mainloop()
+"""
+
+##Functions
+
 def RODP():
   if TN_eCamp==0:
     VA_Request()
@@ -27,6 +47,8 @@ def VA_Request():
   fee_total=int(tech_total+sga_fee+activity_fee)
   total_requst=int(base+fee_total)
   return(total_requst)
+
+#Program Start#
   
 hours=int(input('How many NSCC hours is the student taking? '))
 TN_eCamp=int(input('How many TN eCampus hours is the student taking?  '))
