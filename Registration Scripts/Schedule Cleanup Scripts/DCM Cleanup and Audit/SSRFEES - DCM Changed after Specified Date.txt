@@ -1,0 +1,20 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     01-SEP-2021
+--Purpose:  Requested by Catherine Hansom. Finds all sections that
+--          have had DCM fee changes on SSADETL after August 23, 2021.         
+
+select ssrfees_term_code as "Term Code",
+       ssbsect_crn as "CRN",
+       ssbsect_subj_code as "Subject Code",
+       ssbsect_crse_numb as "Course Number",
+       ssrfees_detl_code as "Detail Code",
+       ssrfees_amount as "Amount",
+       ssrfees_ftyp_code as "Type",
+       ssrfees_activity_date as "Change Date"
+from ssrfees, ssbsect
+where ssrfees_crn = ssbsect_crn
+and ssrfees_detl_code like 'BE%'
+and ssbsect_term_code = ssrfees_term_code
+and ssrfees_term_code = 202180 -- Can adjust term and activity date for future terms
+and ssrfees_activity_date > '23-AUG-21'
+order by 8
