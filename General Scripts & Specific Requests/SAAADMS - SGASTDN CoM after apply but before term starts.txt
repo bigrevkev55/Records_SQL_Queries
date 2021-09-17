@@ -1,0 +1,24 @@
+
+--Author: Kevin Thomas, Registrar
+--Date:   17-SEP-2021
+--Purpose: This query attempts to return students who were admitted in 202180 that 
+--         changed their major before the semester started.
+
+--desc sorlcur;
+
+select spriden_id as "A Number",
+       SARADAP_TERM_CODE_ENTRY as "Admitted Term",
+       spriden_last_name as "Last",
+       spriden_first_name as "First"
+       
+from saradap
+inner join spriden on spriden_pidm = saradap_pidm
+where spriden_change_ind is NULL
+      and saradap_term_code_entry = '202180'
+      and saradap_apst_code= 'D'
+      and saradap_pidm in   --subquery of all students who changed major in term above
+        (select sorlcur_pidm 
+         from sorlcur 
+         where sorlcur_term_code='202180' 
+               and (sorlcur_user_id in ('YOKLEY_T', 'THOMAS_K', 'KOVACS_A'))) 
+order by spriden_last_name, spriden_first_name
