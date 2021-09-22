@@ -3,25 +3,36 @@
 --Purpose:This script attempt to return 202180 Nash Grad Applicants and their High School
 
 
+
+--desc stvsbgi;
+
 select spriden_id,
        spriden_last_name,
        spriden_first_name,
        sgrchrt_chrt_code,
        SORHSCH_SBGI_CODE,
+       /*
        CASE
             WHEN SORHSCH_SBGI_CODE = '431696' THEN 'Academy at Old Cockrill'
             WHEN SORHSCH_SBGI_CODE = '430050' THEN 'LEAD Southeast'
             WHEN SORHSCH_SBGI_CODE = '430018' THEN 'Valor Flagship'
+            --  Ridgecrest Academy does not have a code
+            WHEN SORHSCH_SBGI_CODE = '431692' THEN 'Kipp Nashville'
+            WHEN SORHSCH_SBGI_CODE = '431645' THEN 'RePublic High School'
             WHEN SORHSCH_SBGI_CODE = '431667' THEN 'Glencliff High Schools'
             Else 'Other'
        END as "High School"
+       */
+       STVSBGI_DESC as "High School"
+       
 
-from spriden, sgrchrt,sorhsch
+from spriden, sgrchrt,sorhsch, stvsbgi
 
 where spriden_change_ind is NULL
       and sgrchrt_chrt_code like 'NG2021%'
       and spriden_pidm=sgrchrt_pidm
       and sorhsch_pidm=spriden_pidm
-      and SORHSCH_SBGI_CODE in ('431696', '430050', '430018', '431667')
+      --and SORHSCH_SBGI_CODE in ('431696', '430050', '430018', '431667')
+      and stvsbgi_code = SORHSCH_SBGI_CODE
 
 order by "High School", spriden_last_name, spriden_first_name;
