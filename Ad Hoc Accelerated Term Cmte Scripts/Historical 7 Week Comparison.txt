@@ -1,0 +1,49 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    02-Oct02021
+--Purpose: Ad hoc accelerted term data to compare historical success in NSCC 7 Week Classes versus Full Term
+
+
+
+--desc sfrstcr;  --select * from SFRSTCR order by SFRSTCR_CRN;
+--desc stvptrm;
+--desc ssbsect;
+
+select SFRSTCR_TERM_CODE as "Term",
+       SFRSTCR_PTRM_CODE as "PoT Code",
+       STVPTRM_DESC as "Session", 
+       SFRSTCR_CRN as "CRN",
+      -- SSBSECT_SUBJ_CODE as "Subject",
+      -- SSBSECT_CRSE_NUMB as "Course",
+       SFRSTCR_PIDM as "Student PIDM",
+       SFRSTCR_GRDE_CODE as "Grade"
+       
+            
+from sfrstcr, stvptrm--, ssbsect
+
+where sfrstcr_term_code = 201780
+      --and ssbsect_term_code = sfrstcr_term_code
+      and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+
+union all
+
+select SFRSTCR_TERM_CODE as "Term",
+       SFRSTCR_PTRM_CODE as "PoT Code",
+       STVPTRM_DESC as "Session", 
+       SFRSTCR_CRN as "CRN",
+      -- SSBSECT_SUBJ_CODE as "Subject",
+      -- SSBSECT_CRSE_NUMB as "Course",
+       SFRSTCR_PIDM as "Student PIDM",
+       SFRSTCR_GRDE_CODE as "Grade"
+from sfrstcr, stvptrm--, ssbsect
+
+where sfrstcr_term_code = 201780
+      --and ssbsect_term_code = sfrstcr_term_code
+      and SFRSTCR_PTRM_CODE = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+
+order by 1,2,4,6;

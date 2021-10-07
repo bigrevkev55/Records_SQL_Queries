@@ -1,0 +1,30 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     28-SEP-2021
+--Purpose:  Requested by Dr. Sarah Roberts (AVP Academic Affairs) & Kevin Thomas (Director of Admissions & Records). 
+--          Returns all sections that are active for specified term and lists if the course has DCM or not and its fees.  
+
+SELECT ssbsect_term_code AS "Term",
+       ssbsect_crn AS "CRN",
+       ssbsect_subj_code AS "Subject",
+       ssbsect_crse_numb AS "Number",
+       ssbsect_seq_numb AS "Section",
+       CASE WHEN EXISTS (SELECT ssrfees_term_code, ssrfees_crn, ssrfees_detl_code
+                         FROM ssrfees
+                         WHERE ssrfees_term_code = :term 
+                         AND ssrfees_crn = ssbsect_crn) 
+            THEN 'Y' ELSE 'N'  
+       END AS "DCM?",
+       CASE WHEN EXISTS (SELECT ssrfees_term_code, ssrfees_crn, ssrfees_amount
+                         FROM ssrfees
+                         WHERE ssrfees_term_code = :term 
+                         AND ssrfees_crn = ssbsect_crn) 
+            THEN (SELECT ssrfees_amount FROM ssrfees WHERE ssrfees_term_code = :term 
+                                                     AND ssrfees_crn = ssbsect_crn) 
+            ELSE NULL  
+       END AS "Amount"
+       
+FROM ssbsect
+               
+WHERE ssbsect_term_code = :term
+
+ORDER BY 3,4,5

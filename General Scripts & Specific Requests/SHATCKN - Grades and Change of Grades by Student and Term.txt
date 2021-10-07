@@ -1,0 +1,33 @@
+--Author: Kevin Thomas, Registrar
+--Date:   03-Oct-2021
+--Purpose: This query attempts to find student's final grades and if there was a 
+           change of grade prcesse or not.
+
+Select spriden_id as "A_Number",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+       shrtckg_term_code as "Term",
+       shrtckg_tckn_seq_no as "Student's Class Count",
+       case
+            when shrtckg_seq_no = '1' then 'No'
+            when shrtckg_seq_no > '1' then 'Yes'
+            Else 'Investigate'
+            End as "Change of Grade Processed??",
+       --shrtckg_seq_no as "Grade entry number Changed?",
+       SHRTCKG_GCHG_CODE as "Reason Code",
+       STVGCHG_DESC as "Description",
+       SHRTCKG_USER_ID as "User Id",
+       SHRTCKG_ACTIVITY_DATE "Entered/Changed Date",
+       shrtckg_grde_code_final as "Grade"
+
+from  spriden, stvgchg, shrtckg outer
+where shrtckg_pidm = spriden_pidm
+      and spriden_id = :A_Number
+      and spriden_change_ind is null
+      and shrtckg_gchg_code = stvgchg_code
+      and shrtckg_term_code = :Term_code 
+      and shrtckg_seq_no=(select max (shrtckg_seq_no) from shrtckg   ---This is the entry number for the grade entry on SHATCKN at the bottom
+                           where shrtckg_tckn_seq_no=outer.shrtckg_tckn_seq_no  --shrtckg_tckn_seq_no is the number of the class on teh top of SHATCKN (SHRTCKN - Course Term Maintenance Table)
+                                 and shrtckg_pidm=outer.shrtckg_pidm)
+
+order by spriden_last_name, spriden_first_name, shrtckg_tckn_seq_no;
