@@ -1,0 +1,139 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    02-OCT-2021
+--Purpose: Ad Hoc Accelerated Terms Commmittee Data Request
+
+
+
+Select 
+      
+      (Select :Terms from dual) as "Terms",
+
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr,stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'A') as "A",
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'B') as "B",
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE ='C') as "C",
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE not in ('A','B','C','NR','I','S', 'TNR', 'AU')) as "Non-Successful",
+      
+     ((Select Count (sfrstcr_pidm) 
+        from sfrstcr,stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'A') +
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'B') +
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE ='C')) as "A-C Count",
+      
+      (SELECT ((Select Count (sfrstcr_pidm) 
+        from sfrstcr,stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'A') +
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE = 'B') +
+      
+      (Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE ='C')) + ((Select Count (sfrstcr_pidm) 
+        from sfrstcr, stvptrm 
+        where sfrstcr_term_code > 201750
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and SFRSTCR_PTRM_CODE in ('6', '7')  --Doesn't include Summer terms ('2','3')
+      and sfrstcr_ptrm_code = '1'
+      and stvptrm_code = sfrstcr_ptrm_code
+      and SFRSTCR_RSTS_CODE != 'CC'
+      and SFRSTCR_GRDE_CODE is not null
+      and SFRSTCR_GRDE_CODE not in ('A','B','C','NR','I','S', 'TNR', 'AU'))) from dual) as "Total"
+      
+From Dual; 
+
+
+select distinct SFRSTCR_GRDE_CODE from SFRSTCR
+       where sfrstcr_grde_code not in ('A','B','C')
+       and sfrstcr_term_code > 201750;
+
+select * from sfrstcr 
+ where  sfrstcr_grde_code = 'U'
+       and sfrstcr_term_code > 201750;

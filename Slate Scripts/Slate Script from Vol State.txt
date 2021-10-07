@@ -1,0 +1,39 @@
+
+
+/******************************
+From: Tim Amyx, Registrar, VSCC
+One of the things you’ll want to do for Slate setup is to import several Banner validation tables as prompts.  
+The code below will work in SQL Developer to extract the data preformatted so it can be imported into Slate.  
+I’m sure we’re not 100% on this yet, but basically, all you have to do is change the Key, Value, and Export fields 
+then change the from statement to the correct validation table.  If you need a 
+where statement, just drop the first semicolon and add your conditions
+*******************************/
+
+
+
+select
+     null as "ID"
+    ,'graduation_status' as "Key"
+    ,stvgrst_desc as "Value"
+    ,'' as "Short"
+    ,'' as "Order"
+    ,stvgrst_code as "Export"
+    ,1 as "Active"
+    ,'' as "Index"
+    ,'' as "Parent"
+    ,'' as "Category"
+    ,'' as "Effective"
+    ,'' as "Expires"
+    ,'' as "Export2"
+    ,'' as "Export3"
+    ,'' as "Export4"
+    ,'' as "Export5"
+    ,'' as "HTML"
+    ,'' as "XML"
+
+from
+    stvgrst
+;
+where
+    stvlang_desc like '%Other%'
+;

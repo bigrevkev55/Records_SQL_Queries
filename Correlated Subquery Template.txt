@@ -1,0 +1,10 @@
+
+--Correlated Subquery Template
+
+SELECT column1, column2, ....
+FROM table1 outer
+WHERE column1 operator
+                    (SELECT column1, column2
+                     FROM table2
+                     WHERE expr1 = 
+                               outer.expr2);

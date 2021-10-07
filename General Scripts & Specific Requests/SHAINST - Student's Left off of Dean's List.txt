@@ -1,0 +1,47 @@
+
+
+--Authors: Dorothy May, TBR Analyst; Carol Gentry, NSCC TSD Analyst; Kevin Thomas, Registrar
+
+--Academic Standing Query from call with Dorothy Mayes
+--Gentry, Carol
+--Thu 10/7/2021 3:59 PM
+
+select distinct "SPRIDEN_ID", "SPRIDEN_LAST_NAME", "SPRIDEN_FIRST_NAME","TERM" from (
+SELECT SPRIDEN_ID,
+      -- spriden_pidm,
+       SPRIDEN_LAST_NAME,
+       SPRIDEN_FIRST_NAME,
+       --SHRTCKN_CRN,
+      -- SHRTCKN_SUBJ_CODE,
+       --SHRTCKN_COLL_CODE,
+      -- SHRTCKL_LEVL_CODE,
+       A.SHRTCKG_TERM_CODE as "TERM"--,
+      -- A.SHRTCKG_GRDE_CODE_FINAL
+FROM SHRTCKL, SHRTCKG A, SHRTCKN,SPRIDEN
+WHERE A.SHRTCKG_PIDM = SPRIDEN_PIDM
+and SPRIDEN_CHANGE_IND is NULL
+AND A.SHRTCKG_PIDM = SHRTCKN_PIDM
+AND A.SHRTCKG_PIDM = SHRTCKL_PIDM
+AND A.SHRTCKG_TERM_CODE = SHRTCKN_TERM_CODE
+AND A.SHRTCKG_TERM_CODE = SHRTCKL_TERM_CODE
+AND A.SHRTCKG_TCKN_SEQ_NO = SHRTCKN_SEQ_NO
+AND SHRTCKL_TCKN_SEQ_NO = SHRTCKN_SEQ_NO
+AND SHRTCKL_LEVL_CODE   = :levl
+AND SHRTCKG_SEQ_NO =(SELECT MAX(C.SHRTCKG_SEQ_NO)
+                     FROM SHRTCKG C
+                     WHERE C.SHRTCKG_PIDM = A.SHRTCKG_PIDM
+                     AND C.SHRTCKG_TERM_CODE = A.SHRTCKG_TERM_CODE
+                     AND C.SHRTCKG_TCKN_SEQ_NO = SHRTCKN_SEQ_NO)
+AND EXISTS (SELECT 'X' from SHRASGE where SHRASGE_COLL_CODE = '99' and SHRASGE_GRDE_CODE_EXCLUDED = SHRTCKG_GRDE_CODE_FINAL
+           AND SHRASGE_LEVL_CODE = SHRTCKL_LEVL_CODE)
+--and A.shrtckg_pidm = '404602'
+AND exists (select 'x' from shrtgpa where shrtgpa_pidm = A.SHRTCKG_PIDM and shrtgpa_term_code = A.SHRTCKG_TERM_CODE
+and shrtgpa_levl_code = SHRTCKL_LEVL_CODE and shrtgpa_hours_earned >= 6 and shrtgpa_gpa >= 3.5)
+and not exists (select 'x' from shrttrm where shrttrm_pidm = A.SHRTCKG_PIDM and shrttrm_term_code = A.SHRTCKG_TERM_CODE
+and shrttrm_astd_code_dl = 'DL')
+and A.shrtckg_term_code = :Term
+
+--ORDER BY --A.SHRTCKG_TERM_CODE desc,
+--          SPRIDEN_LAST_NAME,
+--         SPRIDEN_FIRST_NAME
+);
