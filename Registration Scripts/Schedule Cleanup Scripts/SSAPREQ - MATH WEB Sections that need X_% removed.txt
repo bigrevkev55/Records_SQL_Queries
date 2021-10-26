@@ -1,7 +1,9 @@
 --Author:  Kevin Thomas, Assistant Registrar
 --Date:    OCT-??-2019 (Aprox)
---Purpose: This script returns CRNs that need the X_% removed as students must complete MATH LS
---         in order to take college level WEB classes.  
+--Purpose: This script returns CRNs that need the X_% removed as the X_% prereq
+--         requires students to complete LS before taking the web college level class.  
+--         However, STEM dean, Dr. Jennifer Knapp removed that requirement in Spring 2019
+--         so the X_% prereqs need to be removed.  
 
 --/*
 --desc ssbsect;

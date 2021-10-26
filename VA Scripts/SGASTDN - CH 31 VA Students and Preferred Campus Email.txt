@@ -1,5 +1,5 @@
 
---Author:  Kevin Thomas, Assistant Registrat
+--Author:  Kevin Thomas, Assistant Registrar
 --Date:    03-DEC-2019
 --Purpose: This query returns CH 31 students and their preferred campus email address by prompted term.
 

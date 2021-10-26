@@ -1,0 +1,43 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     12-OCT-2021
+--Purpose:  Requested by Kevin Thomas (Director of Admissions and Records).
+--          Totals the number of enrolled students in summer courses since Summer 2017
+--          for part of terms 2 & 3.         
+
+select ssbsect_subj_code as "Subject", 
+       ssbsect_crse_numb as "Number",
+       sum(ssbsect_enrl) as "Total Enrolled Since 201750"
+from ssbsect 
+where ssbsect_term_code >= '201750'
+and   SSBSECT_TERM_CODE like '%50'
+and   SSBSECT_PTRM_CODE in ('2','3')
+group by ssbsect_subj_code, ssbsect_crse_numb
+order by 1;
+
+--Use the below code to spot check above output
+
+--select * from ssbsect where ssbsect_term_code >= '201750'
+--and   SSBSECT_TERM_CODE like '%50'
+--and   SSBSECT_PTRM_CODE in ('2','3')
+--and ssbsect_subj_code = ''
+--and ssbsect_crse_numb = ''
+
+--Number of Transient Students
+select ssbsect_subj_code as "Subject", 
+       ssbsect_crse_numb as "Number",
+       count(sorlcur_admt_code) as "Total Number of Transient"
+from ssbsect, spriden, sfrstcr, sorlcur
+where ssbsect_term_code >= '201750'
+and   SSBSECT_TERM_CODE like '%50'
+and   SSBSECT_PTRM_CODE in ('2','3')
+and sfrstcr_term_code = ssbsect_term_code
+and spriden_change_ind is NULL
+and ssbsect_crn = sfrstcr_crn
+and spriden_pidm = sfrstcr_pidm
+and sorlcur_pidm = spriden_pidm
+and sorlcur_seqno = (select max(sorlcur_seqno) from sorlcur where sorlcur_pidm = spriden_pidm and sorlcur_lmod_code = 'LEARNER')
+and sorlcur_program = 'NON_DEGREE'
+and sorlcur_admt_code = 'XT'
+and sfrstcr_rsts_code != 'CC'
+group by ssbsect_subj_code, ssbsect_crse_numb
+order by 1, 2;
