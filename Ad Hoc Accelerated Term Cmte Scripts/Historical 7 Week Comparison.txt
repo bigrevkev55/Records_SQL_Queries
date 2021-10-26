@@ -2,7 +2,7 @@
 --Date:    02-Oct02021
 --Purpose: Ad hoc accelerted term data to compare historical success in NSCC 7 Week Classes versus Full Term
 
-
+---****************************Note, this script is in progress and not finished yet *****************************
 
 --desc sfrstcr;  --select * from SFRSTCR order by SFRSTCR_CRN;
 --desc stvptrm;

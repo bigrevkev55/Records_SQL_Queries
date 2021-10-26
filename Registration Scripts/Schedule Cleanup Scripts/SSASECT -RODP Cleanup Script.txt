@@ -11,6 +11,7 @@
 --          D2L system...kt...2/26/21
 --        Changed the name of the query to "RODP Cleanup Script" from "RODP Missing Tuition and Fee Waiver Box"...kt...2.26.21
 --        Added a Order by clause to order by CRNs as some CRNs have multiple issues...kt...2.26.21
+--        Added a Union to find CRNs that are built on school RODP codes that are no longer offereing RODP courses (MTSU 24R, ETSU 23R, APSU 14R)...kt...10/24/21
 
  
 select ssbsect_term_code as "Term",
@@ -54,7 +55,25 @@ Where ssbsect_term_code in :Term
       and (SSBSECT_SEQ_NUMB like 'R%' or SSBSECT_CAMP_CODE like '%R' or SSBSECT_INSM_CODE like 'R%')
       and SSBSECT_CAMP_CODE not like 'H%'
       and SSBSECT_INTG_CDE is not NULL
+      
+UNION
+
+Select ' ',     --Query that finds invalid RODP campus codes (MTSU-24R, ETSU-23R, APSU-14R)
+       'R24, R23, and R14 cannot be used for RODP Campuses' as "Campus",
+       ' ',
+       ssbsect_crn as "CRN",
+       ssbsect_subj_code as "SUBJ",
+       ssbsect_crse_numb as "NUMBER",
+       ssbsect_seq_numb as "Section Number",
+       ' ', 
+       ' ' 
+from SSBSECT
+Where ssbsect_term_code in :Term
+      and ssbsect_camp_code in ('24R','23R', '14R')   ---see note above 
+
 Order by CRN;
+
+
 
 
 

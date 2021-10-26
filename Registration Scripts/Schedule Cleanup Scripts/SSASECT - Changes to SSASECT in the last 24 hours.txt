@@ -1,0 +1,25 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    26-OCT-2021
+--Purpose: This records on this report are CRNs that have either been created or edited within 24 hours
+--         before the report was ran.  
+
+select  SSBSECT_TERM_CODE TERM,
+        SSBSECT_CRN CRN,
+        SSBSECT_PTRM_CODE PART_OF_TERM,
+        SSBSECT_SUBJ_CODE SUBJ,
+        SSBSECT_CRSE_NUMB COURSE,
+        SSBSECT_SEQ_NUMB SECTION,
+        SSBSECT_CREDIT_HRS CREDIT_HOURS,
+        SSBSECT_BILL_HRS BILL_HOURS,
+        SSBSECT_GMOD_CODE GRADE_MODE,
+        SSBSECT_GRADABLE_IND GRADABLE_INDICATOR,
+        SSBSECT_TUIW_IND TUITION_AND_FEES_WAIVER,
+        SSBSECT_VOICE_AVAIL VIEWABLE_ON_SCHEDULE,
+        SSBSECT_LEC_HR LECTURE_HOURS,
+        SSBSECT_LAB_HR LAB_HOURS,
+        SSBSECT_CONT_HR CONTACT_HOURS,
+        SSBSECT_ACTIVITY_DATE ACTIVITY_DATE,
+        SSBSECT_USER_ID USER_ID
+from ssbsect 
+where (ssbsect_activity_date)>SYSDATE - 24/24
+order by SSBSECT_TERM_CODE, SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, SSBSECT_SEQ_NUMB;

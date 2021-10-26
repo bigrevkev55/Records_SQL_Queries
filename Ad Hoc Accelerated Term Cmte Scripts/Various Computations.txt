@@ -2,7 +2,7 @@
 --Date:    02-OCT-2021
 --Purpose: Ad Hoc Accelerated Terms Commmittee Data Request
 
-
+---****************************Note, this script is in progress and not finished yet *****************************
 
 Select 
       

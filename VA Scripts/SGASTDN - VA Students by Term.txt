@@ -21,6 +21,6 @@ Where --spriden_pidm = TZRSTSF_PIDM
 --and
 spriden_change_ind is NULL
 and spriden_pidm = sgrvetn_pidm
-and sgrvetn_vetc_code IN ('T','U','1', '5', 'C', 'D', 'H', 'L', '7')
+and sgrvetn_vetc_code is NOT NULL
 and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
 Order by spriden_last_name,spriden_first_name;

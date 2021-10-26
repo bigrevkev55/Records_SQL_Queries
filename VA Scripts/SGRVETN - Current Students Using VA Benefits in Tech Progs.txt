@@ -1,0 +1,32 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     18-OCT-2021
+--Purpose:  Requested by Gwen Falin (Veteran Affairs Student Specialist).
+--          Pulls currently enrolled students using VA benefits for specified
+--          term majoring in a certificate program.
+--          Added cellular number column per Kevin Thomas's (Director of Admissions and Records)
+--          request (20-OCT-2021).
+
+SELECT spriden_id AS "A#",
+       spriden_lASt_name AS "Last Name",
+       spriden_first_name AS "First Name",
+       sgrvetn_vetc_code AS "Veteran Type",
+       sgrvetn_cert_hours AS "Certification Credit Hours",
+       sgrvetn_cert_date AS "Certification Date",
+       sgbstdn_degc_code_1 AS "Degree Type",
+       sgbstdn_majr_code_1 AS "Major",
+       sprtele_phone_area || sprtele_phone_number AS "Cell Number"
+FROM spriden LEFT OUTER JOIN sprtele 
+             ON sprtele_pidm = spriden_pidm AND sprtele_tele_code IN ('CE', 'CELL')
+    , sgrvetn
+    , sgbstdn 
+WHERE spriden_change_ind IS NULL
+AND spriden_pidm = sgrvetn_pidm
+AND sgbstdn_pidm = sgrvetn_pidm
+AND sgrvetn_term_code_va = :term
+AND SGBSTDN_TERM_CODE_EFF =
+           (SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+            FROM SGBSTDN
+            WHERE SGBSTDN_PIDM = sgrvetn_PIDM
+            AND SGBSTDN_TERM_CODE_EFF <= :term) --Change term
+AND sgbstdn_degc_code_1 like 'CRT%' 
+ORDER BY 2, 3
