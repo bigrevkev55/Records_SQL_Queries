@@ -7,7 +7,11 @@
 --          to WHEN/THEN/ELSE statement in the 
 --          Select block...kt...10/31/2019 
 
+--NOTE:     VIP! Do not change this script as it is used with the DCM Audit Program.py python program.  
+--               If changes must be made be sure check DCM Audit Prorgram.py to see if edits need to be made there...kt...31-OCT-2021
 
+ 
+--NOTE2:   *******For python program, be sure to save encoding as UTF-8 and name the file '202210 DCM in Banner.xlsx' ...kt...31-OCT-2021*******
 
 
 --desc ssrfees;
@@ -56,4 +60,4 @@ where ssbsect_CRN in
       and ssbsect_ptrm_code like '%'
       --and ssbsect_ptrm_code = :Part_of_Term
       --and SSBSECT_PTRM_CODE in ('6','7','9')
-Order by SSBSECT_PTRM_CODE, 2,3,4;
+Order by SSBSECT_PTRM_CODE, ssbsect_subj_code,SSBSECT_CRSE_NUMB,SSBSECT_SEQ_NUMB, ssrfees_detl_code;

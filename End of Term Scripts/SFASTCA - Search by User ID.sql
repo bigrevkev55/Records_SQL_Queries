@@ -1,10 +1,23 @@
 --Created By: Lance Woodard
 --      Date: August 13, 2014
---    Edited: Edited by Kevin Thomas, Assistant Registrar on 08-MAY-2019 (Changed acitivty dates, User name, and added a term prompt).
 --   Purpose: This scripts should be run after students are dropped for failed
 --            or unmet pre-requisites (SFRRGAM) to produce their campus email
 --            for notification to the student.
+--    Edited: 1.  Edited by Kevin Thomas, Assistant Registrar on 08-MAY-2019 (Changed acitivty dates, User name, and added a term prompt).
+--            2.  Added a sub query to search and see if the student is a Dual Enrollment Student (DE)...kt...11.20.21  
+
+
 select distinct spriden_id as "ID",
+       CASE WHEN EXISTS (
+                        select SORHSCH_DPLM_CODE, sorhsch_pidm
+                         from sorhsch
+                         where SORHSCH_DPLM_CODE = 'DE'
+                         and sorhsch_pidm = spriden_pidm
+       )
+       
+       THEN 'Y'
+       ELSE 'N'
+       End AS "DE Student?",
        spriden_last_name as "Last Name",
        spriden_first_name as "First Name",
        --spriden_last_name as "Last Name",

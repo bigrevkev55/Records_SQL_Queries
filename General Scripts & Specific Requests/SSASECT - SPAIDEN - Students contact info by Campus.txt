@@ -1,6 +1,6 @@
 -- Author:  Kevin Thomas, Assistant Registrar
 --   Date:    19-MAR-2020
---Purpose:  This query returns students contact information by prompted term and campus codes.  
+--Purpose:  This query returns students contact information by prompted term, CRN,  and campus codes.  
 
 
 
@@ -38,7 +38,8 @@ where spriden_change_ind is null
       and SFRSTCR_RSTS_CODE like 'R%'
       and SPRTELE_STATUS_IND (+) IS NULL
       and SPRTELE_TELE_CODE (+) = any ('LO','PR')
-      and   SFRSTCR_TERM_CODE = '202010'
+      and SFRSTCR_TERM_CODE = :TERM
+      and SFRSTCR_CRN = :CRN   
       and   SFRSTCR_CRN in (select ssbsect_crn from ssbsect where SSBSECT_TERM_CODE = :TERM and SSBSECT_CAMP_CODE = :CAMP_CODE)
       and camp_email_pidm (+) = spriden_pidm 
       and pers_email_pidm (+) = spriden_pidm

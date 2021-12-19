@@ -1,3 +1,13 @@
+
+
+
+NOTE:  NOT THE BEST SCRIPT ANYMORE...see "SFAALST - All in One Discrepencies 2.sql" instead.  
+
+
+
+
+
+
 --   Author: Lance Woodard, Registrar
 --  Created: October 18, 2017
 --  Purpose: This script provides a list of student who earned an "FA" or "F"
@@ -166,7 +176,7 @@ and     shrtckn_term_code = :term_code
 and     shrtckn_crn = sfvstms_crn
 and     ((
                 shrtckg_grde_code_final not in ('FN', 'W')
-                and sfvstms_attending_ind not in ('Y','S')
+                and sfvstms_attending_ind not in ('Y') --edited by Trey Dalton on 12/13/2021 to remove 'S' attendence indicators from this NOT IN statement
         )
 or      (
                 shrtckg_grde_code_final in ('FN')
@@ -182,6 +192,7 @@ and     shrtckg_seq_no = (
                                 and a.shrtckg_tckn_seq_no = shrtckg.shrtckg_tckn_seq_no
                          )
 order by 2, 3, 5, 6, 7, 8
+;
 ;
 
 

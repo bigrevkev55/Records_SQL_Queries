@@ -8,20 +8,28 @@
  /*
  Edited on 2/3/2021 by Trey Dalton, TSD Systems Analyst
  Added "address" subtable to pull address information from SPRADDR
+ 
+ Edited on 12/16/2021 by Kevin Thomas, Registrar
+ Added filter to exclude studetnt that have the confidentiality indicator checked on SPAIDEN
+ Changed code to look for PL or DL on SHAINST now as the Presidents List setup is complete.  
+ Changed sort to Academic Standing, Last Name, First Name
  */
+ 
+ 
 
 
-select distinct spriden_id as "A Number",
+select          spriden_id as "A Number",
                 spriden_last_name as "Last",
                 spriden_first_name as "First",
                 SHRTTRM_TERM_CODE as "Term",
-                trunc (shrtgpa_gpa, 2) as "Term GPA",
-                CASE When trunc (shrtgpa_gpa, 2) < '4.0'  --dont' have to worry about someone with less than 3.5GPA because of Dean's List attribute on SHAINST
-                     then 'Deans List'
-                     when trunc (shrtgpa_gpa, 2) > '3.9999999999'
-                     then 'Presidents List'
-                     Else null
-                     End as "Academic Standing",
+                SHRTTRM_ASTD_CODE_DL as "Academic Standing",
+                --trunc (shrtgpa_gpa, 2) as "Term GPA",
+                --CASE When trunc (shrtgpa_gpa, 2) < '4.0'  --dont' have to worry about someone with less than 3.5GPA because of Dean's List attribute on SHAINST
+               --      then 'Deans List'
+               --      when trunc (shrtgpa_gpa, 2) > '3.9999999999'
+              --       then 'Presidents List'
+              --       Else null
+               --      End as "Academic Standing",
                 address.street1,
                 address.street2,
                 address.city,
@@ -29,7 +37,7 @@ select distinct spriden_id as "A Number",
                 address.zip,
                 address.city||', '||address.state||' '||address.zip city_state_zip
               
-from spriden, shrttrm, shrtgpa,
+from spriden, shrttrm, --shrtgpa,
     (
             select  spraddr_pidm pidm,
                     (select spriden_id from spriden where spriden_pidm = spraddr_pidm and spriden_change_ind is null) name,
@@ -59,13 +67,14 @@ from spriden, shrttrm, shrtgpa,
 	) address
 
 where   spriden_pidm = shrttrm_pidm 
-    and  spriden_pidm = shrtgpa_pidm
+   -- and  spriden_pidm = shrtgpa_pidm
     and  spriden_pidm = address.pidm
     and  spriden_change_ind is NULL
     and  shrttrm_term_code = :Term
-    and  shrttrm_term_code = shrtgpa.SHRTGPA_TERM_CODE
-    and  SHRTTRM_ASTD_CODE_DL = 'DL'
-    and shrtgpa_levl_code = 'UG'
+    --and  shrttrm_term_code = shrtgpa.SHRTGPA_TERM_CODE
+    and  SHRTTRM_ASTD_CODE_DL in ('DL', 'PL')  --added PL Indicator...kt...12.16.2021
+    and spriden_pidm not in (select SPBPERS_PIDM from  SPBPERS where SPBPERS_CONFID_IND = 'Y')  --Excludes students who that are marked as "Confidential" in SPAIDEN...kt...12.16.21
+   -- and shrtgpa_levl_code = 'UG'
     -- and  trunc (shrtgpa_gpa,2)  < =  '4.0'  --commented out because there is no need to check GPA due to Dean's List Attribute on SHAINST
-    and  shrtgpa_gpa_type_ind = 'I'  --I = Institutional GPA and T = Transfer GPA
-    order by 6, 2,3;
+    --and  shrtgpa_gpa_type_ind = 'I'  --I = Institutional GPA and T = Transfer GPA
+    order by SHRTTRM_ASTD_CODE_DL , spriden_last_name,spriden_first_name;
