@@ -20,6 +20,17 @@ The repository includes scripts supporting areas such as:
 
 Many of the SQL scripts are designed for use with Ellucian Banner and Oracle SQL Developer. Python scripts are used for data processing, file generation, validation, and other administrative workflows.
 
+## Topics
+oracle
+sql
+python
+ellucian-banner
+higher-education
+student-information-system
+degree-works
+automation
+
+
 ## Data Privacy
 
 This repository is intended for program code, SQL queries, documentation, and related development files only.
