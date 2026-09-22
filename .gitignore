@@ -4,3 +4,6 @@
 
 # Temporary Excel files
 ~$*.xlsx
+
+# CSV Files
+*.csv
