@@ -1,0 +1,58 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    03-MAR-2023
+--Purpose: This query returns all VA Students email addresses by prompted term
+--          who registered for at least one HC8 campus course.
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       'HC8' as "Campus",
+       listAgg(GOREMAL_EMAIL_ADDRESS, ';')
+           within group (order by goremal_email_address) as "Email",
+       SGRVETN_TERM_CODE_VA as Term,
+       STVVETC_DESC as Type
+
+from spriden,
+     sgrvetn,
+     stvvetc,
+     goremal,
+     sgbstdn
+
+where spriden_pidm = sgrvetn_pidm
+      and spriden_pidm = goremal_pidm (+)
+      and spriden_pidm = sgbstdn_pidm (+)
+      and goremal_preferred_ind (+) = 'Y'
+      and goremal_emal_code (+) in ('CAMP','PERS')
+      and sgrvetn_vetc_code is not null
+      and sgrvetn_term_code_va = :Term
+      and stvvetc_code = sgrvetn_vetc_code
+      and spriden_change_ind is null
+
+      -- Current SGBSTDN record
+      and sgbstdn_term_code_eff = (
+            select max(i.sgbstdn_term_code_eff)
+            from sgbstdn i
+            where i.sgbstdn_pidm = sgbstdn.sgbstdn_pidm
+      )
+
+      -- Student registered in at least one HC8 section
+      and exists (
+            select 1
+            from sfrstcr r,
+                 ssbsect s
+            where r.sfrstcr_pidm = spriden_pidm
+              and r.sfrstcr_term_code = sgrvetn_term_code_va
+              and r.sfrstcr_rsts_code in ('RE','RW','RR')
+              and s.ssbsect_term_code = r.sfrstcr_term_code
+              and s.ssbsect_crn = r.sfrstcr_crn
+              and s.ssbsect_camp_code = 'HC8'
+      )
+
+group by spriden_id,
+         spriden_last_name,
+         spriden_first_name,
+         sgrvetn_term_code_va,
+         stvvetc_desc
+
+order by spriden_last_name,
+         spriden_first_name;

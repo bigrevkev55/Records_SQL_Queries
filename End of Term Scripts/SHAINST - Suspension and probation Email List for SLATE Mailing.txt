@@ -1,0 +1,100 @@
+--Author:  Kevin Thomas, Assistant Registrar
+--         Chuck Hackney (Systems Analyst) 
+--         Derrick Dupuis(IR Director) 
+--Edited from Academic and Probation Script
+--Date:    12-AUG-2019
+--Purpose: This query will return students who are on suspension and probation by prompted major and prompted term.
+--Note:    When prompted, enter the term for which the end of term academic suspension 
+--         resulted in suspension - not the first term of the suspension.
+
+--Edits:   Added Advisor A# as that is now needed for Slate Import....kt...19-DEC-2024
+
+SELECT siden.SPRIDEN_ID AS "ID"
+,   stdn.SGBSTDN_DEGC_CODE_1 AS "DEGREE TYPE"  --Student Degree Type during prompted term
+,   stdn.SGBSTDN_MAJR_CODE_1 AS "MAJOR"   -- Student Major during prompted term
+,   stdn.SGBSTDN_MAJR_CODE_CONC_1 AS "CONCENTRATION"  --Student Concentration during prompted term
+,   siden.SPRIDEN_LAST_NAME AS "LAST NAME"
+,   siden.SPRIDEN_FIRST_NAME AS "FIRST NAME"
+,   ttrm.SHRTTRM_TERM_CODE AS "TERM"
+,   ttrm.SHRTTRM_ASTD_CODE_END_OF_TERM AS "ASTD CODE"  --Academic Standing at the end of the prompted term
+,   semal.CAMPUS_EMAIL
+,   semal.PERSONAL_EMAIL
+,   (CASE WHEN advr.ADVISOR_PIDM IS NOT NULL THEN aiden.SPRIDEN_LAST_NAME||', '||aiden.SPRIDEN_FIRST_NAME END) AS SUCCESS_ADVISOR
+,   aanum.SPRIDEN_ID as AVISOR_A_NUM
+,   aemal.CAMPUS_EMAIL AS ADVISOR_EMAIL
+FROM  (
+-- Probation/Suspension Table
+    SELECT *
+    FROM SHRTTRM
+    WHERE SHRTTRM_TERM_CODE = :TERM
+        AND SHRTTRM_ASTD_CODE_END_OF_TERM <> '00'
+) ttrm
+-- Student Identifiers
+LEFT JOIN SPRIDEN siden ON ttrm.SHRTTRM_PIDM = siden.SPRIDEN_PIDM
+    AND siden.SPRIDEN_CHANGE_IND IS NULL
+-- Student Major
+LEFT JOIN SGBSTDN stdn ON ttrm.SHRTTRM_PIDM = stdn.SGBSTDN_PIDM
+    AND stdn.SGBSTDN_TERM_CODE_EFF = (
+        SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+        FROM SGBSTDN
+        WHERE SGBSTDN_PIDM = ttrm.SHRTTRM_PIDM
+            AND SGBSTDN_TERM_CODE_EFF <= :TERM
+    )
+-- Student Email Addresses
+LEFT JOIN (
+    SELECT GOREMAL_PIDM,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%MY.NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%MY.NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS 
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS CAMPUS_EMAIL,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'PERS' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) NOT LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'PERS' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) NOT LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS PERSONAL_EMAIL
+    FROM GOREMAL
+    WHERE GOREMAL_STATUS_IND = 'A'
+    GROUP BY GOREMAL_PIDM
+) semal ON ttrm.SHRTTRM_PIDM = semal.GOREMAL_PIDM
+-- Student Advisor
+LEFT JOIN (
+    SELECT SGRADVR_PIDM,
+        MAX(SGRADVR_ADVR_PIDM) AS ADVISOR_PIDM
+    FROM SGRADVR cc
+        -- Advisor Identifiers
+        LEFT JOIN SPRIDEN ON SGRADVR_ADVR_PIDM = SPRIDEN_PIDM
+            AND SPRIDEN_CHANGE_IND IS NULL
+    WHERE SGRADVR_TERM_CODE_EFF = (
+        SELECT MAX(SGRADVR_TERM_CODE_EFF)
+        FROM SGRADVR dd
+        WHERE cc.SGRADVR_PIDM = dd.SGRADVR_PIDM
+            AND cc.SGRADVR_ADVR_CODE = dd.SGRADVR_ADVR_CODE
+            AND dd.SGRADVR_TERM_CODE_EFF <= :TERM
+            )
+        AND SGRADVR_ADVR_CODE = 'ADVS'
+    GROUP BY SGRADVR_PIDM
+) advr ON ttrm.SHRTTRM_PIDM = advr.SGRADVR_PIDM
+-- Advisor Identifiers
+LEFT JOIN SPRIDEN aiden ON advr.ADVISOR_PIDM = aiden.SPRIDEN_PIDM
+    AND aiden.SPRIDEN_CHANGE_IND IS NULL
+-- Advisor Email Addresses
+LEFT JOIN (
+    SELECT GOREMAL_PIDM,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'BUSN' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'BUSN' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS CAMPUS_EMAIL
+    FROM GOREMAL
+    WHERE GOREMAL_STATUS_IND = 'A'
+    GROUP BY GOREMAL_PIDM
+) aemal ON advr.ADVISOR_PIDM = aemal.GOREMAL_PIDM
+
+LEFT JOIN (
+    SELECT spriden_pidm, spriden_ID 
+    from spriden 
+    where spriden_change_ind iS NULL
+) aanum on advr.ADVISOR_PIDM = aanum.spriden_PIDM
+
+-- Report Organization
+ORDER BY ttrm.SHRTTRM_ASTD_CODE_END_OF_TERM,
+    siden.SPRIDEN_LAST_NAME,
+    siden.SPRIDEN_FIRST_NAME
+;

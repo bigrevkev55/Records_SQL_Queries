@@ -1,0 +1,60 @@
+--Author:  Kevin Thomas, Registrar  
+--Date:    29-MAR-2023
+--Purpose: This query returns section level prereqs for each section by prompted
+--         term and part of term.
+
+/*
+Notes:  
+    0.  Z_% = Standard catalog level prereq.  Most sections should have Z_% prereqs
+                **Requires all prereqs to have already been successfully completed 
+                **Allows for LS CoReq (really concurrent prereq..ie - Make sure "Current Enrollment Allowed" box IS 
+                  checked on LS Co-Reqs (really prereqs))
+    1.  X_% = Web sections of courses that have LS as a prereq.  
+                **Requires LS co-req (really LS prereq) to be completed ie - Make sure "Current Enrollment Allowed" box IS NOT
+                  checked on LS Co-Reqs (really prereqs))
+    2.  Y_% = 2nd 7/5 week courses that allow concurrent registration of the prereq 
+              within the term
+                **Requires all first 7/5 prereqs of the course to have the 17WC attribute
+                **SEE SMAAREA Y_ENGL1020 from 202350 as an example
+    3.  6_% = Links 1st 7 week college level course and LS course by part of term 6 (First 7 Weeks) and attribute
+                **Requires each CL course in the first 7 to have the First Seven Week Course (17WC) attribute on SSADETL 
+    4.  7_% = Links 2nd 7 week college level course and LS course by part of term 7 (Second 7 Weeks) and attribute
+                **Requires each CL course in the second 7 to have the Second Seven Week Course (27WC) attribute on SSADETL
+ 
+See file labeled: "Prerequisites and Corequisites Guide for SMAAREA" forthe most complete notes!  
+
+*/
+
+--desc ssbsect;
+--desc ssrrare;
+--select * from ssbsect;
+--desc smracaa; 
+/*                  ---This code returns the most recent prereq from SMAAREA
+
+select SMRACAA_AREA, SMRACAA_TERM_CODE_EFF,SMRACAA_SET, SMRACAA_SUBSET, SMRACAA_RULE,SMRACAA_SUBJ_CODE,
+       SMRACAA_CRSE_NUMB_LOW, SMRACAA_CRSE_NUMB_HIGH, SMRACAA_ATTR_CODE,SMRACAA_GRDE_CODE_MIN, SMRACAA_CONCURRENCY_IND,
+       SMRACAA_TESC_CODE, SMRACAA_MIN_VALUE, SMRACAA_MAX_VALUE
+from SMRACAA o 
+where smracaa_area = :SMAALIB_CODE 
+      and SMRAcaa_term_code_eff = (
+          select max(SMRAcaa_term_code_eff) 
+          from smracaa i 
+          where o.smracaa_area=i.smracaa_area
+        )
+order by 3,4;
+*/
+
+select SSBSECT_term_code as "Term",
+       SSBSECT_PTRM_CODE as "Part of Term",
+       SSBSECT_CRN as "CRN",
+       SSBSECT_SEQ_NUMB as "Section Code",
+       SSBSECT_SUBJ_CODE as "Subject",
+       SSBSECT_CRSE_NUMB as "Course",
+       SSRRARE_AREA as "Prereq"
+from ssbsect
+left outer join ssrrare on ssrrare_term_code = ssbsect_term_code 
+                       and ssrrare_crn = ssbsect_crn
+where ssbsect_term_code = :Term_Code
+and ssbsect_ptrm_code = :Part_of_Term_Code
+and SSBSECT_SUBJ_CODE = :Subject_Code
+order by SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, SSBSECT_SEQ_NUMB;

@@ -1,0 +1,38 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    16-APR-2024
+--Purpose: This script will find CRNs that need the '27WC' or '17WC' attribute on 
+--         SSADETL
+
+
+--Note:  This really only needs to be checked for Summer terms as we have a program
+--       that runs every night in Automic for Fall and Spring.  
+
+--desc ssrattr;
+
+SELECT ssbsect_Crn,
+       ssbsect_term_code,
+       ssbsect_ptrm_code,
+       ssbsect_subj_code,
+       ssbsect_crse_numb,
+       ssbsect_seq_numb,
+       LISTAGG(ssrattr_attr_code, ',')within group (order by ssrattr_attr_code) Attribute_Codes
+from ssbsect
+join ssrattr on ssrattr_crn = ssbsect_crn and ssrattr_term_code = ssbsect_term_code
+where ssbsect_TERM_CODE = :Term
+      --AND SSRATTR_ATTR_CODE != :SSADETL_ATTRIBUTE_CODE
+      AND SSRATTR_CRN in 
+      (select distinct SSBSECT_CRN 
+       from SSBSECT
+       Where ssbsect_term_code = :Term 
+             AND SSBSECT_PTRM_CODE = :PoT_Code)
+     AND ssrattr_crn not in
+     (select distinct SSRATTR_CRN from ssrattr where SSRATTR_ATTR_CODE= :SSADETL_ATTRIBUTE_CODE)
+     
+GROUP BY ssbsect_Crn,
+       ssbsect_term_code,
+       ssbsect_ptrm_code,
+       ssbsect_subj_code,
+       ssbsect_crse_numb,
+       ssbsect_seq_numb
+ORDER BY ssbsect_subj_code,
+       ssbsect_crse_numb;

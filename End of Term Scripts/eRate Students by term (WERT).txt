@@ -1,0 +1,21 @@
+-- Created By: Lance Woodard, Registrar
+--       Date: April 24, 2012
+--    Purpose: Script to pull the students for a prompted term with eRate attribute.
+
+--      Edits: Edited to only include students don't already have their attribute ended...kt..8/11/2023
+
+
+--desc sgrsatt;
+select spriden_id as "ID",
+       sgrsatt_term_code_eff as "Term",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       sgrsatt_atts_code as "Attribute",
+       SGRSATT_END_TERM_ETHOS as "End Term"
+from spriden,sgrsatt
+where spriden_change_ind IS NULL
+and   spriden_pidm = sgrsatt_pidm
+and   sgrsatt_term_code_eff = :Term_Code
+and   sgrsatt_atts_code = 'WERT'
+and   SGRSATT_END_TERM_ETHOS = '999999'
+order by spriden_last_name,spriden_first_name;

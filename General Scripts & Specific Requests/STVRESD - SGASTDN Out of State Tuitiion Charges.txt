@@ -1,0 +1,19 @@
+/*
+Author:  Kevin Thomas, Registrar
+Date:    23-AUG-2024
+Purpose: This query returns codes that have been applied to students since 2020 to generate 
+         out of state tuition.
+*/
+
+
+--desc sgbstdn;
+--select distinct SGBSTDN_RESD_CODE from stvresd
+--desc stvresd;
+
+select distinct SGBSTDN_RESD_CODE, stvresd_desc, max(sgbstdn_term_code_eff) 
+from sgbstdn
+inner join stvresd on stvresd_code = sgbstdn_resd_code
+where SGBSTDN_TERM_CODE_EFF > 2020
+and SGBSTDN_RESD_CODE in (select distinct stvresd_code from stvresd where stvresd_in_state_ind = 'O')
+group by SGBSTDN_RESD_CODE, stvresd_desc
+order by  SGBSTDN_RESD_CODE, stvresd_desc;

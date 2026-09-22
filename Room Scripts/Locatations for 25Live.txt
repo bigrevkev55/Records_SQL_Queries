@@ -1,0 +1,22 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    19-JUN-2025
+--Purpose: This query attempts to return all rooms that have events scheduled in them in Banner and
+--         have an active status in Banner.  
+
+
+--select * from slbevnt order by slbevnt_activity_date desc;
+--Select * from gebfunc;
+--Select * from ssrmeet;
+--desc slbrdef;
+--desc ssbsect;
+--desc slbschd; --used to store information about meeting/events
+--desc ssrmeet; --used to store information about class meetings
+
+
+select distinct ssrmeet_room_code,  SLBRDEF_DESC, SLBRDEF_CAPACITY, slbrdef.slbrdef_bldg_code
+from ssrmeet
+join slbrdef on slbrdef_room_number = ssrmeet_room_code
+where slbrdef_rmst_code = 'AC'
+order by ssrmeet_room_code;
+
+

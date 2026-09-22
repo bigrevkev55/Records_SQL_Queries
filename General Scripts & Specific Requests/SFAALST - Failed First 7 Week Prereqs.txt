@@ -25,5 +25,7 @@ Where SFRSTCR_PIDM = SPRIDEN_PIDM
       and SFRSTCR_TERM_CODE = :TERM
       and SFRSTCR_PTRM_CODE = any ('2','6', 'RA1')
       And SFRSTCR_GRDE_CODE  IN (select SHRGRDE_CODE from shrgrde where SHRGRDE_PASSED_IND <> 'Y')     
-      and SFRSTCR_CRN in (select SSRRARE_CRN from ssrrare where SSRRARE_AREA like 'Y%' and SSRRARE_TERM_CODE = :TERM)
+      and SFRSTCR_CRN in (SELECT SSBSECT_CRN from SSBSECT where ssbsect_term_code = :TERM and SSBSECT_PTRM_CODE in('7','3', 'RA2'))
+                        --(select SSRRARE_CRN from ssrrare where SSRRARE_AREA like '7%' and SSRRARE_TERM_CODE = :TERM)
 Order by spriden_last_name, spriden_first_name;
+

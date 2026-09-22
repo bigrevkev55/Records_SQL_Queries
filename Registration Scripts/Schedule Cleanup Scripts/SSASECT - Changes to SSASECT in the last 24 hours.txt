@@ -1,7 +1,7 @@
 --Author:  Kevin Thomas, Registrar
 --Date:    26-OCT-2021
---Purpose: This records on this report are CRNs that have either been created or edited within 24 hours
---         before the report was ran.  
+--Purpose: This query returns CRNs that have either been created or edited within 24 hours
+--         before the report was ran.  Use this to confirm that SSASECT, SSADETL, and DCM charges are setup correctly.    
 
 select  SSBSECT_TERM_CODE TERM,
         SSBSECT_CRN CRN,

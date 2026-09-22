@@ -10,7 +10,7 @@
  Added "address" subtable to pull address information from SPRADDR
  
  Edited on 12/16/2021 by Kevin Thomas, Registrar
- Added filter to exclude studetnt that have the confidentiality indicator checked on SPAIDEN
+ Added filter to exclude students that have the confidentiality indicator checked on SPAIDEN
  Changed code to look for PL or DL on SHAINST now as the Presidents List setup is complete.  
  Changed sort to Academic Standing, Last Name, First Name
  */

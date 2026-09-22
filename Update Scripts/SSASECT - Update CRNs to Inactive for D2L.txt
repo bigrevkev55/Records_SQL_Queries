@@ -1,0 +1,18 @@
+--Author:  Kevin Thomas, Registrar
+--Date;    18-MAR-2024
+--Purpose: Test script to update SSASECT sections to Inactive for the Office of Online 
+--         Learning to test some new D2L integrarion.  
+/*
+select count (ssbsect_crn)
+from ssbsect 
+where ssbsect_term_code = '201680'
+      and ssbsect_ssts_code = 'A'
+      AND ssbsect_intg_cde = 'D2L';   ---1545 Records
+*/
+
+
+UPDATE ssbsect
+SET ssbsect_ssts_code = 'I'
+WHERE ssbsect_ssts_code = 'A'
+      AND ssbsect_term_code='201680'
+      AND ssbsect_intg_cde = 'D2L';

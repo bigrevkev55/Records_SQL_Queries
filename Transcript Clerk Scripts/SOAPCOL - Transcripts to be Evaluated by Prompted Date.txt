@@ -1,0 +1,34 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    17-JUN-2022
+--Purpose: This query attempts to return Non-TBR college transcripts, by prompted date, that have been processed by Admissions
+--         and are ready to be be reviewed by Records.  This script is looking for students whose last names begin with A-G.
+
+select --spriden_id as "A Number",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --sorpcol_sbgi_code as "School Code",
+       stvsbgi_desc as "School"--,
+       --goremal_emal_code as "Email Type",
+       --GOREMAL_EMAIL_ADDRESS as "Email Address"--,
+       --goremal_preferred_ind preferred_ind
+from spriden, sorpcol, stvsbgi--, goremal
+where sorpcol_trans_rev_date >= :DD_MON_YYYY
+      and sorpcol_sbgi_code = stvsbgi_code
+      and sorpcol_pidm = spriden_pidm
+      and spriden_change_ind is NULL
+     -- and spriden_pidm = goremal_pidm
+      and sorpcol_sbgi_code not in (select STVSBGI_CODE 
+from stvsbgi
+where stvsbgi_code in ('001084','002848','001081','007323', '002266', '001543', '000453', 
+                       '000319', '001656', '000274', 
+                       '001881', '001893', '000850'))
+      and (spriden_last_name like 'A%'
+      or  spriden_last_name like 'B%'
+      or  spriden_last_name like 'C%'
+      or  spriden_last_name like 'D%'
+      or  spriden_last_name like 'E%' 
+      or  spriden_last_name like 'F%'
+      or  spriden_last_name like 'G%')
+      
+      
+Order by spriden_last_name;

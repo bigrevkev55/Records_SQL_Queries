@@ -5,8 +5,56 @@
 --             the student's email and addresses have been edited out but can 
 --             be put back in. Can also edit by campus code.   
 --             Note: This script doesn't include students with a GRN grad status...kt...3.18.21
+--             Note: This script doesn't include DE Students because it looks for programs that have been rolled to outcome
+--                   and we don't roll DE students to outcome until after they graduate from HS...kt...2.21.2022
+--	       Note: As 2026 the grad spec started manually coding SHADEGR for DE students and embedded certificate students so they are now included in 
+--                   the output....kt...1.30.2026
+--            Edit:  Edited this to sort by Grad term first (Some may have Aggregate Terms)...kt..2.27.2025
+
+--        Note:  This is not the script to use for Slate Import as that needs to include surrogate ID and GRNs...kt...2/5/2026
 
 
+--Non Duplicated Output---------------------------------------------------------
+
+SELECT spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       LISTAGG(shrdgmr_term_code_grad, ', ') WITHIN GROUP (ORDER BY shrdgmr_term_code_grad) as "Grad Term",
+       LISTAGG(shrdgmr_degs_code, ', ') WITHIN GROUP (ORDER BY shrdgmr_degs_code) as "Award Status",
+       LISTAGG(shrdgmr_grst_code, ', ') WITHIN GROUP (ORDER BY shrdgmr_grst_code) as "Grad Code",
+       LISTAGG(shrdgmr_program, ', ') WITHIN GROUP (ORDER BY shrdgmr_program) as "Program",
+       LISTAGG(shrdgmr_majr_code_conc_1, ', ') WITHIN GROUP (ORDER BY shrdgmr_majr_code_conc_1) as "Concentration"
+       
+FROM spriden,shrdgmr, sovlcur outter
+WHERE spriden_change_ind IS NULL
+AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
+--AND SHRDGMR_PIDM = SHRLGPA_PIDM
+ --Added GPA Information; Type = I (Institutional), T (Transfer), or O for Overall (UG Combined (T and I))
+--and   shrlgpa_levl_code = 'UG'
+--and   shrlgpa_gpa_type_ind = 'O'
+and   spriden_pidm = shrdgmr_pidm
+--and   spriden_pidm = sorlcur_pidm
+--and shrdgmr_pidm = spriden_pidm
+--and   shrdgmr_term_code_grad in ('202080', '202110', '202150')--:Grad_Term
+and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+--and   shrdgmr_term_code_grad IN ('201910') --, '201950')
+--and   shrdgmr_grst_code = 'GR'
+--and   shrdgmr_grst_code = :Grad_Code
+and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')  --excludes students with GRN grad status.
+--and   shrdgmr_grst_code IS NOT NULL
+--and   shrdgmr_program = :Program_Code
+--and   shrdgmr_program = 'AAS_ECED'
+--and shrdgmr_degs_code IN ('PN', 'AW')
+and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
+GROUP BY spriden_last_name,
+       spriden_first_name, spriden_id
+order by "Grad Term", spriden_last_name, spriden_first_name;
+
+
+
+
+----------------------original script, count is duplicated-------------------
+/*
 select spriden_id as "ID",
        --SORLCUR_SITE_CODE as Campus,
        spriden_last_name as "Last Name",
@@ -16,27 +64,27 @@ select spriden_id as "ID",
        shrdgmr_grst_code as "Grad Code",
       -- shrdgmr_grad_date as "Grad Date",
       -- shrdgmr_acyr_code_bulletin as "Catalog",
-       shrlgpa_gpa_type_ind as GPA_TYPE,
-       trunc (SHRLGPA_GPA,2) AS "TRUNCATED GPA",
+      -- shrlgpa_gpa_type_ind as GPA_TYPE,
+     --  trunc (SHRLGPA_GPA,2) AS "TRUNCATED GPA",
        shrdgmr_program as "Program Code",
        shrdgmr_degc_code as "Degree",
        shrdgmr_majr_code_1 as "Major",
-       shrdgmr_majr_code_conc_1 as "Conc",
-    goremal_emal_code as Email,
-    GOREMAL_EMAIL_ADDRESS as "NSCC Email"
+       shrdgmr_majr_code_conc_1 as "Conc" --,
+   -- goremal_emal_code as Email,
+   -- GOREMAL_EMAIL_ADDRESS as "NSCC Email"
        
-from spriden,shrdgmr, sovlcur, SHRLGPA--goremal
+from spriden,shrdgmr, sovlcur outter -- SHRLGPA--goremal
 where spriden_change_ind IS NULL
 AND SHRDGMR_PIDM = SOVLCUR_PIDM AND SHRDGMR_SEQ_NO = SOVLCUR_KEY_SEQNO AND SOVLCUR_CURRENT_IND = 'Y' AND SOVLCUR_ACTIVE_IND = 'Y' AND SOVLCUR_LMOD_CODE = 'OUTCOME'
-AND SHRDGMR_PIDM = SHRLGPA_PIDM
+--AND SHRDGMR_PIDM = SHRLGPA_PIDM
  --Added GPA Information; Type = I (Institutional), T (Transfer), or O for Overall (UG Combined (T and I))
-and   shrlgpa_levl_code = 'UG'
-and   shrlgpa_gpa_type_ind = 'O'
+--and   shrlgpa_levl_code = 'UG'
+--and   shrlgpa_gpa_type_ind = 'O'
 and   spriden_pidm = shrdgmr_pidm
 --and   spriden_pidm = sorlcur_pidm
 --and shrdgmr_pidm = spriden_pidm
-and   shrdgmr_term_code_grad in ('202080', '202110', '202150')--:Grad_Term
---and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
+--and   shrdgmr_term_code_grad in ('202080', '202110', '202150')--:Grad_Term
+and   shrdgmr_term_code_grad IN (:Term1,:Term2,:Term3)
 --and   shrdgmr_term_code_grad IN ('201910') --, '201950')
 --and   shrdgmr_grst_code = 'GR'
 --and   shrdgmr_grst_code = :Grad_Code
@@ -48,7 +96,16 @@ and   shrdgmr_grst_code  IN ('GR','RTS', 'IC', 'EM')  --excludes students with G
 and   shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')
 --and   shrdgmr_degc_code = :Degree
 --and spriden_pidm = GOREMAL_PIDM
-and goremal_emal_code IN ('CAMP','PERS')
-and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+--and goremal_emal_code IN ('CAMP','PERS')
+--and   (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
 --and SORLCUR_SITE_CODE in ('H43')
-order by spriden_last_name,spriden_first_name,shrdgmr_degc_code,shrdgmr_program;
+ORDER BY SHRDGMR_TERM_CODE_GRAD,SHRDGMR_DEGC_CODE,SHRDGMR_MAJR_CODE_1,SPRIDEN_LAST_NAME,SPRIDEN_FIRST_NAME;
+
+*/
+
+
+
+
+       
+       
+

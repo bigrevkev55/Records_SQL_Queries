@@ -1,0 +1,16 @@
+Created by Miranda Inman 09/12/22
+
+Excel function that finds duplicate rows where both column A and column B contain a duplicate value. Adjust columns as needed and also number of rows to compare. 
+
+Notes: Make sure to create a column for the function (example: C), highlight the area where you want the program to run (ex. C2:C5), then enter the funtion formula into the first cell and use Ctrl + Enter to run it in all additionally highlighted cells within the column. If you are running this in a large spreadsheet, as below, this may take up to one hour to run. Don't touch it until it compiles or it will crash the program. Just leave it running and do something else while you wait.
+
+example:
+1	A	B	C
+2	ABC	ACD	YES
+3	ABC	ACD	YES
+4	DCE	EDC	NO
+5	DBE	EDC	NO
+
+
+
+=IF(AND(COUNTIF($A$2:$A$90935, $A2)>1,COUNTIF($B$2:$B$90935, $B2)>1), "YES", "NO")

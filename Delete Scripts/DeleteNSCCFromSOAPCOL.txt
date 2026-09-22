@@ -1,0 +1,12 @@
+--Author: Miranda Inman, Kevin Thomas, Trey Dalton
+--Date:  04-JAN-2023
+--Purpose: This script deletes all instances of NSCC (000850) listed on SOAPCOL. Three scripts total which must be run in the order listed below. 
+
+DELETE FROM sormajr
+WHERE sormajr_sbgi_code = '000850';
+
+DELETE FROM sordegr
+WHERE sordegr_sbgi_code = '000850';
+
+DELETE FROM sorpcol
+WHERE sorpcol_sbgi_code = '000850';

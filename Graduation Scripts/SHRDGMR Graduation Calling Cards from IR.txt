@@ -1,0 +1,84 @@
+-- PROGRAM NAME:  Graduation List for Call Cards
+-- PROGRAMMER:    Derrick Dupuis
+-- VERSION:       1.0
+-- DATE:          October 27, 2022
+-- DESCRIPTION:   Pulls the fields necessary for call cards for graduation
+--                This script is adapted from a traditional script used by Records for this process
+-- NOTE:  Beginning with 2025 Commencement we need to add a "School/Division" column and seat students by School
+--
+-- Query
+SELECT
+    NULL AS CALL_CARD_NO,
+    ' ' as SCHOOL, --candidates to be seated by schools/divisions beginning commencement 2025 per E. Hadley
+    iden.SPRIDEN_ID AS STUDENT_ID,
+    iden.SPRIDEN_LAST_NAME AS LAST_NAME,
+    iden.SPRIDEN_FIRST_NAME AS FIRST_NAME,
+    MAX(TRUNC_GPA) AS TRUNCATED_GPA,
+    MAX(HONORS_TYPE) AS HONORS,
+    LISTAGG (SGRSATT_ATTS_CODE, ', ') 
+        WITHIN GROUP (ORDER BY SGRSATT_ATTS_CODE)
+        AS "ATTRIBUTE(S)",
+    NULL AS CAP_AND_GOWN,
+    MAX(dgmr.SHRDGMR_SEQ_NO) AS DEG_SEQ,
+    dgmr.SHRDGMR_TERM_CODE_GRAD AS GRAD_TERM,
+    MAX(dgmr.SHRDGMR_GRST_CODE) AS GRAD_STATUS,
+    dgmr.SHRDGMR_DEGC_CODE AS DEGREE,
+    dgmr.SHRDGMR_MAJR_CODE_1 AS MAJOR_1,
+    dgmr.SHRDGMR_MAJR_CODE_CONC_1 AS CONC_1,
+    MAX(CASE WHEN dgmr.SGBSTDN_ADMT_CODE IN ('DE','DM') THEN 'Y' END) AS DUAL_ENROLLMENT
+-- Student Completion and Admit Type
+FROM (
+    SELECT *
+    FROM SHRDGMR
+        LEFT JOIN SGBSTDN ON SHRDGMR_PIDM = SGBSTDN_PIDM
+            AND SGBSTDN_TERM_CODE_EFF = (
+                SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+                FROM SGBSTDN
+                WHERE SHRDGMR_PIDM = SGBSTDN_PIDM
+                    AND SGBSTDN_TERM_CODE_EFF <= SHRDGMR_TERM_CODE_GRAD
+            )
+    WHERE SHRDGMR_TERM_CODE_GRAD IN (:TERM_1, :TERM_2, :TERM_3 )
+        AND SHRDGMR_GRST_CODE IN ('EM','IC','GR','RTS')
+        AND SHRDGMR_DEGC_CODE NOT IN ('ACRT1','ACRT2')
+) dgmr
+/* -- Student Major (No reference)
+LEFT JOIN SOVLCUR lcur ON dgmr.SHRDGMR_PIDM = lcur.SOVLCUR_PIDM
+    AND dgmr.SHRDGMR_SEQ_NO = lcur.SOVLCUR_KEY_SEQNO
+    AND lcur.SOVLCUR_CURRENT_IND = 'Y'
+    AND lcur.SOVLCUR_ACTIVE_IND = 'Y'
+    AND lcur.SOVLCUR_LMOD_CODE = 'OUTCOME'*/
+-- Student Identifiers
+LEFT JOIN SPRIDEN iden ON dgmr.SHRDGMR_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+-- Student GPA
+LEFT JOIN (
+    SELECT SHRLGPA.*,
+        TRUNC(SHRLGPA_GPA, 2) AS TRUNC_GPA,
+        (CASE WHEN TRUNC(SHRLGPA_GPA, 2) > '3.89' THEN 'Summa Cum Laude'
+            WHEN TRUNC(SHRLGPA_GPA, 2) > '3.74' THEN 'Magna Cum Laude'
+            WHEN TRUNC(SHRLGPA_GPA, 2) > '3.49' THEN 'Cum Laude'
+            ELSE NULL END) AS HONORS_TYPE
+    FROM SHRLGPA
+    WHERE SHRLGPA_LEVL_CODE = 'UG'
+        AND SHRLGPA_GPA_TYPE_IND = 'O'
+) lgpa ON dgmr.SHRDGMR_PIDM = lgpa.SHRLGPA_PIDM
+-- Student Attributes
+LEFT JOIN SGRSATT satt ON dgmr.SHRDGMR_PIDM = satt.SGRSATT_PIDM
+    AND satt.SGRSATT_TERM_CODE_EFF = (
+        SELECT MAX(SGRSATT_TERM_CODE_EFF)
+        FROM SGRSATT
+        WHERE dgmr.SHRDGMR_PIDM = satt.SGRSATT_PIDM
+            AND SGRSATT_TERM_CODE_EFF <= dgmr.SHRDGMR_TERM_CODE_GRAD
+    )
+-- Report Organization
+GROUP BY iden.SPRIDEN_ID,
+    iden.SPRIDEN_LAST_NAME,
+    iden.SPRIDEN_FIRST_NAME,
+    dgmr.SHRDGMR_TERM_CODE_GRAD,
+    dgmr.SHRDGMR_DEGC_CODE,
+    dgmr.SHRDGMR_MAJR_CODE_1,
+    dgmr.SHRDGMR_MAJR_CODE_CONC_1
+ORDER BY dgmr.SHRDGMR_DEGC_CODE,
+    iden.SPRIDEN_LAST_NAME,
+    iden.SPRIDEN_FIRST_NAME
+;

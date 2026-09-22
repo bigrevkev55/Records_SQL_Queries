@@ -1,3 +1,9 @@
+--Script to pull GRNs by prompted term.  
+--Must be ran in Sql Developer as a Script (F5) and not a statement
+--Copy output into Notepad, save by removing the * and adding .txt.
+
+
+
 set  serveroutput on size 1000000
 declare
 p_termcode varchar2(6) := &termcode;

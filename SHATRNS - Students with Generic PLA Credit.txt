@@ -1,0 +1,20 @@
+--Author: Kevin Thomas, Registrar
+--Date:   23-JUN-2026
+--Purpose: This query returns students who've received generic PLA credit. The PLA code can
+--         can be edited in the subquery to look for students who have received different 
+--         PLA credit.  
+
+Select Spriden_id, spriden_last_name, spriden_first_name
+from spriden
+where SPRIDEN_PIDM in
+(
+Select distinct shrtrit_pidm--, 
+--stvsbgi_code, stvsbgi_desc 
+from shrtrit
+join stvsbgi on shrtrit_sbgi_code = stvsbgi_code    
+where shrtrit_sbgi_code like '999010%' --Generic PLA Code
+--order by 2
+)
+and spriden_change_ind is null
+
+--select * from STVSBGI where stvsbgi_desc like 'CLEP%' order by 4;

@@ -1,0 +1,25 @@
+
+
+--Author:  Kevin Thomas, Registrar
+--Date:    30-MAY-2023
+--Purpose: Find 202350 and 202380 students that have been admitted with 30, AI, CC.  
+--         Per Laura Moran, Executive Director of EM, these holds need to be ended.
+
+
+
+--desc sprhold;
+
+
+select SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME, SPRIDEN_ID, sprhold.*, sarappd.*
+from saraPPD
+
+RIGHT OUTER JOIN SPRIDEN ON SPRIDEN_PIDM = SARAPPD_PIDM
+right outer join sprhold on sprhold_pidm = sarappd_pidm
+where SARAPPD_APDC_CODE IN ('30', 'AI', 'CC')
+      AND SARAPPD_TERM_CODE_ENTRY IN ('202350', '202380')
+      AND SPRIDEN_CHANGE_IND IS NULL
+      and sprhold_hldd_code = 'OA'
+      and sprhold_to_date > sysdate
+
+
+ORDER BY SARAPPD_TERM_CODE_ENTRY, SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME;

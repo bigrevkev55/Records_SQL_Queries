@@ -1,0 +1,95 @@
+/******************************************************************************
+Written by:   
+Trey Dalton
+Nashville State Community College  
+
+Date Created:
+05/08/2024
+
+Description:   
+End the HS for students for whom we have received a transcript
+
+Modified:       By:                 Changes made:
+05/10/2024      Trey                Added check for if the to_date is NOT LIKE
+                                    the from_date, to prevent already processed 
+                                    people from pulling; to increase performance.
+05/13/2024      Trey                Selection needs to exclude those with post-dated
+                                    holds.
+*******************************************************************************/
+set serveroutput on
+
+declare
+    v_id        varchar2(9);
+    v_to_date   date;
+    v_from_date date;
+    v_count     number := 0;
+cursor  c_get_info is
+--select  distinct
+--        spriden_id
+--    ,   sprhold_to_date     
+--    ,   sprhold_from_date
+--from    spriden
+--join    sorhsch     on  spriden_pidm = sorhsch_pidm
+--join    sprhold     on  spriden_pidm = sprhold_pidm
+--join    sarappd s   on  spriden_pidm = s.sarappd_pidm
+--where   sprhold_hldd_code = 'HS'
+--and     sprhold_to_date > sysdate
+----051024: start of modification by Trey
+--and     sprhold_to_date like sprhold_from_date
+----051024: end of modification by Trey
+----051324: start of modification by Trey
+--and     sprhold_from_date < sysdate
+----051324: end of modification by Trey
+--and     sorhsch_admr_code = 'HST1'
+--and     sorhsch_trans_recv_date is not null
+--and     sarappd_term_code_entry =   (--limit selection to those who are admitted from 202310
+--                                    select  max(sarappd_term_code_entry)
+--                                    from    sarappd
+--                                    where   sarappd_pidm = s.sarappd_pidm
+--                                    and     sarappd_term_code_entry >= '202310'
+--                                    )     
+--and     spriden_change_ind is null                                       
+
+select  distinct
+        spriden_id
+    ,   sprhold_to_date     
+    ,   sprhold_from_date
+--    ,   sprhold_activity_date
+from    spriden
+join    sorhsch     on  spriden_pidm = sorhsch_pidm
+join    sprhold     on  spriden_pidm = sprhold_pidm
+join    sarappd s   on  spriden_pidm = s.sarappd_pidm
+where   sprhold_hldd_code = 'HS'
+and     sprhold_to_date > sysdate
+and     sprhold_to_date like sprhold_from_date
+and     sorhsch_admr_code = 'HST1'
+and     sorhsch_trans_recv_date is not null
+and     sarappd_term_code_entry =   (--limit selection to those who are admitted from 202310
+                                    select  max(sarappd_term_code_entry)
+                                    from    sarappd
+                                    where   sarappd_pidm = s.sarappd_pidm
+                                    and     sarappd_term_code_entry >= '202310'
+                                    )     
+and     spriden_change_ind is null
+;--151       
+begin
+	open c_get_info;
+        loop
+        fetch c_get_info into v_id, v_to_date, v_from_date;
+        exit when c_get_info%notfound;     
+        dbms_output.put_line(v_id);
+                update  sprhold
+                set     sprhold_to_date = '31-DEC-2099'
+                    ,   sprhold_user = 'BANWORX'
+                    ,   sprhold_activity_date = trunc(sysdate)
+                where   sprhold_pidm = gb_common.f_get_pidm(v_id)
+                and     sprhold_hldd_code = 'HS'
+                and     sprhold_to_date > sysdate
+                ;----end of update
+            v_count := v_count + 1;
+        end loop; 
+    close c_get_info;
+    dbms_output.put_line('Records updated: ' || v_count);
+    commit;	
+end;	
+/

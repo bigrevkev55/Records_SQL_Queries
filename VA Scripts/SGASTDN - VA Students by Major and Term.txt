@@ -1,42 +1,44 @@
-
---Author:  Kevin Thomas, Assistant Registrar
---Date:    09-OCT-2019
---Purpose: This query returns VA Students and their programs of study.
-
-
---desc stvvetc;
+-- Author:  Kevin Thomas, Assistant Registrar
+-- Date:    09-OCT-2019
+-- Purpose: Returns VA Students and their programs of study (major & concentration) for a given VA cert term.
+-- Edits:   11-MAR-2026 added in SSN and Major/Concentration Descriptions...kt
 
 SELECT
-    spriden.spriden_id,
-    spriden.spriden_last_name,
-    spriden.spriden_first_name,
-    sgrvetn.sgrvetn_cert_hours,
-    --sgbstdn.sgbstdn_stst_code,
-    --sgbstdn.sgbstdn_term_code_eff,
-    sgbstdn.sgbstdn_degc_code_1,
-    sgbstdn.sgbstdn_majr_code_1,
-    sgbstdn.sgbstdn_majr_code_conc_1,
-    sgrvetn.sgrvetn_term_code_va,
-    sgrvetn.sgrvetn_vetc_code
-FROM
-    spriden,
-    sgrvetn,
-    sgbstdn
+    s.spriden_id                      AS student_id,
+    p.spbpers_ssn                     AS ssn,
+    s.spriden_last_name               AS last,
+    s.spriden_first_name              AS first,
+    v.sgrvetn_cert_hours              AS hours_certified,
+    st.sgbstdn_degc_code_1            AS degree_type,
+    mj.stvmajr_desc                   AS major,
+    cn.stvmajr_desc                   AS concentration,
+    v.sgrvetn_term_code_va            AS cert_term,
+    vc.stvvetc_desc                   AS vet_code
+FROM spriden s
+JOIN sgrvetn v
+  ON v.sgrvetn_pidm = s.spriden_pidm
+JOIN spbpers p
+  ON p.spbpers_pidm = s.spriden_pidm
+JOIN sgbstdn st
+  ON st.sgbstdn_pidm = s.spriden_pidm
+JOIN stvvetc vc
+  ON vc.stvvetc_code = v.sgrvetn_vetc_code
+LEFT JOIN stvmajr mj
+  ON mj.stvmajr_code = st.sgbstdn_majr_code_1
+LEFT JOIN stvmajr cn
+  ON cn.stvmajr_code = st.sgbstdn_majr_code_conc_1
 WHERE
-    spriden.spriden_pidm = sgrvetn.sgrvetn_pidm
-   -- AND spriden.spriden_pidm = sgbstdn.sgbstdn_pidm
-    and sgbstdn_pidm = sgrvetn_pidm
-    AND sgrvetn.sgrvetn_term_code_va = :TERM
-    AND SGRVETN.sgrvetn_vetc_code IS NOT NULL
-    AND spriden.spriden_change_ind IS Null
-    AND SGBSTDN_TERM_CODE_EFF =
-           (SELECT MAX(SGBSTDN_TERM_CODE_EFF)
-            FROM SGBSTDN
-            WHERE SGBSTDN_PIDM = sgrvetn_PIDM
-            AND SGBSTDN_TERM_CODE_EFF <= :TERM) --Change term
+    v.sgrvetn_term_code_va = :TERM
+    AND v.sgrvetn_vetc_code IS NOT NULL
+    AND s.spriden_change_ind IS NULL
+    AND st.sgbstdn_term_code_eff = (
+        SELECT MAX(st2.sgbstdn_term_code_eff)
+        FROM sgbstdn st2
+        WHERE st2.sgbstdn_pidm = st.sgbstdn_pidm
+          AND st2.sgbstdn_term_code_eff <= :TERM
+    )
 ORDER BY
-    sgrvetn.sgrvetn_cert_hours,
-    spriden.spriden_last_name,
-    spriden.spriden_last_name, 
-    SPRIDEN.spriden_first_name,
-    sgrvetn.sgrvetn_term_code_va
+    v.sgrvetn_cert_hours,
+    s.spriden_last_name,
+    s.spriden_first_name,
+    v.sgrvetn_term_code_va;

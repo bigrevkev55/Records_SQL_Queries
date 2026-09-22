@@ -1,0 +1,33 @@
+/******************************************************************************
+Written by:   
+Trey Dalton
+Nashville State Community College  
+
+Date Created:
+04/23/2023
+
+Description:   
+This report should find courses with XSUP attributes for sections that start before the
+full-term census date.
+
+Modified:       By:                 Changes made:
+--/--/----      ------ --------     -------------------------------------------
+                                    -------------------------------------------
+*******************************************************************************/
+select  ssbsect_term_code as term_code  
+        ,   ssbsect_crn as crn
+        ,   ssbsect_ptrm_code as part_of_term
+        ,   ssrattr_attr_code attribute_code
+from    ssbsect
+join    ssrattr on ssbsect.ssbsect_crn = ssrattr.ssrattr_crn
+where   ssbsect_term_code not like ('%50')
+and     ssrattr_attr_code = 'XSUP'
+and     ssbsect_term_code = :term_code
+and     ssrattr_term_code = ssbsect_term_code
+and     ssbsect_ptrm_start_date <   (  
+                                    select  sobptrm_census_date
+                                    from    sobptrm
+                                    where   sobptrm_ptrm_code = '1'
+                                    and     sobptrm_term_code = :term_code
+                                    )
+;

@@ -1,48 +1,87 @@
 --Author:  Kevin Thomas, Assistant Registrar
 --Date:    06-JUN-2020
---Purpose: This query returns transcript request on SHAETOR 
---           that are in AD status. 
+--Purpose: This query returns transcript request on SHAETOR for students that have:
+            --1.  Turned in an Intent to Graduate
+            --2.  Requested an AD Transcript
 --Edits:  1. Added Degree Status Program, Email, and Phone number columns
 --        commented out attachment and cancelled indicators...kt...25-JAN-2021
 --        2. Added graduation status so we can see GRN students.  
 --        3. Added a prompt for graduation term as we only need to update based on prompted term.
 --        4. Changed sort to sort by descending order date and added 'FO' status to subquery filter...kt...6.10.21
+--        5. Changed the script to pull in everyone on SHAETOR with an outstanding AD transcript.  And 
+--           added additional notes and instructions, changed sort to last name, first name...kt...8/27.2023
+--        6. Added note#6
+
+--NOTE#1 Some students appear in this list but did not turn their intent in for this term (see INTENT_TO_GRAD_TERM column). 
+--       These students need their order cancelled and 
+--       to resubmit their transcript request and choose "Send now - As Is" instead of After Degree Posts "AD".  
+--       Use the email they provided when making the request to notify them (Email column).  
+
+--NOTE# 1.5 - Students that do not have an intent term listed, also need to have their order cancelled and need to be notified that they need
+--            to submit a new request after they have turned in an intent for the term.  If they do not actually want an AD transcript, they
+--            should choose, "Send Now - As Is" for their delivery option.  
+
+--Note# 1.75 - Students whose Reported PoS, Graduating Term, and Degree Status Program don't match will not have a transcript sent by the system.  
+--             Their orders need to be cancelled and they need to do an updated transcript request based on their intent, term of graduation, and 
+--             degree status program.
+
+--NOTE#2 Some students are in SHAETOR with an AD status.  Those students will not appeal in this report.  
+
+--NOTE#3 - This report needs to be ran after Grad Spec has completed final evaluatios.  At that time check Degree Status Program Versus Student reported
+--         program.  
+
+--NOTE#4 - Students that are in GRN status need their orders cancelled and to be emailed that no transcript will be sent and 
+--         that they should do an update to the intent or
+--         contanct the Grad Spec about what is needed to graduate.  
+
+--NOTE#5 - The count on this report is grouped by A# so it will have less than SHAETOR because SHAETOR counts every 
+--         order number as a separate record (row).  
+
+--NOTE#6 - There is an Automic job that runs nightly until 2040 that updates the student reported PoS to match the 
+--         degree status program.  
+
 
 --DESC shrteos;
 --DESC shrteod;
 --DESC SHRDGMR;
 
-SELECT 
+SELECT DISTINCT
 --SPRIDEN_PIDM,
 SHBTEOT_LAST_NAME LAST,
 SHBTEOT_FIRST_NAME FIRST,
-SHRTEOD_EMAIL_ADDR as "Email", --Email number for the electronic request form
+SHRTEOD_EMAIL_ADDR as "Email for GRN students and those w/o an intent for this term", --Email number for the electronic request form
 SHRTEOD_PHONE_NUMBER as "Phone", --Phone number for the electronic request form
 SHBTEOT_BANNER_ID  A_NUMBER,
-SHRTEOS_ORDER_ID ORDER_NUMBER,
-SHRTEOS_ETST_CODE STATUS_CODE,
-SHRTEOS_ETST_DATE STATUS_DATE,
-SHRDGMR_DEGS_CODE  Degree_Status,
-SHRDGMR_GRST_CODE  Graduation_Status,
+--SHRTEOS_ORDER_ID as "Order ID",
+ListAgg(SHRTEOS_ORDER_ID, ',') within group (order by shrteos_order_id) OVER (PARTITION by SHBTEOT_BANNER_ID )as ORDER_NUMBER,
+ListAgg(SHRDGMR_TERM_CODE_GRAD, ',') within group (order by 1) over (partition by SHBTEOT_BANNER_ID) Intent_to_Grad_Term,
+ListAGG(SHRTEOS_ETST_CODE, ',') within group (order by 1) over (partition by SHBTEOT_BANNER_ID) STATUS_CODE,
+ListAgg(SHRTEOS_ETST_DATE, ',') within group (order by shrteos_etst_date)over (partition by SHBTEOT_BANNER_ID) as DATE_OF_REQUEST,
+ListAgg(SHRDGMR_DEGS_CODE, ',') within group (order by 1) over (PARTITION BY shbteot_banner_id) Degree_Status,
+LISTAGG(SHRDGMR_GRST_CODE, ',') within group (order by 1) over (partition by shbteot_banner_id) Graduation_Status,
 --SHBTEOT_ATTACHMENT_IND ATTACHMENT,
 --SHBTEOT_CANCEL_IND CANCELLED,
-SHRTEOD_RECIPIENT_NAME RECIPIENT,
+LISTAGG(SHRTEOD_RECIPIENT_NAME, ',') within group (order by 1) over (partition by shbteot_banner_id) RECIPIENT,
 shrteod.shrteod_hold_degree_curriculum as "STUDENT_REPORTED_PoS",  --Student chooses from drop down list of currently enrolled programs when placing the order
 --SHRDGMR_SEQ_NO as "Sequence NO",
-SHRDGMR_TERM_CODE_GRAD as "Graduating Term",
-SHRDGMR_DEGC_CODE || '_' || SHRDGMR_MAJR_CODE_1 || '_' || SHRDGMR_MAJR_CODE_CONC_1 as "Degree Status Program"
+ListAgg(SHRDGMR_TERM_CODE_GRAD, ',') within group (order by 1)over (partition by SHBTEOT_BANNER_ID) as "Graduating Term",
+ListAgg(SHRDGMR_DEGC_CODE || '_' || SHRDGMR_MAJR_CODE_1 || '_' || SHRDGMR_MAJR_CODE_CONC_1, ',') within group (order by 1) over (partition by (SHBTEOT_BANNER_ID)) as "Degree Status Program"
 
 FROM shrteos--, spriden--, shrteod, shbteot 
-INNER JOIN shbteot 
+JOIN shbteot 
 on shrteos_order_ID = shbteot_order_Id
-INNER JOIN shrdgmr
+left outer JOIN shrdgmr
 on shrteos_pidm = shrdgmr_pidm
-iNNER JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
+JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
 --inner join spriden on shrteos_pidm = spriden_pidm
-and SHRDGMR_TERM_CODE_GRAD = :Term
-and shrteos_etst_code = 'AD'
+
+where
+ --SHRDGMR_TERM_CODE_GRAD = :Term
+ --SHRDGMR_GRST_CODE is not null
+ shrteos_etst_code = 'AD'
 ---and spriden_pidm = shrteos_pidm
-and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code in ('RG', 'FO')) --Subquery to filter out former AD status requests that have been processed already.
+and SHRTEOS_ORDER_ID not in (select SHRTEOS_ORDER_ID from shrteos where shrteos_etst_code in ('CA','RG', 'FO')) --Subquery to filter out former AD status requests that have been processed already.
 and SHBTEOT_CANCEL_IND <> 'Y'
 
-ORDER BY SHRTEOS_ETST_DATE desc, shbteot_last_name, shbteot_first_name;
+ORDER BY --DATE_OF_REQUEST desc, 
+shbteot_last_name, shbteot_first_name;

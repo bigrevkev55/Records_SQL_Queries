@@ -1,0 +1,111 @@
+--Author:  Unknown (received from Donna Bettis, Chatt State Registrar)
+--Date:    ???
+--Purpose:
+
+/*  From Donna:  
+
+Do you know if they had an override (SFASRPO or SFAREGS) to get into the course? If a student fails 
+the pre-req but had an override, SFRRGAM automatically skips them.
+This report is not pretty but you can enter the term and anumber 
+as variables on the report. Scroll to the end of the report and there is coreq_over, prereq_over etc. If prereq_over 
+is a “Y” or “I” that indicates the student was given a prereq_over for the course, even if someone 
+has removed the override in SFASRPO, this field still indicates the override was given.
+
+
+Donna
+*/
+
+
+--Edits:  Edited this to look at all students for prompted term and only return those who have PREREQ_OVER of Y or I...kt...3.17.2022
+
+
+select distinct
+spriden_id as Anumber,
+spriden_last_name as last_name,
+spriden_first_name as first_name,
+SHRTCKG_GRDE_CODE_FINAL as grd,
+sfrstcr_Crn as CRN,
+SSBSECT_SUBJ_CODE as sbjct,
+SSBSECT_CRSE_NUMB as nmb,
+SSBSECT_SEQ_NUMB as section,
+SSBSECT_PTRM_CODE as pot,
+SSRRARE_AREA as smaarea,
+a.SMRACAA_SET as "SET",
+a.SMRACAA_SUBSET as sub_set,
+a.SMRACAA_TESC_CODE || ' ' || a.SMRACAA_MIN_VALUE || ' - ' || a.SMRACAA_MAX_VALUE  || ' ' ||
+a.SMRACAA_SUBJ_CODE || ' ' || a.SMRACAA_CRSE_NUMB_LOW || ' - ' || a.SMRACAA_CRSE_NUMB_HIGH as course_test_req,
+(select distinct sortest_tesc_code|| '-' ||sortest_test_score
+    from sortest
+ where sortest_tesc_code = 'DSPM'
+     and sortest_pidm = spriden_pidm
+     and sortest_test_date = (select max(b.sortest_test_date)
+                                 from sortest b
+                              where b.sortest_pidm = spriden_pidm
+                                  and b.sortest_tesc_code = 'DSPM')) as dspm,
+(select distinct sortest_tesc_code|| '-' ||sortest_test_score
+    from sortest
+ where sortest_tesc_code = 'DSPR'
+     and sortest_pidm = spriden_pidm
+     and sortest_test_date = (select max(b.sortest_test_date)
+                                 from sortest b
+                              where b.sortest_pidm = spriden_pidm
+                                  and b.sortest_tesc_code = 'DSPR')) as dspr,
+(select distinct sortest_tesc_code|| '-' ||sortest_test_score
+    from sortest
+ where sortest_tesc_code = 'DSPW'
+     and sortest_pidm = spriden_pidm
+     and sortest_test_date = (select max(b.sortest_test_date)
+                                 from sortest b
+                              where b.sortest_pidm = spriden_pidm
+                                  and b.sortest_tesc_code = 'DSPW')) as dspw,
+a.SMRACAA_GRDE_CODE_MIN as min_grd,
+a.SMRACAA_TERM_CODE_EFF as smaarea_trm,
+a.SMRACAA_TRANSFER_IND as trnsfer_ind,
+a.SMRACAA_SPLIT_COURSE_IND as splt_crs,
+a.SMRACAA_CNT_IN_GPA_IND as count_GPA,
+
+a.SMRACAA_END_FUNCTION as end_func,
+a.SMRACAA_CONCURRENCY_IND as concurrent,
+sfrstcr_rsts_date as reg_dt,
+sfrstcr_user as usr,
+SFRSRPO_CRN as SFASRPO,
+SFRSTCR_CORQ_OVER as coreq_over,
+SFRSTCR_PREQ_OVER as prereq_over,
+SFRSTCR_APPR_OVER as Spec_over,
+sfrstcr_rept_over
+from sfrstcr, spriden, sfrsrpo, ssbsect, SHRTCKG, SHRTCKN, ssrrare,  smracaa a
+
+where spriden_pidm = sfrstcr_pidm
+and spriden_pidm = SFRSRPO_PIDM (+)
+and spriden_pidm = SHRTCKG_PIDM (+)
+and spriden_pidm = SHRTCKN_PIDM (+)
+
+and sfrstcr_term_code = SHRTCKG_TERM_CODE (+)
+and sfrstcr_term_code = SHRTCKN_TERM_CODE (+)
+and sfrstcr_term_code = ssbsect_TERM_CODE (+)
+and sfrstcr_term_code = SSRRARE_TERM_CODE (+)
+
+and SFRSTCR_CRN = SHRTCKN_CRN (+)
+and sfrstcr_crn = SFRSRPO_CRN (+)
+and sfrstcr_crn = ssbsect_CRN (+)
+and sfrstcr_crn = SSRRARE_CRN (+)
+
+and SHRTCKN_SEQ_NO = SHRTCKG_TCKN_SEQ_NO (+)
+
+and a.SMRACAA_AREA (+) = SSRRARE_AREA
+
+and a.SMRACAA_TERM_CODE_EFF =
+(select max(b.SMRACAA_TERM_CODE_EFF)
+   from SMRACAA B
+  where b.SMRACAA_AREA = a.SMRACAA_AREA)
+
+
+and SFRSTCR_RSTS_CODE like 'R%'
+and spriden_change_ind is null
+
+and spriden_id like '%'
+and sfrstcr_term_code = '&Term'
+
+and SFRSTCR_PREQ_OVER in ('I', 'Y') 
+
+order by last_name, first_name, smaarea

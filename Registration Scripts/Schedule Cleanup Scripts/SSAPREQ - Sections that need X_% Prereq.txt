@@ -1,4 +1,3 @@
-
 -- Author:  Kevin Thomas, Assistant Registrar
 --   Date:  18-OCT-2019
 --Purpose:  This query returns CRNs by prompted term, subject code, and course code
@@ -24,6 +23,15 @@
 --          sections rather than using ( ssbsect.ssbsect_seq_numb LIKE 'R%' or ssbsect.ssbsect_seq_numb LIKE 'W%') to 
 --          look for them...kt...13-JUL-2020.
 
+--VIP NOTE: **During the 202050 - 202150 terms, all sections were allowed do be take WEB CL courses even if in LS due to COVID 19
+--VIP NOTE2: * Effective 202180 - Only non TN eCampus MATH courses are allowed to concurrently enroll in the CL Web Sections.  Everything else 
+--             is back to pre-covid rules.
+
+--    Edit:  Filterd out NSCC MATH courses as those CL courses can be taken online if students need LS...kt...9.26.2022
+
+--VIP NOTE3:  Effective 202510 per email from Michael Sundblad (ARTS DEAN) and Sarah Roebers (AVPAA) - we can remove this requirement entirely.  Students can now take all online
+--            sections even if they need LS.  Put another way, students do not have to complete LS before taking online sections of a class, they can take LS and online prereqs concurrently.
+--            Email from Dean Sundblad, dated 11/12/2024 2:57PM
 /*
 
 SELECT
@@ -103,6 +111,10 @@ WHERE
                                from smracaa y
                                where y.smracaa_area = x.smracaa_area
                                and SMRACAA_CRSE_NUMB_LOW < '1000'
-                               and SMRACAA_SUBJ_CODE in ('READ','ENGL', 'MATH')))     --Courses that need ENGL 0815 but not READ 0815 will be returned
+                               and SMRACAA_SUBJ_CODE in ('READ','ENGL', 'MATH')))  
+                               --Courses that need ENGL 0815 but not READ 0815 will be returned
+    and ssbsect_crn not in (select ssbsect_crn from ssbsect         
+                            where ssbsect_subj_code = 'MATH' 
+                                  and ssbsect_insm_code not like 'R%'    --subquery of NSCC MATH Courses, to exclude them
+                                  and ssbsect_term_code = :term_code)
 Order by ssbsect.ssbsect_subj_code,ssbsect.ssbsect_crse_numb;
---*/

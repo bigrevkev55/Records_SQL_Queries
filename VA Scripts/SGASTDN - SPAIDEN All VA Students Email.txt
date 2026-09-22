@@ -1,0 +1,37 @@
+
+--Author:  Kevin Thomas, Registrar
+--Date:    03-MAR-2023
+--Purpose: This query returns all VA Students email addresses by prompted term
+
+--desc sfrstcr;  
+--desc sgrvetn;
+--desc spriden;
+
+select spriden_id as "ID",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+      -- SGBSTDN_DEGC_CODE_1 as "Degree",
+      -- SGBSTDN_MAJR_CODE_1 as "Major",
+     --  SGBSTDN_MAJR_CODE_CONC_1 as "Concentration",
+       listAgg(GOREMAL_EMAIL_ADDRESS, ';') within group (order by goremal_email_address)as "Email",
+       SGRVETN_TERM_CODE_VA  Term,
+      STVVETC_DESC as Type--,
+      --sgbstdn_term_code_eff
+       
+
+from spriden, SGRVETN, stvvetc, goremal, SGBSTDN
+
+where spriden_pidm = sgrvetn_pidm
+      and spriden_pidm = GOREMAL_PIDM (+)
+      and spriden_pidm = sgbstdn_pidm (+)
+      and goremal_preferred_IND (+) = 'Y'
+      and goremal_emal_code (+) in ('CAMP','PERS')
+      and SGRVETN_VETC_CODE is not null
+      and SGRVETN_TERM_CODE_VA = :Term
+      and stvvetc_code = sgrvetn_vetc_code
+      and SPRIDEN_CHANGE_IND is NULL 
+     -- and sgbstdn_term_code_eff = (select max(SGBSTDN_TERM_CODE_EFF) FROM SGBSTDN I WHERE sgbstdn_pidm = I.sgbstdn_pidm)
+      
+group by spriden_id, spriden_last_name, spriden_first_name, SGRVETN_TERM_CODE_VA, STVVETC_DESC 
+ --SGBSTDN_DEGC_CODE_1,SGBSTDN_MAJR_CODE_1,  SGBSTDN_MAJR_CODE_CONC_1, sgbstdn_term_code_eff      
+Order by spriden_last_name, spriden_first_name;

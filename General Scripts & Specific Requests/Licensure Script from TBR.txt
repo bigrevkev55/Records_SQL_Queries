@@ -1,0 +1,348 @@
+-- Licensure_Process_Disclosure_Extract_using_SGBSTDN_20240725.sql
+-- Requested by: 	Johnathan Button
+-- Created by:		Dorothy Mayes
+-- Date Created:	7/25/2024
+--
+-- Values Hardcoded in the script were provided by Johnathan Button
+--
+-- This script was created to be used by each Community College.
+--
+--
+--July 25, 2024
+--Updates made to include changes using new spreadsheet from Johnathan Button on 7/17/2024
+--
+-- This script uses SGBSTDN to determine the major for the student. The assumption is made that in the event of a major change, 
+-- a new SGBSTDN record will be created and used to determine if the major is one of the majors listed in the spreadsheet. The SFRSTCR
+-- table is also queried to determine if the student has registered for classes. The effective term code on the SGBSTDN table is used to determine
+-- if registration exists for a term in or after the effective date of the SGBSTDN record. If registration already exists, the student is not included 
+-- in the list.
+--  
+--July 29, 2024
+--Updates made to select only students requiring a hold and provide an option for selecting an address type.
+--
+select  final.sgbstdn_pidm, 
+        final.spriden_id,
+        final.spriden_last_name,
+        final.spriden_first_name,
+        final.spriden_mi,
+        final.sgbstdn_term_code_eff,
+        final.sgbstdn_term_code_admit,
+        final.sgbstdn_levl_code,
+        final.sgbstdn_majr_code_1,
+        final.stvmajr_desc,
+        final.stvmajr_cipc_code,
+        final.stvmajr_valid_major_ind,
+        final.spraddr_atyp_code,
+        final.spraddr_street_line1,
+        final.spraddr_street_line2,
+        final.spraddr_city,
+        final.spraddr_stat_code,
+        final.spraddr_zip,
+        final.goremal_email_address,
+        case
+        when final.stvmajr_cipc_code in ('100203','110103','140102','150000','150101','151001','151201','190706',
+                                         '220302','320111','470608','510801','510904','511004','511012','520201',
+                                         '520299','520302','520401','520701','520803') 
+                                         and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'NO'
+	   when final.stvmajr_cipc_code in ('430107') 
+                                        and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510805') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510805') and final.spraddr_stat_code in 
+		                                ('AL','AR','CA','KY','LA','MS','MO','NC','SC',
+                                         'TN','VA') then 'NO'
+	   when final.stvmajr_cipc_code in ('510602') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510602') and final.spraddr_stat_code in 
+		                                ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN','VA') then 'NO'
+	   when final.stvmajr_cipc_code in ('510809') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CO','CT','DE','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NH','NJ',
+                                         'NM','NY','ND','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('510809') and final.spraddr_stat_code in 
+                                        ('AL','AR','CA','FL','KY','LA','MS','MO',
+                                         'NV','NC','OH','SC','TN','WA','VA') then 'NO'
+        when final.stvmajr_cipc_code in ('510910') and final.spraddr_stat_code in 
+                                        ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('510910') and final.spraddr_stat_code in 
+                                        ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN') then 'NO'
+        when final.stvmajr_cipc_code in ('511803') and final.spraddr_stat_code in 
+                                        ('AL','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'NO'
+        when final.stvmajr_cipc_code in ('511801') and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('013801','120301','120503','150303','150403','150612',	
+                                         '150614','150615','150805','510601','510701','510707',
+                                         '510714','510803','510806','510901','510905','510907',
+                                         '510908','510909','510917','511099','513501','513801',	
+                                         '520904')
+                                         and final.spraddr_stat_code in 
+                                        ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('013801','120301','120503','150303','150403','150612',	
+                                         '150614','150615','150805','510601','510701','510707',
+                                         '510714','510803','510806','510901','510905','510907',
+                                         '510908','510909','510917','511099','513501','513801',	
+                                         '520904') and final.spraddr_stat_code in 
+                                        ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN') then 'NO' 
+        else 'NO' 
+        end "HOLD_REQUIRED"
+from
+(select s.sgbstdn_pidm, 
+        spriden_id,
+        spriden_last_name,
+        spriden_first_name,
+        spriden_mi,
+        s.sgbstdn_term_code_eff,
+        s.sgbstdn_term_code_admit,
+        s.sgbstdn_levl_code,
+        s.sgbstdn_majr_code_1,
+        stvmajr_desc,
+        stvmajr_cipc_code,
+        stvmajr_valid_major_ind,
+        address.spraddr_atyp_code,
+        address.spraddr_street_line1,
+        address.spraddr_street_line2,
+        address.spraddr_city,
+        address.spraddr_stat_code,
+        address.spraddr_zip,
+        g.goremal_email_address
+from sgbstdn s, stvmajr, goremal g, spriden,
+(select min(stvterm_code)stvterm_code
+ from stvterm
+ where stvterm_code != '999999' and trunc(stvterm_end_date) >= trunc(sysdate)) t1,
+ (select a3.spraddr_pidm, a3.spraddr_atyp_code, a3.spraddr_street_line1, a3.spraddr_street_line2, a3.spraddr_city, a3.spraddr_stat_code, a3.spraddr_zip
+from
+(select a2.spraddr_pidm, min(a2.priority) priority 
+from
+(select a.spraddr_pidm, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '1' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_first_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+union
+select a.spraddr_pidm, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '2' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_second_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+union
+select a.spraddr_pidm, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '3' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_third_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+) a2
+group by a2.spraddr_pidm) a4,
+(select a.spraddr_pidm, a.spraddr_atyp_code, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '1' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_first_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+union
+select a.spraddr_pidm, a.spraddr_atyp_code, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '2' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_second_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+union
+select a.spraddr_pidm, a.spraddr_atyp_code, a.spraddr_street_line1, a.spraddr_street_line2, a.spraddr_city, a.spraddr_stat_code, a.spraddr_zip,
+ '3' priority from spraddr a
+ where a.spraddr_atyp_code = :enter_third_address_type
+ and a.spraddr_seqno = (select max(a1.spraddr_seqno) from spraddr a1 where a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_pidm = a1.spraddr_pidm
+                        and a.spraddr_atyp_code = a1.spraddr_atyp_code
+                        and a1.spraddr_status_ind is null
+                        and ((a1.spraddr_to_date is null and a1.spraddr_from_date is null)
+                              or (a1.spraddr_to_date is not null and a1.spraddr_from_date is not null
+                              and trunc(sysdate) between trunc(a1.spraddr_from_date) and trunc(a1.spraddr_to_date))
+                              or (a1.spraddr_from_date is not null and a1.spraddr_to_date is null and trunc(sysdate) >= trunc(a1.spraddr_from_date))
+                              or (a1.spraddr_from_date is null and a1.spraddr_to_date is not null and trunc(sysdate) <= trunc(a1.spraddr_to_date))))
+) a3
+where a3.spraddr_pidm = a4.spraddr_pidm
+and a3.priority = a4.priority) address
+where  s.sgbstdn_pidm = spriden_pidm
+and spriden_change_ind is null
+and s.sgbstdn_term_code_eff = (select max(ss.sgbstdn_term_code_eff) from sgbstdn ss
+                                 where s.sgbstdn_pidm = ss.sgbstdn_pidm
+                                 and ss.sgbstdn_term_code_eff >= t1.stvterm_code)
+and not exists (select 'x' from sfrstcr where sfrstcr_pidm = s.sgbstdn_pidm and
+                 sfrstcr_term_code >= s.sgbstdn_term_code_eff)
+and s.sgbstdn_pidm = address.spraddr_pidm
+and s.sgbstdn_pidm = g.goremal_pidm
+ and trunc(g.goremal_activity_date) = (select max(trunc(gg.goremal_activity_date)) 
+                                    from goremal gg
+                                     where g.goremal_pidm = gg.goremal_pidm
+                                     and g.goremal_emal_code = gg.goremal_emal_code
+                                     and gg.goremal_status_ind = 'A')
+ and g.goremal_emal_code = 'CAMP'
+ and g.goremal_status_ind = 'A'
+and s.sgbstdn_majr_code_1 = stvmajr_code
+and stvmajr_valid_major_ind = 'Y'
+and stvmajr_cipc_code in ('013801','100203','110103','120301','120503','140102','150000','150101','150303',
+                           '150403','150612','150614','150615','150805','151001','151201','190706','220302',
+                           '320111','430107','470608','510601','510602','510701','510707','510714','510801',
+                           '510803','510805','510806','510809','510901','510904','510905','510907','510908',
+                           '510909','510910','510917','511004','511012','511099','511801','511803','513501',
+                           '513801','520201','520299','520302','520401','520701','520803','520904')) final
+where 
+        case
+        when final.stvmajr_cipc_code in ('100203','110103','140102','150000','150101','151001','151201','190706',
+                                         '220302','320111','470608','510801','510904','511004','511012','520201',
+                                         '520299','520302','520401','520701','520803') 
+                                         and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'NO'
+	   when final.stvmajr_cipc_code in ('430107') 
+                                        and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510805') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510805') and final.spraddr_stat_code in 
+		                                ('AL','AR','CA','KY','LA','MS','MO','NC','SC',
+                                         'TN','VA') then 'NO'
+	   when final.stvmajr_cipc_code in ('510602') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+	   when final.stvmajr_cipc_code in ('510602') and final.spraddr_stat_code in 
+		                                ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN','VA') then 'NO'
+	   when final.stvmajr_cipc_code in ('510809') and final.spraddr_stat_code in 
+		                                ('AK','AZ','CO','CT','DE','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NH','NJ',
+                                         'NM','NY','ND','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('510809') and final.spraddr_stat_code in 
+                                        ('AL','AR','CA','FL','KY','LA','MS','MO',
+                                         'NV','NC','OH','SC','TN','WA','VA') then 'NO'
+        when final.stvmajr_cipc_code in ('510910') and final.spraddr_stat_code in 
+                                        ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('510910') and final.spraddr_stat_code in 
+                                        ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN') then 'NO'
+        when final.stvmajr_cipc_code in ('511803') and final.spraddr_stat_code in 
+                                        ('AL','AR','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+                                         'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+                                         'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+                                         'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY') then 'NO'
+        when final.stvmajr_cipc_code in ('511801') and final.spraddr_stat_code in 
+                                        ('AL','AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('013801','120301','120503','150303','150403','150612',	
+                                         '150614','150615','150805','510601','510701','510707',
+                                         '510714','510803','510806','510901','510905','510907',
+                                         '510908','510909','510917','511099','513501','513801',	
+                                         '520904')
+                                         and final.spraddr_stat_code in 
+                                        ('AK','AZ','CA','CO','CT','DE','FL','GA',
+                                         'HI','ID','IL','IN','IA','KS','ME','MD',
+                                         'MA','MI','MN','MT','NE','NV','NH','NJ',
+                                         'NM','NY','ND','OH','OK','OR','PA','RI',
+                                         'SD','TX','UT','VT','WA','WV','WI','WY') then 'YES'
+        when final.stvmajr_cipc_code in ('013801','120301','120503','150303','150403','150612',	
+                                         '150614','150615','150805','510601','510701','510707',
+                                         '510714','510803','510806','510901','510905','510907',
+                                         '510908','510909','510917','511099','513501','513801',	
+                                         '520904') and final.spraddr_stat_code in 
+                                        ('AL','AR','KY','LA','MS','MO',
+                                         'NC','SC','TN') then 'NO' 
+        else 'NO' 
+        end  = 'YES'
+order by spriden_last_name,
+         spriden_first_name,
+         spriden_mi;

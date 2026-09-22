@@ -1,0 +1,27 @@
+
+--Author:   Kevin Thomas, Registrar
+--Date:       11/21/2022
+--Purpose: These scripts update SSASECT/SSBSECT and SFAREGS/SFRSTCR with the new campus code for Dickson.   These
+--               scripts have already been ran in TEST.  
+
+
+--Script 1 - Update sections in App Nav that have already been built so that the future registration will be correct.  
+--desc ssbsect;
+update ssbsect
+set ssbsect_camp_code = 'H3K'
+where ssbsect_camp_code = 'H3G'
+      and SSBSECT_TERM_CODE = '202310';
+
+     
+--Script 2 - Update registered students schedules and registration form in App. Nav Banner.
+
+update sfrstcr
+set SFRSTCR_camp_code = 'H3K'
+where sfrstcr_term_code = '202310'
+      and SFRSTCR_RSTS_CODE like 'R%'
+      and sfrstcr_camp_code = 'H3G;
+
+
+
+
+--Please send me the number of records that are updated by each script.  

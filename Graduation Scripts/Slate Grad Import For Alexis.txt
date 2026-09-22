@@ -1,0 +1,102 @@
+-- Created By: Kevin Thomas, Registrar
+--       Date:  ??-JAN-2022
+--    Purpose:  To import students and add the Slate Source code that have turned in an intent to graduate into
+--              Slate for communication purposes and tracking.
+
+--       Note:  Change the group list in the select statement to the proper group name in Signal Vine
+
+--       Note: Edited this query for import into Slate, instead of Signal Vine 2/8/2024..kt
+--       Note: Removed the phone numbers and email filters as this will be imported into Slate and it already has that info...1.31.2025
+--       Note: Added SHRDGMR_SURROGATE_ID for Slate Unique Identifier...kt...1.31.2025
+
+--       Note: Note: This script doesn't include DE Students because it looks for programs that have been rolled to outcome
+--                   and we don't roll DE students to outcome until after they graduate from HS...kt...2.28.2025  **SEE NEXT NOTE** THIS IS NO LONGER TRUE
+
+--       Note:  The grad spec now builds the DE students into SHADEGR manually instead of rolling to outcome so they are now included...kt...1.30.2026
+
+--        VIP: ****BE SURE TO EDIT THE LITERAL VALUE FOR THE "SOURCE CODED FOR SLATE COLUMN" each ceremony year.  
+--              I started with COMMENCEMENT_2024 for "2024 Commencement".  This will cover, 202380, 202410, and 202450 grads.
+
+--       NOTE: Since we are importing this into Slate we are now also pulling in GRN students so that Slate gets updated for students that don't graduate...kt..1.30.26
+--       NOTE: Edited to include LO addresses for Slate Import...kt...1/30/26
+
+
+
+--Note that some LO addresses will have a "To Date" and a Status of "I" for inactive which means they do not have an active LO Address in SPAIDEN 
+SELECT DISTINCT
+    x."last_name",
+    x."first_name",
+    x."Surrogate_id",
+    x."Student ID",
+    x."dob",
+    x."Grad Date",
+    x."Grad Term",
+    x."Grad Status",
+    x."Degree",
+    x."Degree Status",
+    x."Major 1",
+    x."Major 1 Concentration",
+    x."Major 2",
+    x."Major 2 Concentration",
+    -- LO address fields
+    lo_addr.spraddr_street_line1      AS "LO Street Line1",
+    lo_addr.spraddr_street_line2      AS "LO Street Line2",
+    lo_addr.spraddr_street_line3      AS "LO Street Line3",
+    lo_addr.spraddr_street_line4      AS "LO Street Line4",
+    lo_addr.spraddr_city              AS "LO City",
+    lo_addr.spraddr_stat_code         AS "LO State",
+    lo_addr.spraddr_zip               AS "LO Zip",
+    lo_addr.spraddr_natn_code         AS "LO Country",
+    lo_addr.spraddr_to_date           AS "LO TO_DATE",
+    lo_addr.spraddr_status_ind        AS "LO STATUS_IND",
+    'COMMENCEMENT_2026'               AS "Source Code for Slate"   --edit this literal each grad year...kt...2.8.24,  
+FROM (
+    SELECT
+        shrdgmr_surrogate_id           AS "Surrogate_id",
+        spriden_id                     AS "Student ID",
+        shrdgmr_term_code_grad         AS "Grad Term",
+        shrdgmr_grst_code              AS "Grad Status",
+        shrdgmr_degc_code              AS "Degree",
+        shrdgmr_degs_code              AS "Degree Status",
+        shrdgmr_majr_code_1            AS "Major 1",
+        shrdgmr_majr_code_conc_1       AS "Major 1 Concentration",
+        shrdgmr_majr_code_2            AS "Major 2",
+        shrdgmr_majr_code_conc_2       AS "Major 2 Concentration",
+        shrdgmr_grad_date              AS "Grad Date",
+        spbpers_birth_date             AS "dob",
+        spriden_last_name              AS "last_name",
+        spriden_first_name             AS "first_name",
+        spriden_pidm                   AS pidm -- carry PIDM for joining to SPRADDR
+    FROM spriden
+    JOIN spbpers
+      ON spbpers_pidm = spriden_pidm
+    JOIN shrdgmr
+      ON shrdgmr_pidm = spriden_pidm
+    WHERE spriden_change_ind IS NULL
+      AND shrdgmr_term_code_grad IN (:Term1, :Term2, :Term3)
+      AND shrdgmr_grst_code IN ('GR','RTS','IC','EM','GRN') --We now pull in GRNs so that Graduation status in Slate gets updated...kt...1/30/26
+      AND shrdgmr_degc_code NOT IN ('ACRT1','ACRT2')--Exclude Academic Certificates
+) x
+LEFT JOIN (
+-- Student Address
+    SELECT aa.*,
+        SUBSTR(SPRADDR_ZIP,1,5) AS ZIP5,
+        STVCNTY_DESC
+    FROM SPRADDR aa
+        LEFT JOIN STVCNTY ON SPRADDR_CNTY_CODE = STVCNTY_CODE
+    WHERE SPRADDR_SEQNO = (
+        SELECT MAX(SPRADDR_SEQNO)
+        FROM SPRADDR bb
+        WHERE aa.SPRADDR_PIDM = bb.SPRADDR_PIDM
+            AND aa.SPRADDR_ATYP_CODE = bb.SPRADDR_ATYP_CODE
+        )
+        AND SPRADDR_ATYP_CODE = (
+            SELECT MAX(SPRADDR_ATYP_CODE)
+            FROM SPRADDR cc
+            WHERE aa.SPRADDR_PIDM = cc.SPRADDR_PIDM
+                AND SPRADDR_ATYP_CODE IN ('LO')
+                AND SPRADDR_STATUS_IND IS NULL
+        )
+)
+lo_addr ON lo_addr.spraddr_pidm = x.pidm
+ORDER BY "last_name", "first_name";

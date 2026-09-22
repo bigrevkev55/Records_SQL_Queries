@@ -1,0 +1,25 @@
+SELECT DISTINCT
+    STVSBGI_DESC AS source_univ_name,
+    SHBTATC_SBGI_CODE as ceeb_code,
+    SHBTATC_TLVL_CODE AS source_course_level,
+    SHBTATC_SUBJ_CODE_TRNS || ' ' || SHBTATC_CRSE_NUMB_TRNS AS source_course_code,
+    SHBTATC_TRNS_TITLE AS source_course_title,
+    SHBTATC_TRNS_LOW_HRS AS source_univ_credits_low_hrs,
+    SHBTATC_TRNS_HIGH_HRS AS source_univ_credits_high_hrs,
+    SHRTATC_SUBJ_CODE_INST || ' ' || SHRTATC_CRSE_NUMB_INST AS target_course_code,
+    SHRTATC_INST_TITLE AS target_course_title,
+    SHRTATC_INST_CREDITS_USED AS target_univ_credits,
+    CASE
+        WHEN SHRTATC_CONNECTOR = 'A' THEN 'AND (must be taken together)'
+        WHEN SHRTATC_CONNECTOR = 'O' THEN 'OR (either course is acceptable)'
+        ELSE 'Single equivalency'
+    END AS equivalency_logic
+FROM SHBTATC
+INNER JOIN SHRTATC
+    ON SHBTATC_SBGI_CODE = SHRTATC_SBGI_CODE
+   AND SHBTATC_SUBJ_CODE_TRNS = SHRTATC_SUBJ_CODE_TRNS
+   AND SHBTATC_CRSE_NUMB_TRNS = SHRTATC_CRSE_NUMB_TRNS
+LEFT JOIN STVSBGI
+    ON SHBTATC_SBGI_CODE = STVSBGI_CODE
+ORDER BY STVSBGI_DESC,
+         source_course_code;

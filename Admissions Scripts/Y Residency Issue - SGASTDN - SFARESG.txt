@@ -1,0 +1,27 @@
+--Author: Kevin Thomas, Registrar
+--Date:  21-DEC-2023
+--Purpose:  Find students that have a Y residency code that shouldn't 
+
+
+
+
+select spriden_id ANummber,
+       SPBPERS_BIRTH_DATE DOB,
+       spriden_last_name Lname,
+       spriden_first_name FName,
+       SGBSTDN_TERM_CODE_EFF as "Residency Effective Term",
+       SGBSTDN_TERM_CODE_ADMIT as "Admit Term",
+       SGBSTDN_RESD_CODE as "Residency Code"
+       
+       
+
+from SGBSTDN
+inner join spbpers on spbpers_pidm = sgbstdn_pidm
+inner join spriden on spriden_pidm = sgbstdn_pidm
+where SGBSTDN_RESD_CODE = 'Y'
+and sgbstdn_term_code_eff = '202410'
+and SPBPERS_BIRTH_DATE > '21-DEC-2005'
+and SPBPERS_CITZ_CODE <> 'N'
+and spriden_change_ind is NULL
+
+Order by spriden_last_name;

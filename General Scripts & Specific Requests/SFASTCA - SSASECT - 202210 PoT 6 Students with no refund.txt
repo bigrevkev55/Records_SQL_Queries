@@ -1,0 +1,30 @@
+
+--Author:  Kevin Thomas, Director of Admissions and Records
+--Date:    2-FEB-2022
+--Purpose:  Find 202210 PoT 6 students who DC on 1/30 and 1/31/22.  The refund wasn't built for those dates so students weren't
+--          refundeded any money.  These students need to be fixed on SFAREGS
+
+--desc sfrstca;
+--desc ssbsect;
+
+Select spriden_last_name,
+       spriden_first_name,
+       spriden_id,
+       sfrstca_rsts_code,
+       sfrstca_rsts_code,
+       sfrstca_crn,
+       sfrstca_activity_date,
+       sfrstca_source_cde
+
+from spriden,sfrstca
+
+where spriden_change_ind is null
+      and spriden_pidm = sfrstca_pidm
+      and sfrstca_term_code = '202210'
+      and sfrstca_rsts_code = 'DC'
+      and sfrstca_activity_date > '29-JAN-2022'
+      and sfrstca_crn in (select ssbsect_crn from ssbsect where ssbsect_term_code = '202210' and ssbsect_ptrm_code = '6')
+      and sfrstca_source_cde = 'BASE'
+
+order by spriden_last_name, spriden_first_name;
+      

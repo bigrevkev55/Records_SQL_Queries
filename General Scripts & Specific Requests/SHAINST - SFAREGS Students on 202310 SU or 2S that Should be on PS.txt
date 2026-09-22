@@ -1,0 +1,24 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    06-OCT-2022
+--Purpose: Find students who have an approved suspesion appeal from 202210 or 202250
+--         but are still aren't on PS for 202310.  Updated these students on SFAREGS to PS
+
+--desc sgbstdn;
+--desc shrttrm;
+
+select spriden_id ANumber,
+       spriden_last_name last,
+       spriden_first_name first,
+       sgbstdn_astd_code standing
+
+from spriden, sgbstdn
+
+where spriden_pidm = sgbstdn_pidm
+      and spriden_change_ind is null
+      and sgbstdn_term_code_eff = '202310'
+      and sgbstdn_astd_code in ('SU', '2S')
+      and spriden_pidm in (select distinct shrttrm_pidm 
+                           from shrttrm
+                           where shrttrm_astd_code_end_of_term in ('SU', '2S')
+                                 and SHRTTRM_TERM_CODE in ('202210', '202250'))
+Order by spriden_last_name, spriden_first_name;

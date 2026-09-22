@@ -1,0 +1,14 @@
+-- Author:  Kevin Thomas, Registrar
+-- Date:    04-OCT-2022
+-- Purpose: Find all HCMT CRNs for 202310 that have a spcecial approval indicator on SSASECT.  
+--          Per Dean Karen Stevenson and Instructor Ronda Watson we are are to remove these
+--          indicators so students can register without instructor permission.  
+
+
+
+
+select ssbsect_crn CRN
+from ssbsect
+where ssbsect_term_code = '202310'
+      and ssbsect_subj_code = 'HCMT'
+      and SSBSECT_SAPR_CODE is not null;

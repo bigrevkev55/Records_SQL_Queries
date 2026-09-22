@@ -1,0 +1,27 @@
+--Author: Kevin Thomas
+--Date: 13-NOV-2025
+--This script will return a list of all students receiving VA benefits by prompted term and description.
+--Edit: edit by MB to include SSN and all terms attended for VA Enrollment numbers by type of VA student 
+--Edit: add Veteran Description Type 11/13/2025...ChatGPT and Matthew Burdette
+
+SELECT DISTINCT
+       spriden_id AS "ID",
+       spbpers_ssn AS "SSN",
+       spriden_last_name AS "Last Name",
+       spriden_first_name AS "First Name",
+       SGRVETN.SGRVETN_TERM_CODE_VA AS "Term",
+       sgrvetn_vetc_code AS "Veteran Type",
+       stvvetc_desc AS "Veteran Description"
+FROM spriden,
+     sgrvetn,
+     spbpers,
+     stvvetc
+WHERE spriden_change_ind IS NULL
+  AND spriden_pidm = sgrvetn_pidm
+  AND spriden_pidm = spbpers_pidm
+  AND sgrvetn_vetc_code = stvvetc_code
+  AND sgrvetn_vetc_code IS NOT NULL
+  AND SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+ORDER BY spriden_last_name,
+         spriden_first_name,
+         sgrvetn_term_code_va;

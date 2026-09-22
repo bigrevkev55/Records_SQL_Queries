@@ -8,6 +8,6 @@ and   spriden_pidm = shrttrm_pidm
 and   shrttrm_pidm = sfrstcr_pidm
 and   shrttrm_term_code = :Susp_Term
 and   sfrstcr_term_code = :Reg_Term
-and   shrttrm_astd_code_end_of_term LIKE '%S%'
+and   shrttrm_astd_code_end_of_term in ('2S', 'SU')  ---edited by kt...12.14.2022
 and   sfrstcr_credit_hr > 0
 ORDER BY shrttrm_astd_code_end_of_term,spriden_last_name;

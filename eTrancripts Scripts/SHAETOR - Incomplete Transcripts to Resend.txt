@@ -1,0 +1,43 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    05-JAN-2023
+--Purpose: This query returns transcript requests on SHAETOR 
+--         that are in SHAETOR from 12/17/2022. This will be used to resend
+--         all transcripts as we aren't sure which ones were complete and which 
+--         ones were only partial.  
+
+
+--DESC shrteos;
+--DESC shrteod;
+--DESC SHRDGMR;
+
+SELECT 
+--SPRIDEN_PIDM,
+SHBTEOT_LAST_NAME LAST,
+SHBTEOT_FIRST_NAME FIRST,
+SHBTEOT_BANNER_ID  A_NUMBER,
+SHRTEOD_TRANSMISSION_DATE ORDER_DATE,
+SHRTEOS_ORDER_ID ORDER_NUMBER,
+SHRTEOS_ETST_CODE STATUS_CODE,
+SHRTEOS_ETST_DATE STATUS_DATE,
+SHRTEOD_TRANSMISSION_DATE TRANSMISSION_DATE,
+SHRTEOD_RECIPIENT_NAME RECIPIENT
+
+
+FROM shrteos
+
+INNER JOIN shbteot 
+on shrteos_order_ID = shbteot_order_Id
+
+iNNER JOIN SHRTEOD ON SHRTEOS_ORDER_ID = SHRTEOD_ORDER_ID
+--inner join spriden on shrteos_pidm = spriden_pidm
+
+WHERE SHRTEOD_TRANSMISSION_DATE > '17-DEC-2022'
+      and SHRTEOD_TRANSMISSION_DATE < '10-JAN-2023'
+      
+      and SHBTEOT_CANCEL_IND <> 'Y'
+      and SHRTEOS_ETST_CODE = 'FF'   --if using FO transcripts as well, comment out this line and uncomment the next line
+      --and SHRTEOS_ETST_CODE in ('FF', 'FO')
+      and SHRTEOS_ETST_DATE < '10-JAN-2023'
+
+ORDER BY SHRTEOD_RECIPIENT_NAME, shbteot_last_name, shbteot_first_name;
+

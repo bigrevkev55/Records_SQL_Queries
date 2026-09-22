@@ -1,0 +1,15 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    14-AUG-2024
+--Purpose: This query attempts to return students who have a transient override in 
+--         SFASRPO by prompted term.  
+
+Select distinct spriden_id A_Number,
+       spriden_last_name lname,
+       spriden_first_name fname
+       
+from spriden
+join SFRSRPO on sfrsrpo_pidm = spriden_pidm
+where sfrsrpo_term_code= :Registration_Term
+      and spriden_change_ind is null
+      and SFRSRPO_ROVR_CODE = 'TRANSIENT'
+order by spriden.spriden_last_name, spriden_first_name;

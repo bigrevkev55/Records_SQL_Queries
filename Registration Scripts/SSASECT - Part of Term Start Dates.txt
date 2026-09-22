@@ -1,0 +1,11 @@
+
+--Author:  Kevin Thomas, Registrar
+--Date:    20-MAY-2026
+--Purpose: Run before about a week before the first purge to confirm start dates
+--         are correct (See New Term Setup Calendar Reminders cheatsheet).
+--The is necessesay for the Deparment of Online Learning's D2L LMS.  
+
+select distinct ssbsect_ptrm_start_date
+from ssbsect
+where ssbsect_term_code = :Term_Code
+and ssbsect_ptrm_code = :Part_Of_Term_Code;

@@ -1,0 +1,20 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    06-OCT-2022
+--Purpose: One student (A00593983) has incorrect billing and credit hours for CRN 86985. 
+--         The other students in the CRN currently have the correct billing and credit hours, but if 
+--         anyone gets dropped and re-registered their hours will be incorrect as well.  
+--         This script updates billing
+--         and credit hours on 202280 CRN 86985 on SSASECT/SSBSECT.  After this,
+--         I'll drop and re-register the student so that her billing and credit
+--         hours are calculating correctly.  This will also prevent any students in the CRN 
+--         from being erroneously charged and credited.  
+
+--desc ssbsect;
+
+update ssbsect
+       set SSBSECT_CREDIT_HRS = '0', SSBSECT_BILL_HRS = '0'
+        
+where ssbsect_term_code = '202280' 
+      and ssbsect_crn = '86985'
+      and ssbsect_subj_code = 'OTAP'
+      and ssbsect_crse_numb = '2320';

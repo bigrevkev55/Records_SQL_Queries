@@ -1,0 +1,35 @@
+--      Author:  Kevin Thomas, Assistant Registrar
+--        Date:  25-FEB-2025
+--     Purpose:  This report finds schools that transfer in PHED with the G-SS attribute on SHATATR
+--  
+            
+--desc shbtatc;  --Transfer College Course Info on SHATATR; top block
+--desc shrtatc;  --Institutional Transfer Table; middle block
+--desc shrtrat;
+--desc shrtatc;
+
+select shrtatc_sbgi_code          as "Transfer School Code",
+       STVSBGI_DESC as "Description",
+       shrtatc_term_code_eff_trns as "Eff Term",
+       shbtatc_subj_code_trns     as "Transfer Sub Code",
+       shbtatc_crse_numb_trns     as "Transfer Crse Numb",
+       shbtatc_trns_low_hrs       as "Transfer Hours",
+       shrtatc_subj_code_inst     as "NSCC Subj Code",
+       shrtatc_crse_numb_inst     as "NSCC Crse Numb",
+       shrtatc_inst_title         as "Title",
+       shrtatc_inst_credits_used  as "Inst Hours",
+       shrtrat_attr_code          as "Attribute(s)"
+from shrtatc,shbtatc, stvsbgi, SHRTRAT
+where  shrtatc_sbgi_code = shbtatc_sbgi_code
+and    STVSBGI_CODE = shrtatc_sbgi_code 
+and    shrtatc.SHRTATC_SUBJ_CODE_inst = :OLD_NSCC_SUBJ_CODE
+and    shrtatc.SHRTATC_CRSE_NUMB_inst = :OLD_NSCC_CRSE_numb
+and    shrtatc_subj_code_trns = shbtatc_subj_code_trns
+and    shrtatc_crse_numb_trns = shbtatc_crse_numb_trns
+and shrtatc_sbgi_code = SHRTRAT_SBGI_CODE
+and shrtatc_subj_code_trns = SHRTRAT_SUBJ_CODE_TRNS
+and shrtatc_crse_numb_trns = shrtrat_crse_numb_trns
+and shrtrat_attr_code = 'G-SS'
+
+order by shrtatc_sbgi_code,shbtatc_subj_code_trns,shbtatc_crse_numb_trns;
+

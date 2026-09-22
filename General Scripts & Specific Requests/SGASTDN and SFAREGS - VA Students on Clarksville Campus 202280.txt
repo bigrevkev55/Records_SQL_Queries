@@ -1,0 +1,31 @@
+--Autthor:  Kevin Thomas, Registrar
+--Date:     01-NOV-2022
+--Purpose:  This script returns VA students that are not dependants and who are taking 
+--          courses on the Clarksville Campus in 202280.
+
+
+--desc sfrstcr;
+--desc sgbstdn;
+--desc sgrvetn;
+
+select distinct spriden_id "A Number",
+       spriden_first_name "First",
+       Spriden_last_name "Last",
+       SGRVETN_VETC_CODE "Vet Code"--,
+       --sfrstcr_camp_code
+       
+       
+
+from spriden, sfrstcr, sgrvetn, sgbstdn 
+
+Where spriden_change_ind is NULL 
+      and spriden_pidm = sfrstcr_pidm
+      and sfrstcr_term_code = '202280'
+      and spriden_pidm = sgrvetn_pidm
+      and SGBSTDN_TERM_CODE_EFF = '202280'
+      and spriden_pidm = sgbstdn_pidm
+      and sfrstcr_camp_code = 'HC8'
+      and spriden_pidm in (select distinct sgrvetn_pidm 
+                           from sgrvetn
+                           where sgrvetn_term_code_VA = '202280'
+                                 and sgrvetn_vetc_code in ('T','1','D','9'))

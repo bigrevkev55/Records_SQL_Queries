@@ -1,12 +1,15 @@
 
 --Created by Time Ewell to pull student debt students from SOAHOLD.
 
+--Edits:  Added origination school description....kt...3.30.2022
 
+--desc stvorig;
 
 select SPRIDEN_ID,
        SPRIDEN_LAST_NAME,
        SPRIDEN_FIRST_NAME,
        STVHLDD_DESC,
+       STVORIG_DESC,
        case when (select COUNT(sfrstcr_pidm)
            from sfrstcr
            where sfrstcr_rsts_code <> 'DC'
@@ -17,9 +20,13 @@ select SPRIDEN_ID,
            then 'No' Else 'Yes' End CurrentlyEnrolled
   from SPRHOLD,
        SPRIDEN,
-       STVHLDD
+       STVHLDD,
+       stvorig
 where ( SPRHOLD_PIDM = SPRIDEN_PIDM
          and STVHLDD_CODE = SPRHOLD_HLDD_CODE)
    and ( SPRIDEN_CHANGE_IND is null
          and ( SPRHOLD_HLDD_CODE = 'XO'
-           or SPRHOLD_HLDD_CODE = 'XR' ) )
+           or SPRHOLD_HLDD_CODE = 'XR' or sprhold_hldd_code='XB' ) )
+   and sprhold_orig_code = stvorig_code
+
+order by sprhold_orig_code, SPRIDEN_LAST_NAME, spriden_first_name;

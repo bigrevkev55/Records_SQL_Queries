@@ -1,0 +1,161 @@
+--Authors:  Kevin Thomas, Registrar
+--          Trey Dalton, TSD Systems Analyst II
+--Date:    19-APR-2024
+--Purpose: This SQL seeks to remove any rolled OER attributes from 202380
+--         sections and add in the proper OER attributes on the 202480 
+--         list provided by the VPAA.  
+
+--Notes:  Attribute Code WOR = Zero Textbook Cost
+--        Attribute Code WORL = Textbook Cost <$40
+
+--        Kace Ticket:  46841
+
+
+/*Script #1 Drop Sections that have WOR attribute rolled from prior semester* - should remove 68 Records in TEST*/
+delete from ssrattr
+--SELECT * FROM SSRATTR
+where ssrattr_term_code = '202480'
+      and ssrattr_attr_code = 'WOR' or ssrattr_attr_code = 'WORL';
+      
+/*end of Script #1*/     
+      
+/*Script #2 Add the OER attribute at the college/catalog level from the list provided by the AVPAA*/
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ARCT','2320','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ARCT','2910','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ARCT','1035','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ART','1045','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ART','1050','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ART','1340','202480','WOR',sysdate,'0');   
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('BUSN','2360','202480','WOR',sysdate,'0');   
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CADD','1200','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CADD','1650','202480','WOR',sysdate,'0');    
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version)
+    values('CITC','1332','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CITC','2190','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CITC','2340','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CITC','2367','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COM','1110','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COM','2010','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COM','2140','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COM','2240','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COMM','2025','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COMM','2045','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('COMM','2065','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CSPT','1102','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CULA','1000','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CULA','1305','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('CULA','2376','202480','WOR',sysdate,'0');   
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ECED','2335','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version)
+    values('ECED','2365','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ECON','2000','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('EETC','1300','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('EETC','1313','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('EETC','1314','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('EETC','1331','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ENGL','2020','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ENGL','2140','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ENGL','2310','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('ENST','2361','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('HIST','2030','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('MATH','2120','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('NSCC','1010','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('PHED','1030','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('PHED','1340','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('PHIL','1040','202480','WOR',sysdate,'0'); 
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('PHO','1490','202480','WOR',sysdate,'0');   
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('PSYC','2000','202480','WOR',sysdate,'0'); 
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('SOCI','1010','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('SOCI','1040','202480','WOR',sysdate,'0');
+insert into scrattr(scrattr_subj_code, scrattr_crse_numb, scrattr_eff_term, scrattr_attr_code, scrattr_activity_date, scrattr_version) 
+    values('SOCI','2010','202480','WOR',sysdate,'0');
+
+/*end of Script #2*/ 
+
+/*Script #3 - Add the attribute to the proper sections for 202480*/
+declare
+    v_crn       varchar2(5);
+    v_count     number := 0;
+cursor  c_get_crn is
+    select  distinct ssrattr_crn
+    from    ssrattr
+    --join to limit selection by ssbsect data
+    join    ssbsect on  ssrattr_crn = ssbsect_crn
+                    and ssrattr_term_code = '202480'
+                    and ssbsect_term_code = ssrattr_term_code
+    --join to limit selection by scrattr data
+    join    scrattr on  ssbsect_subj_code || ssbsect_crse_numb = scrattr_subj_code || scrattr_crse_numb 
+                    and scrattr_eff_term = '202480'
+                    and scrattr_attr_code = 'WOR' 
+;
+begin
+	open c_get_crn;
+        loop
+        fetch c_get_crn into v_crn;
+        exit when c_get_crn%notfound;
+            insert into ssrattr (
+                                    ssrattr_term_code
+                                ,   ssrattr_crn
+                                ,   ssrattr_attr_code
+                                ,   ssrattr_activity_date
+                                ,   ssrattr_version
+                                ,   ssrattr_user_id
+                                )
+            values  (
+                        '202480'
+                    ,   v_crn
+                    ,   'WOR'
+                    ,   sysdate
+                    ,   '0'
+                    ,   'BANWORX'
+                )
+            ;       
+            v_count := v_count + 1;
+        end loop; 
+    close c_get_crn;
+    commit;	
+end;	
+/

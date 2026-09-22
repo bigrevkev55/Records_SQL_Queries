@@ -1,0 +1,79 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    26-JUL-2022
+--Purpose: This script returns needed data for Army Ignited Enrollment File upload
+
+--desc sfrstcr;
+--desc ssbsect;
+--desc scbcrse;
+--desc ssrfees;
+
+--select * from sfrstcr where sfrstcr_pidm = '230247' and sfrstcr_term_code = '202280';
+
+select '00814500'          as "OPEID",
+       spriden_id          as "Soldier School ID", --A Number
+       SPBPERS_SSN         as "SSN",
+       spriden_last_name   as "Last Name",
+       max(SFRSTCR_ACTIVITY_DATE)as "DATE Completed Registration",
+       CASE 
+                                when sfrstcr_rsts_code like 'R%' then 'RE'
+                                when SFRSTCR_rsts_code like 'D%' then 'DR'
+                                WHEN SFRSTCR_rsts_code like 'W%' then 'WD'
+       ELSE 'CHECK SFAREGS'
+       End                 as "Enrollment Code", --RE enrolled, DR Dropped, WD Withdrawn, CO Completed
+       '**DELETE unless Enrollment Code DR or WD'   as "Enrollment Code Reason", --only required if Enrollment Code is DR or WD
+       SSBSECT_SUBJ_CODE   as "Subject",
+       SSBSECT_CRSE_NUMB   as "Catalog Number",
+       SSBSECT_SEQ_NUMB    as "Class Section",
+       SFRSTCR_CRN         as "Class Reference Number",
+       SFRSTCR_CREDIT_HR   as "Credit Hours",
+       'Semester'          as "Credit Type",
+       --(Select distinct SCBCRSE_TITLE from SCBCRSE where scbcrse_subj_code || scbcrse_crse_numb = SSBSECT_SUBJ_CODE || SSBSECT_CRSE_NUMB)  as "Course Title",
+      'ENTER COURSE TITLE' as "Course Title",
+      'ENTER COURSE TITLE' as "Long Course Title",
+        :Term_Start_Date   as "Start DATE",
+        :Term_End_Date     as "End DATE",
+        CASE 
+                                when SSBSECT_SEQ_NUMB like 'W%' then 'WW'
+                                when SSBSECT_SEQ_NUMB like 'R%' then 'WW'
+                                when SSBSECT_SEQ_NUMB like 'V%' then 'WM'
+                                when SSBSECT_SEQ_NUMB like 'A%' then 'CF' 
+                                when SSBSECT_SEQ_NUMB like 'D%' then 'CF' 
+                                when SSBSECT_SEQ_NUMB like 'E%' then 'CF'
+                                when SSBSECT_SEQ_NUMB like 'H%' then 'CF'
+                                when SSBSECT_SEQ_NUMB like 'M%' then 'CF'
+                                when SSBSECT_SEQ_NUMB like 'N%' then 'CF'
+       ELSE 'CHECK SQL CODE' 
+       END                 as "Instruction Mode",
+        ''                 as "Instructor Name" ,--Optional
+        ''                 as "Residency Flag", --Optional
+        '0'     as "Additional Fees", --RODP, NURS, ETC
+        'IS'                 as "Tuition Type", --IS In State, OS Out of State, DS Distance Learning, M Military
+        'Required if Enrollment code = DR or WD'                 as "Date of Withdrawal", --Required when enrollment code is DR or WD
+      'U'                  as "Degree Level", 
+      'N'                  as "Flat Rate"
+                         
+from spriden
+inner join sgrvetn on spriden_pidm = sgrvetn_pidm
+inner join spbpers on spriden_pidm = spbpers_pidm
+inner join sfrstcr on spriden_pidm = sfrstcr_pidm
+inner join ssbsect on sfrstcr_term_code = ssbsect_term_code and sfrstcr_crn = ssbsect_crn 
+--inner join ssrfees on sfrstcr_term_code = ssrfees_term_code and ssrfees_crn = sfrstcr_crn
+where spriden_change_ind is NULL
+      and sfrstcr_term_code = :Term
+      --and ssbsect_term_code = sfrstcr_term_code
+      --and ssbsect_crn = sfrstcr_crn
+      and spriden_pidm in (select sgrvetn_pidm
+                            from sgrvetn 
+                            where sgrvetn_term_code_va = :Term
+                            and sgrvetn_vetc_code = 'H')
+group by SSBSECT_CRSE_TITLE, SFRSTCR_CREDIT_HR, spriden_id, SPBPERS_SSN, spriden_last_name, 
+SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, '00814500', SFRSTCR_CRN, sfrstcr_rsts_code, 
+CASE when sfrstcr_rsts_code like 'R%' then 'RE' when SFRSTCR_rsts_code like 'D%' then 'DR' WHEN SFRSTCR_rsts_code like 'W%' then 'WD' ELSE 'CHECK SFAREGS' End, sfrstcr_rsts_code, 'R%', 'RE', SFRSTCR_rsts_code, 
+'D%', 'DR', SFRSTCR_rsts_code, 'W%', 'WD', 
+'CHECK SFAREGS', '**DELETE unless Enrollment Code DR or WD', SSBSECT_SEQ_NUMB, 'Semester', '', 
+'U', 'Y', 'ENTER COURSE TITLE', :Term_Start_Date, :Term_End_Date, 
+CASE when SSBSECT_SEQ_NUMB like 'W%' then 'WW' when SSBSECT_SEQ_NUMB like 'R%' then 'WW' when SSBSECT_SEQ_NUMB like 'V%' then 'WM'
+when SSBSECT_SEQ_NUMB like 'A%' then 'CF' when SSBSECT_SEQ_NUMB like 'D%' then 'CF' when SSBSECT_SEQ_NUMB like 'E%' then 'CF' 
+when SSBSECT_SEQ_NUMB like 'H%' then 'CF' when SSBSECT_SEQ_NUMB like 'M%' then 'CF' when SSBSECT_SEQ_NUMB like 'N%' then 'CF' 
+ELSE 'CHECK SQL CODE' END, 'SEE TSICSRV', 'IS', 'Required if Enrollment code = DR or WD' 
+order by "Last Name";

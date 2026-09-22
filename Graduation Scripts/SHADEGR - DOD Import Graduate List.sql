@@ -12,11 +12,11 @@ select distinct spriden_id as "Student ID" -- Added Spriden ID...LLW 4-16-11
 ,      spriden_first_name       as "First Name"
 ,      spriden_mi               as "Middle Name"
 ,      spriden_last_name        as "Last Name"
---,       rtrim(spriden_first_name)
---    ||     ' '
---    ||     rtrim(spriden_mi)
---    ||     ' '
---    ||     rtrim(spriden_last_name) as "Full Name"
+,       rtrim(spriden_first_name)
+    ||     ' '
+    ||     rtrim(spriden_mi)
+    ||     ' '
+    ||     rtrim(spriden_last_name) as "Full Name"
 ,      SHRDGMR_TERM_CODE_GRAD   as "Term"
 --,      SOVLCUR_KEY_SEQNO        as "Deg_Seq"
 --,      SHRDGMR_DEGS_CODE        as "Award_Status"

@@ -1,0 +1,40 @@
+--Author:  Kevin Thomas, Director of Admissions and Records, College Registrar
+--Date:    02-OCT-2025
+--Purpose: This report returns amounts entered on RPAARSC for CH 33 VA Students.  This is needed by the 
+--         Student Billing and Accounts office to verify how much money the VA SCO has requested for 
+--         these students
+
+--Instructions:  1.  When prompted for 'Aid_Year' enter the financial aid year (normally the last two digits of each year in the academic year)
+--               for example 2025-2026 would be '2526'
+--              
+--               2.   When prompted for 'TERM' enter the Banner term code for the term in question
+
+--Script:  
+
+--desc RPRARSC ;
+
+SELECT
+  spriden_id AS "A Number",
+  spriden_last_name AS "Last",
+  spriden_first_name AS "First",
+  RPRARSC_AIDY_CODE AS "Aid Year",
+  RPRARSC_TERM_CODE AS "RPRARSC Term",
+  RPRARSC_RESOURCE_DESC AS "Resource",
+  TO_CHAR(RPRARSC_EST_AMT, '$999,999,999.99') AS "RPRARSC Estimated Amount",
+  RPRARSC_USER_ID AS "RPRARSC User ID",
+  RPRARSC_ACTIVITY_DATE AS "RPRARSC Activity Date"
+
+from RPRARSC
+join spriden on RPRARSC_pidm=spriden_pidm
+where RPRARSC_AIDY_CODE = :Aid_Year
+and spriden_change_ind IS NULL
+and RPRARSC_PIDM IN 
+--sbubquery to find CH 33 VA students by term
+    (
+    select distinct sgbstdn_pidm 
+    from sgbstdn
+    join sgrvetn on sgrvetn_pidm=sgbstdn_pidm
+    where SGRVETN_TERM_CODE_VA  = :TERM
+    and sgrvetn_vetc_code in ('T', 'U')
+    )
+Order by spriden_last_name, spriden.spriden_first_name;

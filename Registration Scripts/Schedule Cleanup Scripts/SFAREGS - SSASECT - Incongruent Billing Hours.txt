@@ -1,0 +1,26 @@
+
+--Author:  Derrick Dupuis, NSCC IR Director
+--Date:     12-Jan-2022
+--Purpose: This script finds students that are registered for courses that has had SSASECT billing hours changed after they registered.  Changing billing hours after a 
+--              students register doesn't correct the issue for students that are already registered.  These students will need to be dropped and re-registered from SFAREGS to 
+--              get the change from SSASECT to show on SFAREGS and on the student's account...kt...1.23.2022
+--Edits:  Changed SFRSTCR_PIDM to SPRIDEN ID and gave the columns Aliases.  Also changed the term to be a prompt...9.26/22 kt
+
+
+SELECT spriden_id A_Number,
+    SFRSTCR_TERM_CODE Term,
+    SFRSTCR_CRN CRN,
+    SSBSECT_SUBJ_CODE SUBJ,
+    SSBSECT_CRSE_NUMB Course,
+    SSBSECT_BILL_HRS SSASECT_Bill_Hours,
+    SSBSECT_CREDIT_HRS SSASECT_Credit_Hours,
+    SFRSTCR_BILL_HR SFAREGS_BILL_HOurs,
+    SFRSTCR_CREDIT_HR SFAREGS_Credit_Hours
+FROM SFRSTCR, SSBSECT, spriden
+WHERE SPRIDEN_PIDM = SFRSTCR_PIDM
+    AND SPRIDEN_CHANGE_IND IS NULL
+    AND SFRSTCR_TERM_CODE = SSBSECT_TERM_CODE
+    AND SFRSTCR_CRN = SSBSECT_CRN
+    AND SFRSTCR_BILL_HR != SSBSECT_BILL_HRS
+    AND SFRSTCR_TERM_CODE = :TERM
+;

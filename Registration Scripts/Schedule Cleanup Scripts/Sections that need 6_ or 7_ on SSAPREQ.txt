@@ -1,0 +1,60 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    04-APR-2024
+--Purpose: Returns CRNs that need '7_%' or '6_%' prereq on SSAPREQ   
+
+--NOTE:  VIP!! This job needs to be run for both 6_% and 7_% (both scripts are below) 
+--             and should be run often while new sections are being created during a semesters registration.  
+
+--desc ssbsect;
+
+
+--1st 7 RUN:
+select ssbsect_term_code as "Term", 
+       ssbsect_crn as "CRN", 
+       SSBSECT_MAX_ENRL as "Max Enrollment",
+       ssbsect_camp_code as "Camp", 
+       ssbsect_subj_code as "Subject", 
+       ssbsect_crse_numb as "Crse Numb", 
+       ssbsect_seq_numb as "Section", 
+       ssbsect_ptrm_code as "Ptrm", 
+       ssbsect_ptrm_start_date as "Class Begin Date", 
+       ssbsect_ptrm_end_date as "Class End Date", 
+       ssrrare_area as "Pre-Req", 
+       ssrrare_activity_date as "Pre-Req Date" 
+from ssbsect,ssrrare 
+where ssbsect_term_code = ssrrare_term_code 
+and   ssbsect_crn = ssrrare_crn 
+and   ssbsect_term_code = :Term_Code 
+and   ssbsect_ptrm_code IN ('3','7','RA2')
+--and   ssbsect_ptrm_code IN ('2','6','RA1')
+and   ssrrare_area not like '7_%' 
+--and   ssrrare_area not like '6_%'
+and   SUBSTR(ssrrare_area, 3,20) in (select DISTINCT SUBSTR(smralib_area, 3,20) from smralib where smralib_area like '7_%')
+--and   SUBSTR(ssrrare_area, 3,20) in (select DISTINCT SUBSTR(smralib_area, 3,20) from smralib where smralib_area like '6_%')
+order by ssbsect_camp_code,ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
+
+--2nd 7 RUN:
+select ssbsect_term_code as "Term", 
+       ssbsect_crn as "CRN", 
+       SSBSECT_MAX_ENRL as "Max Enrollment",
+       ssbsect_camp_code as "Camp", 
+       ssbsect_subj_code as "Subject", 
+       ssbsect_crse_numb as "Crse Numb", 
+       ssbsect_seq_numb as "Section", 
+       ssbsect_ptrm_code as "Ptrm", 
+       ssbsect_ptrm_start_date as "Class Begin Date", 
+       ssbsect_ptrm_end_date as "Class End Date", 
+       ssrrare_area as "Pre-Req", 
+       ssrrare_activity_date as "Pre-Req Date" 
+from ssbsect,ssrrare 
+where ssbsect_term_code = ssrrare_term_code 
+and   ssbsect_crn = ssrrare_crn 
+and   ssbsect_term_code = :Term_Code 
+--and   ssbsect_ptrm_code IN ('3','7','RA2')
+and   ssbsect_ptrm_code IN ('2','6','RA1')
+--and   ssrrare_area not like '7_%' 
+and   ssrrare_area not like '6_%'
+--and   SUBSTR(ssrrare_area, 3,20) in (select DISTINCT SUBSTR(smralib_area, 3,20) from smralib where smralib_area like '7_%')
+and   SUBSTR(ssrrare_area, 3,20) in (select DISTINCT SUBSTR(smralib_area, 3,20) from smralib where smralib_area like '6_%')
+order by ssbsect_camp_code,ssbsect_subj_code,ssbsect_crse_numb,ssbsect_seq_numb;
+

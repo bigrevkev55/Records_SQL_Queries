@@ -1,0 +1,15 @@
+--Author: Miranda Inman
+--Date:  02-FEB-2023
+--Purpose: This script allows queries to be filtered by last name where this option doesn't otherwise exist in Slate.
+
+SQL:
+
+/* Last Name Contains. Set parameters for the letter range you want to pull back. */
+
+(pe.[last] LIKE '[A-C]%')
+
+SQL Join:
+
+/* p_30d8.[id] may need to be configured to match the p.[id] in the query you are building. Click on "Display SQL" and look for the p.[id] join which is connected to the a_JID_.[person]. You may need to do a configurable join to person first. Note that this is for Application based Configurable Joins and may differ slightly on other bases. */
+
+inner join [person] pe on (pe.[id] = p_30d8.[id])

@@ -1,0 +1,58 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    04-Jan-2022
+--Purpose: This query returns students that have over 12 hours max possible registration 
+--         hours for 202210.  These will have to be manually fixed.  
+
+
+--desc sfbetrm;
+
+select spriden_id as "A Number",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+       sfbetrm_mhrs_over as "Max Hours"
+from spriden
+inner join sfbetrm on sfbetrm_pidm=spriden_pidm
+
+Where sfbetrm_mhrs_over > '21'
+      and SFBETRM_TERM_CODE = '202510'
+      and spriden_change_ind IS NULL
+      and exists(select sfrstcr_pidm from sfrstcr where sfrstcr_term_code = 202510)
+
+Order by 2,1;
+
+
+
+
+-------------------Script 2 will return students who are actually registered for more than 21 hours:
+
+
+--Author:  Kevin Thomas, Registrar
+--Date:    04-Jan-2022
+--Purpose: This query returns students that have over 12 hours max possible registration 
+--         hours for 202210.  These will have to be manually fixed.  
+
+--desc sfbetrm;
+--DESC sftregs;
+
+/*
+select spriden_id as "A Number",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+       sfbetrm_mhrs_over as "Max Hours",
+       sum(SFRSTCR_CREDIT_HR) as"Registered Hours"
+       
+       
+from spriden,sfrstcr,sfbetrm
+
+Where sfbetrm_mhrs_over > '21'
+      and sfbetrm_pidm=spriden_pidm
+      and sfrstcr_pidm = spriden_pidm
+      and SFBETRM_TERM_CODE = '202510'
+      and sfrstcr_term_code = '202510'
+      and spriden_change_ind IS NULL
+      --and sftregs_credit_hr;
+having sum(sfrstcr_credit_hr) > '21'
+group by spriden_id, spriden_last_name, spriden_first_name, sfbetrm_mhrs_over     
+Order by 5 desc,2,3;
+
+*/

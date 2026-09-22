@@ -1,0 +1,41 @@
+
+--Author:  Kevin Thomas, Registrar
+--Date:    16-JUN-2023
+--Purpose: Seeking to update former SAILS Math students who were assigned a DSPM 4 to 3
+
+
+/*
+desc sortest;
+
+select * from sortest;
+
+select distinct sortest_tsrc_code from sortest;
+
+select * from sortest
+where sortest_tsrc_code like 'SAI%'
+order by 3 desc;
+*/
+
+
+--"UPDATE" Script
+UPDATE SORTEST
+SET SORTEST_TEST_SCORE = '3'
+WHERE SORTEST_TSRC_CODE = 'SAIL'
+      and SORTEST_TEST_SCORE = '4'
+      and SORTEST_TESC_CODE = 'DSPM'
+
+/*      
+
+--"SELECT" Script to see students that will be updated by the "UPDATE" Script
+SELECT spriden_id A_Number,
+       SPRIDEN_LAST_NAME Last,
+       SPRIDEN_first_name First,
+       SORTEST.* 
+from SORTEST
+left join spriden on sortest_pidm=spriden_pidm
+WHERE SPRIDEN_change_ind is NULL
+      and SORTEST_TSRC_CODE = 'SAIL'
+      and SORTEST_TEST_SCORE = '4'
+      and SORTEST_TESC_CODE = 'DSPM'
+*/
+      

@@ -1,0 +1,84 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    04-AUG-2023
+--Purpose: This script is for uploading Amazon Career Services to their portal.
+--Directions:  1.  Run the first script to find the start date of all students with a AMZN start 
+--                   term before the term you are certifying students for.  
+--             2.  End (don't delete) those AMZN start term before current certifying term 
+--             3.  Be sure to add AMZN attribute to all Amazon students
+--                 in ther curent term of the Amazon portal on SGASADD
+--             4.  Run second script to create the file for current Amazon students upload to portal
+--             5.  Use Excel function to remove duplicate rows (if any)
+--             6.  After uploading the file to the Amazon portal send the output to the Bursar
+
+--desc sftregs; --select * from sftregs where sftregs_term_code = '202380';
+--desc sobptrm;
+--desc ssbsect;
+--desc sfrstcr;
+--desc sgrsatt;  --select * from sgrsatt where sgrsatt_atts_code = 'AMZN';
+-------------------------------------------------------------------------------------------------------
+
+/*First Script to find past amazon students and end (not delete) their attribute*/ 
+select spriden_id A_Number,
+       spriden_last_name Last_name,
+       spriden_first_name First_Name,
+       sgrsatt_atts_code Attribute,
+       sgrsatt_term_code_eff Effective_Term,
+       'End Attribute if not current Certifying Term' Message
+
+from sgrsatt
+join spriden on sgrsatt_pidm = spriden_pidm
+Where spriden_change_ind is NULL
+      and sgrsatt_atts_code = 'AMZN'
+      and sgrsatt_end_term_ethos = '999999'
+Order by sgrsatt_term_code_eff, spriden_last_name;
+       
+
+
+/*Second Script to create file of current Amazon student to upload to Amazon Portal*/ 
+SELECT 
+sfrstcr_term_code as "Registration Term - DELETE BEFORE UPLOADING TO AMAZON",
+sgrsatt_term_code_eff as "SGASADD EFFECTIVE TERM - DELETE",
+'Copy from Amazon File' as  "Amazon ID",
+spriden_last_name  as "Last Name",
+spriden.spriden_first_name as "First Name",
+TO_CHAR(SPBPERS_BIRTH_DATE, 'MM/DD/YYYY')   as  "Date of Birth",
+'  '  as "Eligibility Date",
+'  '  as "Available Budget",
+'  ' as "Submission Date",
+'  ' as "Request ID",
+'  ' as "Status",
+'  ' as "Notes", 
+'  ' as "Start Date",
+'  ' as "Program",
+spriden_id as "Student ID",
+'Tuition' as "Type",
+'Yes' as "Approve(Required)",
+'No' as "Deny(Required)",
+' ' as "Reason For Denial(Required if Deny=Yes)",
+SSBSECT_SUBJ_CODE || ' ' || SSBSECT_CRSE_NUMB as "Course Id(Required if Approve=Yes)",
+sfrstcr_bill_hr as "Credits(Required if Approve=Yes)",
+TO_CHAR(sobptrm_start_date, 'YYYYMMDD' ) as "Start date(Required if Approve=Yes and in format YYYYMMDD",
+TO_CHAR(sobptrm_end_date, 'YYYYMMDD') as "End Date(Required if Approve=Yes and in format YYYYMMDD)",
+'1' as "Cost of Course"
+
+From sgrsatt
+join spriden on sgrsatt_pidm = spriden_pidm
+join sfrstcr on spriden_pidm = sfrstcr_pidm --and spriden_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr.sfrstcr_term_code = :Term_Code)
+join ssbsect on ssbsect_crn = sfrstcr_crn
+join sobptrm on sfrstcr_ptrm_code = sobptrm_ptrm_code
+join SPBPERS on spbpers_pidm = spriden_pidm
+
+
+where sgrsatt_atts_code = 'AMZN'  --spriden_pidm in (select distinct sgrsatt_pidm from sgrsatt where sgrsatt_atts_code = 'AMZN')
+     and sfrstcr_term_code = :Term_Code
+     and sgrsatt.sgrsatt_term_code_eff = :Term_Code
+     and  spriden.spriden_change_ind is NULL
+    and sobptrm_term_code = sfrstcr_term_code
+     and ssbsect_term_code = sfrstcr_term_code
+order by 
+     sfrstcr_term_code desc, -- before uploading to Amazon portal delete delete all but the desired term
+     spriden_last_name, spriden_first_name;
+      --and spriden_id = :A_Number;
+
+
+

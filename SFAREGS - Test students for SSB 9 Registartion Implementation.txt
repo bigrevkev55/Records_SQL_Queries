@@ -1,0 +1,38 @@
+-- Author:  Kevin Thomas, Registrar
+-- Date:    13-AUG-2025
+-- Purpose: This is to find test students for SSB9 implementation.
+--          It returns students who were admitted in SARADAP for term 202580,
+--          whose application decision code is CC or 30,
+--          and includes their most recent student type (STYP) code.
+
+SELECT DISTINCT
+    spriden_id,                      -- Student ID
+    sgbstdn.sgbstdn_styp_code,       -- Most recent student type code
+    spriden_last_name,              -- Student last name
+    spriden_first_name              -- Student first name
+FROM spriden
+
+-- Join to SGBSTDN, but only include the most recent term code effective per student
+JOIN (
+    SELECT sgbstdn_pidm, sgbstdn_styp_code
+    FROM sgbstdn
+    WHERE (sgbstdn_pidm, sgbstdn_term_code_eff) IN (
+        SELECT sgbstdn_pidm, MAX(sgbstdn_term_code_eff)
+        FROM sgbstdn
+        WHERE sgbstdn_term_code_eff <= '202580'
+        GROUP BY sgbstdn_pidm
+    )
+) sgbstdn ON spriden_pidm = sgbstdn.sgbstdn_pidm
+
+-- Join to SARADAP to get students admitted for term 202580
+JOIN saradap ON spriden_pidm = saradap.saradap_pidm
+            AND saradap.saradap_term_code_entry = '202580'
+
+-- Join to SARAPPD to filter by decision code
+JOIN sarappd ON spriden_pidm = sarappd.sarappd_pidm
+            AND sarappd.sarappd_term_code_entry = '202580'
+
+WHERE sarappd.sarappd_apdc_code IN ('CC', '30')          -- Only include students with decision code CC or 30
+  AND spriden_change_ind IS NULL                         -- Exclude outdated identity records
+
+ORDER BY spriden_last_name, spriden_first_name;          -- Sort alphabetically by name

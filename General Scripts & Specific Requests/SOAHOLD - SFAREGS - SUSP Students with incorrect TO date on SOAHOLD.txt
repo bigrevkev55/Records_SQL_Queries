@@ -1,0 +1,33 @@
+--  Author: Kevin Thomas, Interim Registrar
+--    Date: 13-NOV-2020
+-- Purpose: This query returns students that had holds 
+--          put on SOAHOLD with an incorrect "To Date".  
+
+--select distinct sprhold_hldd_code from sprhold order by 1;
+--select * from stvhldd order by 1;
+
+
+select spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       SPRHOLD_HLDD_code,
+       sprhold_to_date,
+       sgbstdn_astd_code
+
+from spriden, sprhold, sgbstdn
+Where spriden_change_ind is NULL
+      and spriden_pidm = sprhold_pidm
+      and spriden_pidm = sgbstdn_pidm
+      and sprhold_Hldd_code in ('S1', 'S2', 'S3', 'S4', 'SP')
+      and sprhold_to_date < SYSDATE
+      and sprhold_pidm in (select distinct sgbstdn_pidm from SGBSTDN where sgbstdn_term_code_eff = '202510')
+      and sgbstdn_term_code_eff = '202510'
+ORDER BY spriden_LAST_name;
+join sgbstdn on spriden_pidm =  sgbstdn_pidm 
+join sprhold on spriden_pidm = sprhold_pidm
+Where spriden_change_ind is NULL
+      --and spriden_pidm = sprhold_pidm
+      and sprhold_Hldd_code in ('S1', 'S2', 'S3', 'S4', 'SP')
+      and sprhold_to_date < SYSDATE
+      and sprhold_pidm in (select distinct sgbstdn_pidm from SGBSTDN where sgbstdn_term_code_eff = '202510')
+ORDER BY spriden_LAST_name;

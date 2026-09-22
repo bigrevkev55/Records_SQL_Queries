@@ -10,6 +10,11 @@
 --             SFRSTCA_RSTS_CODE not like 'R%'  (courses that students have dropped or withdrawn from.)..kt..12/9/2020   
 --          3. Added subquery to exclude entered grades from showing and clogging up the report...kt...3/25/2021
 
+--   Notes: When running this the first time each semester follow these insturctions:
+--		--1. Run from mid registration to the current date for non CH 33 students, save output 
+		--2. Run it separatly for CH 33 with the date of the Census date (or whenever you began submitting T/F
+		--   to the VA for CH 33 students.  You will have already checked CH 33 enrollment changes when you submitted T/F  	
+
 -- Script:
 
 --desc ssbsect;
@@ -34,12 +39,12 @@ select SFRSTCA_TERM_CODE as "Term",
        SFRSTCA_USER as "User"      
 from spriden, SFRSTCA, sgrvetn, ssbsect, stvcamp
 Where spriden_change_ind is NULL
-and (spriden_id = :A_Number or spriden_id like :A_Number)
+--and (spriden_id = :A_Number or spriden_id like :A_Number)
 and spriden_pidm = sgrvetn_pidm
 and sgrvetn_pidm = SFRSTCA_pidm
 and sfrstca_camp_code = stvcamp_code
 and SSBSECT_CRN = SFRSTCA_CRN
-and sgrvetn_vetc_code IN ('T','U','1', '5', 'C', 'D', 'H', 'L' ,'7')
+and sgrvetn_vetc_code IN ('T','U','1', '5', 'C', 'D', 'H', 'L' ,'7', 'Y')
 and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
 --and SFRSTCA_RSTS_CODE not like 'R%'
 and ssbsect_term_code = sgrvetn_term_code_va
@@ -56,9 +61,16 @@ and SFRSTCA_PIDM not in(
       'Final grade updated to B',
       'Final grade updated to C',
       'Final grade updated to D',
-      'Final grade updated to F'
+      'Final grade updated to F',
+      'Final grade updated to FA',
+      'Final grade updated to FN'
       ))    
-Order by SFRSTCA_ACTIVITY_DATE DESC, spriden_last_name,spriden_first_name;
+Order by spriden_last_name,spriden_first_name, SFRSTCA_ACTIVITY_DATE DESC;
+
+
+
+
+
 
 
 

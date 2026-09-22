@@ -1,0 +1,22 @@
+--Author: Kevin Thomas, Registrar
+--Date:  03-FEB-2022
+--Purpose: Request from Financial Aid and Executive Director of Enrollment Management
+--         to find students who have HM on SOAHSCH.  
+
+select spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       sorhsch_sbgi_code,
+       STVSBGI_DESC,
+       SORHSCH_DPLM_CODE,
+       sorhsch_user_id,
+       sorhsch_activity_date,
+       sorhsch_dplm_code      
+
+from SORHSCH, stvsbgi, spriden
+where SORHSCH_DPLM_CODE ='HM'
+      and stvsbgi_code = sorhsch_sbgi_code
+      and spriden_pidm = sorhsch_pidm
+      and spriden_change_ind is null
+
+order by sorhsch_activity_date desc, spriden_last_name, spriden_first_name;

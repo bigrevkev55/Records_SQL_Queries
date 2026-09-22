@@ -1,0 +1,40 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    06-NOV-2024
+--Purpose: This query returns students who have a hold on SOAHOLD for Academic suspension
+--         that ended before the current date.  Use this to update the students
+--         academic standing on SFAREGS so that they don't get the message
+--         that "Student Status Prohibits Registration".
+
+--VIP Note 1 - When promted, enter the SFAREGS Registration term..kt...11/6/2024
+
+--desc sgbstdn; select * from sgbstdn where sgbstdn_pidm = (select spriden_pidm from spriden where spriden_id = 'A00547524') 
+
+
+select spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       sprhold_hldd_code,
+       sprhold_reason,
+       max(sprhold_to_date),
+       sprhold_orig_code,
+       sprhold_user,
+       sgbstdn_astd_code,
+       SGBSTDN_TERM_CODE_ASTD,
+       max(SGBSTDN_TERM_CODE_EFF)
+       
+from spriden
+join sgbstdn on spriden_pidm = sgbstdn_pidm
+join sprhold on spriden_pidm = sprhold_pidm
+
+where spriden_change_ind IS NULL
+and   sprhold_hldd_code IN ('S1','S2','S3','S4','SP')
+and   sgbstdn_astd_code is NULL --this filters out those who already have the PS on SFAREGS
+--and   sprhold_reason LIKE '%Return Sp 2025%'
+--Use the statement below if I want to pull by Hold Release Date
+and   sprhold_to_date < SYSDATE
+and   spriden_pidm not in (select distinct sgbstdn_pidm from sgbstdn where  sgbstdn_term_code_astd = :term_code)
+--and   spriden_pidm in (select distinct sgbstdn_pidm from sgbstdn where sgbstdn_term_code_eff > '202410')
+
+group by spriden_id, spriden_last_name, spriden_first_name, sprhold_hldd_code, sprhold_reason, sprhold_orig_code, sprhold_user, sgbstdn_astd_code,  SGBSTDN_TERM_CODE_ASTD
+
+order by spriden_last_name,spriden_first_name;

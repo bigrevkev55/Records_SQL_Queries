@@ -1,0 +1,44 @@
+--Authors:  Kevin Thomas, Director of Admissions and Records/Registrar
+--                Trey Dalton, TSD, Analyst
+--                Derrick Dupuis, IR Director
+--Date:    18-SEP-2023
+--Purpose: This script seeks to update the SFAREGS concentration priority to 2. 
+--         Axiom is currently writing these in as a 1, which is causing several different 
+--         issuee, as NSCC's priority for concentration is a 2.  
+
+--desc sorlfos;
+--desc sorlcur;
+
+
+
+/*Code to Test How Many records Should Update*/    ---TEST COUNT = 341
+select spriden_id, sorlcur_seqno, sorlfos.* 
+from sorlfos
+join spriden on spriden_pidm = sorlfos_pidm
+join sorlcur on (sorlcur_seqno = sorlfos_lcur_seqno
+                  and sorlfos_pidm = sorlcur_pidm)
+where sorlfos_term_code = :Term
+and  SORLCUR_TERM_CODE_END is NULL
+and   SORLFOS_LFST_CODE = 'CONCENTRATION'
+and   SORLFOS_PRIORITY_NO = '1'
+and   SORLFOS_CACT_CODE = 'ACTIVE'
+and spriden_change_ind is null
+order by 1 desc;
+
+
+
+/*Update Script*/
+update (
+select sorlfos_priority_no as old, '2' as new
+from sorlfos
+join sorlcur on sorlcur_seqno = sorlfos_lcur_seqno
+and sorlfos_pidm = sorlcur_pidm
+where sorlfos_term_code = :term_code
+and sorlcur_term_code_end is null
+and sorlfos_lfst_code = 'CONCENTRATION'
+and sorlfos_priority_no = '1'
+and sorlfos_cact_code = 'ACTIVE'
+) t
+set t.old = t.new
+;
+commit;

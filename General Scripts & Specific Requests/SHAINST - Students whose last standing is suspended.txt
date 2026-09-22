@@ -1,0 +1,30 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    08-JAN-2025
+--Purpose: The query seeks to find students whose last acadmic standing is
+--         suspended but who are eligible to register
+
+--desc shrttrm;
+
+SELECT 
+    s.spriden_id AS student_id,
+    s.spriden_last_name AS last_name,
+    s.spriden_first_name AS first_name,
+    a.SHRTTRM_TERM_CODE AS academic_standing_term_code,
+    a.shrttrm_astd_code_end_of_term AS academic_standing_code,
+    ast.stvastd_desc AS academic_standing_description
+FROM 
+    spriden s
+JOIN 
+    shrttrm a ON s.spriden_pidm = a.shrttrm_pidm
+JOIN 
+    stvastd ast ON a.shrttrm_astd_code_end_of_term = ast.stvastd_code
+JOIN
+    sgbstdn sgb on sgb.sgbstdn_pidm = s.spriden_pidm
+
+WHERE 
+    s.spriden_change_ind IS NULL
+    and a. shrttrm_astd_code_end_of_term in ('SU', '2S')
+    AND a.shrttrm_term_code = (SELECT MAX(shrttrm_term_code) FROM shrttrm WHERE shrttrm_pidm = s.spriden_pidm)
+    and (SGBSTDN_TERM_CODE_EFF >= (select SOBTERM_READM_REQ from sobterm where sobterm_term_code=:current_term_registration)) 
+ORDER BY 
+    s.spriden_last_name, s.spriden_first_name;

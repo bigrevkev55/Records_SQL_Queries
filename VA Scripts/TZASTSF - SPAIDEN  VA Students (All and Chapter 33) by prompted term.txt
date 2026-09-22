@@ -1,9 +1,7 @@
 
 
 
-
-
---Author: Kevin Thomas
+--Author: Kevin Thomas, Assistant Registrar
 --Date: 8/17/2018
 --This script will give a list of Chapter 33 (T and U) VA students and their email addresseses by prompted term.
 

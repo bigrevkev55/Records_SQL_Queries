@@ -1,0 +1,40 @@
+--Author: Kevin Thomas, Director of Admissions/Registrar
+--Date:   20-OCT-2023
+--Purpose: This script seeks to update students' HEPB Received Indictor in SZAITRK/SZRITRK who were not
+--         updated properly by Axiom.  
+
+
+--This should update 94 students in TEST.  
+--Sample TEST students that should be updated.  
+
+/*
+A00617723	Alghanem	Danya	AXIOM_USR
+A00618901	Armstrong	Madison	AXIOM_USR
+A00619781	Arnold	Kitana	AXIOM_USR
+A00621207	Ashley	Peyton	AXIOM_USR
+A00622940	Bailey	Emily	AXIOM_USR
+A00620761	Balderas Martinez	Esmeralda	AXIOM_USR
+A00619791	Barahona	Marelyn	AXIOM_USR
+A00620802	Berry	Hannah	AXIOM_USR
+A00615230	Bissinger	Luke	AXIOM_USR
+A00624086	Booker	Jameson	AXIOM_USR
+A00626744	Buchanan	Clayton	AXIOM_USR
+A00619829	Buford	Cassidy	AXIOM_USR
+A00626334	Cable	Allison	AXIOM_USR
+A00619843	Cart	Brian	AXIOM_USR
+A00619851	Caum	Cayce	AXIOM_USR
+*/
+
+Update SZRITRK
+       set Szritrk_Received_Ind = 'Y'
+       
+WHERE  Szritrk_Pidm = (Select Distinct Sfrstcr_Pidm From Sfrstcr Where Sfrstcr_Term_Code > = '202380' And Sfrstcr_Bill_Hr > '0')
+      And Szritrk_Immz_Code = 'HEPB'
+      And Szritrk_Received_Ind <> 'Y'
+      And Szritrk_Refused_Ind  <> 'Y' 
+      And Szritrk_Parent_Approved_Ind <> 'Y'
+      And Szritrk_Proof_Waived_Ind <> 'Y'
+      And Szritrk.Szritrk_Proof_Receive_Date Is Null;
+
+
+

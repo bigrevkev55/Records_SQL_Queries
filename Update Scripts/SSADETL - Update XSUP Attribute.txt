@@ -1,0 +1,19 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    24-MAR-2023
+--Purpose: This script will add the XSUP flag to 2nd 7-Weeks classes for supplement and end of term reporting
+--         to TBR.  
+
+--desc ssbsect;
+--desc ssrattr;
+
+update SSRATTR
+       set SSRATTR_ATTR_CODE = 'XSUP'
+        
+where SSRATTR_TERM_CODE = :Term
+      AND SSRATTR_ATTR_CODE != 'XSUP'
+      AND SSRATTR_CRN in 
+      (select SSBSECT_CRN 
+       from SSBSECT
+       Where ssbsect_term_code = :Term 
+             AND SSBSECT_SSTS_CODE = 'A'
+             AND SSBSECT_PTRM_CODE = '7');

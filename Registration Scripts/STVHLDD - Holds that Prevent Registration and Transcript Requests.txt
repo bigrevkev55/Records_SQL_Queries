@@ -1,0 +1,23 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    29-MAR-2023
+--Purpose: This query returns holds from SOAHOLD that prevent registration or transcript requests.
+
+--desc stvhldd;
+
+SELECT STVHLDD_CODE Code,
+       STVHLDD_DESC Description,
+       STVHLDD_REG_HOLD_IND Prevents_Registration,
+       STVHLDD_TRANS_HOLD_IND Prevents_Transcript_Request
+       
+FROM STVHLDD
+
+WHERE STVHLDD_REG_HOLD_IND is NOT NULL
+      OR STVHLDD_REG_HOLD_IND is NOT NULL
+      
+ORDER BY STVHLDD_CODE;
+       
+       
+
+
+
+

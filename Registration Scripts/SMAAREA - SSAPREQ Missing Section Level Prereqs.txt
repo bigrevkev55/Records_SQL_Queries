@@ -1,0 +1,33 @@
+
+-- Author:  Kevin Thomas, Registrar
+-- Date:    06-MAR-2026
+--
+-- Purpose: Identifies course sections in a given term that are missing 
+--          prerequisite attachments on SSAPREQ.
+--
+-- Background: Prerequisites are built at the course level on SCAPREQ. When new 
+--             sections are created *after* the prereq has been built, the 
+--             section automatically inherits the prereq on SSAPREQ.
+--
+--             However, if a section is created on SSASECT *before* the course-
+--             level prereq is added on SCAPREQ, the section will NOT inherit 
+--             the prereq and nothing appears on SSAPREQ.
+--
+-- Use Case: Run this query to find any sections that should have a prereq but 
+--           do not—so they can be manually corrected on SSAPREQ.
+--
+-- Note: Always confirm that the prereq area is built on SMAAREA and attached 
+--       at the course level on SCAPREQ before expecting it to appear on SSAPREQ.
+
+
+SELECT s.*
+FROM ssbsect s
+WHERE s.ssbsect_term_code = :Term
+  AND s.ssbsect_subj_code = :SUBJ_CODE
+  AND s.ssbsect_crse_numb = :COURSE_NUMBER
+  AND NOT EXISTS (
+        SELECT 1
+        FROM ssrrare r
+        WHERE r.ssrrare_term_code = s.ssbsect_term_code
+          AND r.ssrrare_crn       = s.ssbsect_crn
+  );

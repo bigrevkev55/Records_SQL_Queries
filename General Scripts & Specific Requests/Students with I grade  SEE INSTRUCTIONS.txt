@@ -2,6 +2,8 @@
 --Date:    Unknown
 --Purpose: Use this script to find grades by term...specifically "I" grades.  
 
+--Edits: 13-JUL-2026 Removed prompt for grade code and hard coded in "I".  Sent to TSD to request an Argos report with access for the deans...kt...7.13.26
+
 
 
 
@@ -42,5 +44,5 @@ Select
     AND SHRTCKG.SHRTCKG_TCKN_SEQ_NO = MASTER.SHRTCKN_SEQ_NO
     AND SHRTCKG.SHRTCKG_SEQ_NO = MASTER.SHRTCKG_SEQ_NO_MAX
     --AND SPRIDEN_ID IN ('A00357197')
-    AND SHRTCKG_GRDE_CODE_FINAL = :Grade
+    AND SHRTCKG_GRDE_CODE_FINAL = 'I'
   ORDER BY SHRTCKN_SUBJ_CODE,SHRTCKN_CRSE_NUMB,SHRTCKN_SEQ_NUMB,SPRIDEN_LAST_NAME,SPRIDEN_FIRST_NAME;

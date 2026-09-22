@@ -1,0 +1,27 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    11-AUG-2022
+--Purpose: This script attempts to find DE students that do not have the DUAL Rate on their max SGASTDN Term
+
+--desc sgbstdn;
+
+select spriden_id as "A Number",
+       spriden_last_name as "Last",
+       spriden_first_name as "First",
+       SGBSTDN_TERM_CODE_EFF as "Max SGASTDN Effective Term",
+       sgbstdn_rate_code as "Rate Code",
+       sgbstdn_admt_code as "Admit Code",
+       sgbstdn_program_1 as "Program Code"
+
+from spriden, sgbstdn outter, saradap o
+
+Where spriden_pidm = sgbstdn_pidm
+      and saradap_term_code_entry = :Admit_term_code
+      and spriden_pidm = saradap_pidm
+      and saradap_admt_code in ('DE','DM')
+      and sgbstdn_rate_code is NULL  --select distinct sgbstdn_rate_code from sgbstdn;
+      and spriden_change_ind is NULL
+      --and spriden_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code = :Term)
+      --and sgbstdn_rate_code = 'DUAL'
+      and sgbstdn_term_code_eff = (select max(sgbstdn_term_code_eff) from sgbstdn i where outter.sgbstdn_pidm = i.sgbstdn_pidm)
+     -- and saradap_term_code_entry = (select max (saradap_term_code_entry) from saradap i where o.saradap_pidm = i.saradap_pidm)
+      order by spriden_last_name, spriden_first_name;

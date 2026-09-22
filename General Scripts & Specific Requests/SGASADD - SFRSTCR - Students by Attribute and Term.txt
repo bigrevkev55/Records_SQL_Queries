@@ -1,0 +1,22 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    09-DEC-2021
+--Purpose: This script returns Riverbend and Debra Johnson students for 2502180
+
+
+
+--desc spriden;
+--desc sfrstcr;
+
+SELECT SGRSATT_TERM_CODE_EFF as " Start Term",
+       SGRSATT_ATTS_CODE as "Facility",
+       SPRIDEN_ID as "A Number",
+       SPRIDEN_LAST_NAME as "Last Name",
+       SPRIDEN_FIRST_NAME AS "First Name"
+       
+from SGRSATT 
+INNER JOIN SPRIDEN on sgrsatt_pidm=spriden_pidm
+where sgrsatt_atts_code in ('RVR','DJRC')
+and sgrsatt_end_term_ethos = '999999'
+and spriden_change_ind IS NULL
+and spriden_pidm in (Select sfrstcr_pidm from sfrstcr where sfrstcr_term_code='202180')
+order by SGRSATT_ATTS_CODE, SPRIDEN_LAST_NAME;

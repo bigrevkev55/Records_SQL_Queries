@@ -1,0 +1,66 @@
+--Created by: Derrick Dupuis, IR Director
+--            Kevin Thomas, Registrar
+--Date:       09-JUN-2023
+--Purpose:    Returns graduates by prompted term...INCLUDES CELL NUMBERS, PERS Email address, Email Addresses, and Campus Pickup Codes for SLATE. 
+--Edits:      15-JUN-2023 wrote cmp block in from block as a left join to pull in indicated campus for pickup...kt
+--            23-AUG-2024 Updated email and phone with current blocks. Added local current address..ddd
+--            25-JAN-2025 wrote hnrs block in from block as a left join to pull in honors designation...kt
+--            30-JUN-2025 Updated joins to prevent duplicate records...copilot
+
+SELECT iden.SPRIDEN_ID AS "ID",
+    iden.SPRIDEN_LAST_NAME AS "LAST NAME",
+    iden.SPRIDEN_FIRST_NAME AS "FIRST NAME",
+    chrt.SHRDGMR_TERM_CODE_GRAD AS "GRAD TERM",
+    chrt.SHRDGMR_DEGS_CODE AS "AWARD STATUS",
+    chrt.SHRDGMR_GRST_CODE AS "GRAD CODE",
+    hnrs.HONORS AS "Honors",
+    chrt.SHRDGMR_GRAD_DATE AS "GRAD DATE",
+    chrt.SHRDGMR_PROGRAM AS "PROGRAM CODE",
+    chrt.SHRDGMR_DEGC_CODE AS "DEGREE",
+    chrt.SHRDGMR_MAJR_CODE_1 AS "MAJOR",
+    chrt.SHRDGMR_MAJR_CODE_CONC_1 AS "CONC",
+    addr.SPRADDR_STREET_LINE1 AS ADDRESS1,
+    addr.SPRADDR_STREET_LINE2 AS ADDRESS2,
+    addr.SPRADDR_CITY AS CITY,
+    addr.SPRADDR_STAT_CODE AS STATE_CODE,
+    addr.ZIP5 AS ZIP_CODE
+FROM (
+    SELECT *
+    FROM SHRDGMR
+    WHERE SHRDGMR_TERM_CODE_GRAD = :GRAD_TERM
+        AND SHRDGMR_GRST_CODE IN ('GR','RTS')
+        AND SHRDGMR_DEGC_CODE NOT IN ('ACRT1','ACRT2')
+) chrt
+LEFT JOIN SPRIDEN iden ON chrt.SHRDGMR_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+-- Address Join (one per student)
+LEFT JOIN (
+    SELECT *
+    FROM (
+        SELECT aa.*,
+            SUBSTR(aa.SPRADDR_ZIP,1,5) AS ZIP5,
+            STVCNTY_DESC,
+            ROW_NUMBER() OVER (PARTITION BY aa.SPRADDR_PIDM ORDER BY aa.SPRADDR_SEQNO DESC) AS rn
+        FROM SPRADDR aa
+        LEFT JOIN STVCNTY ON aa.SPRADDR_CNTY_CODE = STVCNTY_CODE
+        WHERE aa.SPRADDR_ATYP_CODE = 'LO'
+            AND aa.SPRADDR_STATUS_IND IS NULL
+    ) 
+    WHERE rn = 1
+) addr ON chrt.SHRDGMR_PIDM = addr.SPRADDR_PIDM
+-- Honors Join (one per student)
+LEFT JOIN (
+    SELECT *
+    FROM (
+        SELECT 
+            SHRDGIH_PIDM,
+            SHRDGIH_HONR_CODE, 
+            STVHONR_DESC AS HONORS,
+            ROW_NUMBER() OVER (PARTITION BY SHRDGIH_PIDM ORDER BY SHRDGIH_HONR_CODE) AS rn
+        FROM SHRDGIH 
+        LEFT JOIN STVHONR ON STVHONR_CODE = SHRDGIH_HONR_CODE
+    )
+    WHERE rn = 1
+) hnrs ON chrt.SHRDGMR_PIDM = hnrs.SHRDGIH_PIDM
+ORDER BY iden.SPRIDEN_LAST_NAME,
+    iden.SPRIDEN_FIRST_NAME;

@@ -1,0 +1,55 @@
+--Author:  Kevin Thomas, Registrar; Derrick Dupuis IR Director
+--Date:    21-OCT-2022
+--Purpose: This script will insert end terms for a student who has 29 curriculum 
+--         records with no end term.  To do this manually would be much more labor 
+--         intensive.  
+
+
+UPDATE sorlcur
+SET sorlcur_term_code_end = '200580'
+WHERE sorlcur_pidm = '123188'
+               AND SORLCUR_SEQNO = '44';
+
+
+
+--SCRIPT #2
+
+--Author:  Kevin Thomas, Registrar
+--Date:    24-OCT-2022
+--Purpose: This script will insert end terms for a specific student who has one program without an end term or 
+--         inactive status.   
+
+UPDATE sorlcur
+SET sorlcur_term_code_end = '200750'
+WHERE sorlcur_pidm = '76024' 
+      AND sorlcur_seqno = '46';
+
+
+--Script #3
+
+--Author: Kevin Thomas, Registrar
+--Date:     24-APR-2023
+--Purpose: This script will insert an end date for the students 200580 curricullum.  It's still active in 2023 and is 
+--               causing IR reporting issues and will cause issues for Records TBR End of Term reporting.  
+
+UPDATE sorlcur
+SET sorlcur_term_code_end = '200580'
+WHERE sorlcur_pidm = '123188'
+               AND SORLCUR_SEQNO = '44';
+
+
+
+--Script #3
+
+--Author: Kevin Thomas, Registrar
+--Date:     24-APR-2023
+--Purpose: This script will insert an end date for the students 200580 curricullum.  It's still active in 2023 and is 
+--               causing IR reporting issues and will cause issues for Records TBR End of Term reporting.  
+
+UPDATE sorlcur
+SET sorlcur_term_code_end = '199780'
+WHERE sorlcur_pidm = '57389'
+               AND SORLCUR_SEQNO = '19';
+
+
+

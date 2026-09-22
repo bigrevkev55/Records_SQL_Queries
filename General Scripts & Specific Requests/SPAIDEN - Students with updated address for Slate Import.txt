@@ -1,0 +1,37 @@
+--Author:  Kevin Thomas, Director of Admissions and Records
+--Date:    09-DEC-2024
+--Purpose: This is to find students whose adress has been changed into Banner, 
+--         extract that data, and upload it into Slate.
+
+--Note:  I tabled this project because Slate is only allowing us to hit the SFTP so many times a day and we are already over that limit.  
+
+--desc spraddr;
+
+select spriden_id,
+       spriden_last_name, 
+       spriden_first_name,
+       spraddr_atyp_code as "Type",
+       spraddr.spraddr_street_line1 as "Street 1",
+       spraddr.spraddr_street_line2 as "Street 2",
+       spraddr.spraddr_street_line3 as "Street 3",
+       spraddr_city as "City",
+       spraddr_stat_code as "State",
+       spraddr_zip as "Zip",
+       spraddr.spraddr_status_ind as "Status",
+       spraddr.spraddr_activity_date, 
+       spraddr_user
+       --spraddr.* 
+from spraddr 
+inner join spriden on spriden_pidm = spraddr_pidm
+--where spraddr_user = 'MOORE_C'
+where spraddr_data_origin = 'Banner'
+--and spraddr_user != 'WWW2_USER'
+--and spraddr_user != 'BANWORX'
+and SPRADDR_ACTIVITY_DATE > sysdate - 1
+--and spraddr_activity_date < '10-DEC-2024'
+and spraddr_to_date is NULL
+and spraddr_status_ind is NULL --This is the inactivate box on SPAIDEN. Some address
+                               --will have this checked but will not have an end date.
+and SPRADDR_ATYP_CODE = 'LO'
+and spriden_change_ind is NULL
+order by spriden_last_name;

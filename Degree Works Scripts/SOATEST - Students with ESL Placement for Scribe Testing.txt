@@ -1,0 +1,26 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    23-NOV-2022
+--Purpose: This query returns CERT students who have and ESL Placement score on SOATEST.  
+--         Use this to test students for ESL Degree Works Scribing.
+
+
+
+--Desc SGBSTDN;
+--select * from sgbstdn order by 1;
+--desc spriden;
+--desc sorlcur;
+
+Select spriden_id,
+       SPRIDEN_LAST_NAME,
+       spriden_first_name
+from SGBSTDN, spriden 
+where SGBSTDN_DEGC_CODE_1 like 'CRT%'
+      and sgbstdn_term_code_eff > '202180'
+      and sgbstdn_pidm = spriden_pidm
+      and spriden_change_ind is null
+      and sgbstdn_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code > '202250')
+      and sgbstdn_pidm in (Select distinct sorlcur_pidm 
+                           from sorlcur 
+                           where sorlcur_program like 'CERT%' 
+                                 and (sorlcur_term_code_end is null or sorlcur_cact_code = 'ACTIVE'))
+      and sgbstdn_pidm in (Select distinct sortest_pidm from sortest where sortest_tesc_code like 'ES%');

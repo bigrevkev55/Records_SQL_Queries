@@ -1,0 +1,23 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    05-DEC-2022
+--Purpose: Find students with registration since 202250 who have an inactive 
+--         curricullum on SFAREGS but also has  the current box checked and 
+--         there is no end term.  To fix these students go to the term showing in 
+--         SORLCUR_TERM_CODE on SFAREGS, find the curricullum with the error and delete.
+--NOTE:    This clean up was requested by IR for their reporting.  
+
+select sp.spriden_id , so.* 
+from  sorlcur so
+join spriden sp on sorlcur_pidm = spriden_pidm
+where 
+      sorlcur_lmod_code = 'LEARNER'
+      and sorlcur_cact_code = 'INACTIVE'
+      and sorlcur_term_code_end IS NULL
+      --and sorlcur_pidm > '27000'
+      --and sorlcur_term_code > '200610'
+      and sorlcur_priority_no = '2'
+      and SORLCUR_current_cde = 'Y'
+      and sorlcur_pidm in (select distinct sfrstcr_pidm from sfrstcr where sfrstcr_term_code > '202250')
+      and spriden_change_ind is null
+      order by sorlcur_pidm;
+      

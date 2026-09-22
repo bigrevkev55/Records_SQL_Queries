@@ -3,6 +3,8 @@
 --Purpose: This query finds NURS courses that do not have a 
 --	   detail code of FNUR, amount of $25, or type of CRED
 --	   on SSADETL
+--Edits:  edited to exclude CRNs found in subquery so we only get a list of CRNs that need
+--        to be fixed...kt...10/8/2024
 
 select ssrfees_term_code as "Term Code",
        ssbsect_crn as "CRN",
@@ -16,6 +18,4 @@ where ssrfees_crn = ssbsect_crn
 and ssbsect_term_code = ssrfees_term_code
 and ssrfees_term_code = :term_code
 and ssbsect_subj_code = 'NURS'
-and (ssrfees_detl_code not in 'FNUR' 
-    or ssrfees_amount not in 25
-    or ssrfees_ftyp_code not in 'CRED')
+and ssrfees_crn not in (select ssrfees_crn from ssrfees where ssrfees_term_code = :term_code and ssrfees_detl_code = 'FNUR');

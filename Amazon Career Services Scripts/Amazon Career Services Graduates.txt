@@ -1,0 +1,40 @@
+--Date:  22-JAN-2024
+--Author: Kevin Thomas, Director of Admissions and Records/Registrar
+--Purpose:  This query returns students who used Amazon Career Services to help pay for 
+--          a credential at NSCC.  This has to be submitted to Amazon Career Services after
+--          each Spring and Fall Graduation.  
+
+WITH latest_grad AS (
+  SELECT shrdgmr_pidm,
+         MAX(shrdgmr_grad_date) AS latest_grad_date
+  FROM shrdgmr
+  WHERE shrdgmr_degs_code = 'AW'
+    AND shrdgmr_grad_date > TO_DATE('01-JAN-2022', 'DD-MON-YYYY') --first term of Amazon Career Services at NSCC.  Any credential before this didn't use Amazon Career Services;
+  GROUP BY shrdgmr_pidm
+),
+latest_service AS (
+  SELECT tbvcsrv_pidm,
+         MAX(tbvcsrv_term_code) AS latest_term_code
+  FROM tbvcsrv
+  WHERE tbvcsrv_detail_code = 'T021'
+  GROUP BY tbvcsrv_pidm
+)
+
+SELECT DISTINCT
+  spriden.spriden_id,
+  spriden.spriden_last_name,
+  spriden.spriden_first_name,
+  tbvcsrv.tbvcsrv_detail_code_desc,
+  tbvcsrv.tbvcsrv_term_code,
+  shrdgmr.shrdgmr_majr_code_1,
+  shrdgmr.shrdgmr_grad_date
+FROM spriden
+JOIN tbvcsrv ON tbvcsrv.tbvcsrv_pidm = spriden.spriden_pidm
+JOIN shrdgmr ON shrdgmr.shrdgmr_pidm = spriden.spriden_pidm
+JOIN latest_grad ON latest_grad.shrdgmr_pidm = shrdgmr.shrdgmr_pidm
+                 AND latest_grad.latest_grad_date = shrdgmr.shrdgmr_grad_date
+JOIN latest_service ON latest_service.tbvcsrv_pidm = tbvcsrv.tbvcsrv_pidm
+                    AND latest_service.latest_term_code = tbvcsrv.tbvcsrv_term_code
+WHERE spriden.spriden_change_ind IS NULL
+  AND tbvcsrv.tbvcsrv_detail_code = 'T021'
+ORDER BY shrdgmr.shrdgmr_grad_date DESC, SPRIDEN_LAST_NAME, SPRIDEN_FIRST_NAME;

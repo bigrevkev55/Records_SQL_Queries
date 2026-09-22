@@ -1,0 +1,37 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    14-JAN-2022
+--Purpose: This query returns students that are in CRNs that do not have DCM codes built on 
+--         on SSADETL that should.  Several of these CRNs are cancelled and Laura L (Bookstore Manager)
+--         will remove them from the shared spreadsheet.  
+
+
+--desc ssbsect
+--desc sfrstcr
+
+
+select spriden_id as "A Number",
+       ssbsect_ptrm_code as "Part of Term",
+       SFRSTCR_CRN as "CRN",
+       --SFRSTCR_RSTS_CODE as "Registration Status",
+       CASE 
+        WHEN SFRSTCR_RSTS_CODE like 'R%' THEN 'Registered' 
+        ELSE 'Check'
+        END as "Registration Status",
+       SFRSTCR_RSTS_DATE as "Registration Date",
+       spriden_last_name as "Last",
+       spriden_first_name as "First"
+
+     --desc sfrstcr;  
+from spriden, sfrstcr
+Inner join ssbsect on ssbsect_term_code = sfrstcr_term_code and ssbsect_crn = sfrstcr_crn
+
+where 
+spriden_pidm=sfrstcr_pidm
+and spriden_change_ind is NULL
+and sfrstcr_crn in ('18352', '18685', '18749','18757','18595', '18782', '18063',
+                     '18639', '18777','18708', '18411',
+                    '13996', '18584', '14000', '16746', '18418')
+--and sfrstcr_crn in (select distinct ssbsect_crn from ssbsect where ssbsect_term_code = '202210')
+and sfrstcr_term_code = '202210'
+--order by sfrstcr_crn asc
+order by sfrstcr_crn, spriden_last_name, spriden_first_name;

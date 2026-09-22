@@ -1,7 +1,7 @@
 --Author: Kevin Thomas, Registrar
 --Date:   03-Oct-2021
 --Purpose: This query attempts to find student's final grades and if there was a 
-           change of grade prcesse or not.
+--           change of grade prcesse or not.
 
 Select spriden_id as "A_Number",
        spriden_last_name as "Last",

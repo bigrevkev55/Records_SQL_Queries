@@ -1,0 +1,12 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    08-AUG-2024
+--Purpose: These query looks at H Building active rooms and their attributes from SLARDEF.  
+
+--select * from slbrdef where slbrdef_activity_date > '08-AUG-24' order by 2;
+
+select slbrdef.*, slrrdef.*  
+from slbrdef 
+inner join slrrdef on slrrdef_room_number = slbrdef_room_number
+where slbrdef_room_number like 'H-%'
+and slbrdef_rmst_code = 'AC' 
+order by slbrdef_room_number;

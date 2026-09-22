@@ -1,0 +1,14 @@
+-- Created By: Kevin Thomas, Registrar
+--       Date:  05-FEB-2025
+--    Purpose:  This report returns students that have a null or invalid Graduation Status Code on SHADEGR, by prompted term. 
+--              This report should be run after the graduation specialist gets done awarding degrees each semester.  TBR looks at 
+--              SHRDDGMR_GRST_CODE in our reporting so it's important that field not be null and that it contains proper values.
+
+--desc shrdgrm;
+
+SELECT spriden_last_name LAST_NAME, spriden_first_name FIRST_NAME, spriden_id A_NUMBER,
+shrdgmr_degc_code, shrdgmr_degs_code, SHRDGMR_GRST_CODE,shrdgmr_term_code_Grad GRAD_TERM 
+FROM spriden
+INNER JOIN SHRDGMR on shrdgmr_pidm=spriden_pidm
+WHERE SPRIDEN_CHANGE_IND is NULL and SHRDGMR_TERM_CODE_GRAD IN :Term
+AND (SHRDGMR_GRST_CODE NOT IN ('GR','RTS','IC','EM','GRN') OR SHRDGMR_GRST_CODE IS NULL);

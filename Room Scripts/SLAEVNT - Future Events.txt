@@ -1,0 +1,64 @@
+/*=============================================================
+Author: Kevin Thomas
+Date: 2025-11-11
+Purpose: Retrieve all SSRMEET rows for term 'EVENT' that have 
+         an end date today or later, ensuring one row per CRN.
+         Includes related event details from SLBEVNT using 
+         aggregate functions to avoid duplicates.
+=============================================================*/
+desc ssrmeet;
+SELECT 
+    -- Meeting details (grouped by CRN)
+    m.SSRMEET_CRN,
+    m.SSRMEET_TERM_CODE,
+    m.SSRMEET_START_DATE,
+    m.SSRMEET_SUN_DAY,                   
+    m.SSRMEET_MON_DAY,                    
+    m.SSRMEET_TUE_DAY,                    
+    m.SSRMEET_WED_DAY,                    
+    m.SSRMEET_THU_DAY,                   
+    m.SSRMEET_FRI_DAY,                    
+    m.SSRMEET_SAT_DAY,  
+    m.SSRMEET_BEGIN_TIME,
+    m.SSRMEET_END_TIME,
+    m.SSRMEET_END_DATE,
+    m.SSRMEET_BLDG_CODE,
+    m.SSRMEET_ROOM_CODE,
+    -- Event details (aggregated to avoid duplicates)
+    MAX(e.SLBEVNT_DESC) AS SLBEVNT_DESC,
+    MAX(e.SLBEVNT_LONG_DESCRIPTION) AS SLBEVNT_LONG_DESCRIPTION,
+    MAX(e.SLBEVNT_ETYP_CODE) AS SLBEVNT_ETYP_CODE,
+    MAX(e.SLBEVNT_CONTACT_NAME) AS "Event Contact",
+    MAX(e.SLBEVNT_USER_ID) AS "Scheduled BY"
+
+FROM SSRMEET m
+    -- LEFT JOIN ensures all SSRMEET rows are returned even if no matching SLBEVNT record exists
+    LEFT JOIN SLBEVNT e
+        ON m.SSRMEET_CRN = e.SLBEVNT_CRN
+
+WHERE 
+    -- Only include meetings that end today or later
+    m.SSRMEET_END_DATE >= TRUNC(SYSDATE)
+    -- Limit to the 'EVENT' term
+    AND m.SSRMEET_TERM_CODE = 'EVENT'
+
+GROUP BY
+    -- Group by SSRMEET columns to ensure one row per CRN
+    m.SSRMEET_CRN,
+    m.SSRMEET_TERM_CODE,
+    m.SSRMEET_START_DATE,
+    m.SSRMEET_SUN_DAY,                   
+    m.SSRMEET_MON_DAY,                    
+    m.SSRMEET_TUE_DAY,                    
+    m.SSRMEET_WED_DAY,                    
+    m.SSRMEET_THU_DAY,                   
+    m.SSRMEET_FRI_DAY,                    
+    m.SSRMEET_SAT_DAY, 
+    m.SSRMEET_BEGIN_TIME,
+    m.SSRMEET_END_TIME,
+    m.SSRMEET_END_DATE,
+    m.SSRMEET_BLDG_CODE,
+    m.SSRMEET_ROOM_CODE
+
+ORDER BY 
+    m.SSRMEET_END_DATE;

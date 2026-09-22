@@ -2,9 +2,9 @@
 --Author:  Kevin Thomas, Assistant Registrar
 --Date:    11-MAY-2020
 --Purpose: This query returns transcript request on SHAETOR 
-           that are in AG status.  Compare this against 
-           any submitted paper requests with the same recipient to 
-           prevent duplication.  
+--           that are in AG status.  Compare this against 
+--           any submitted paper requests with the same recipient to 
+ --          prevent duplication.  
 
 --desc SHBTEOT;
 --desc SHRTEOS;
@@ -14,9 +14,9 @@
 --Author:  Kevin Thomas, Assistant Registrar
 --Date:    11-MAY-2020
 --Purpose: This query returns transcript request on SHAETOR 
-           that are in AG status.  Compare this against 
-           any submitted paper requests with the same recipient to 
-           prevent duplication.  
+--           that are in AG status.  Compare this against 
+--           any submitted paper requests with the same recipient to 
+--           prevent duplication.  
 
 --desc SHBTEOT;
 --desc SHRTEOS;

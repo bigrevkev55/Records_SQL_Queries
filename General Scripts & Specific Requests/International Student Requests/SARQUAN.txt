@@ -1,0 +1,26 @@
+--Author:   Javon Yokley, Records Clerk
+--Date:     19-NOV-2021
+--Purpose:  Requested by Laura Moran (Executive Director of Enrollment Services). 
+--          Returns a count of students who answered yes to the question "Did you attend school completely in the United States (ages 6-18)?",
+--          their native language is not English, and their MCHN checklist item has a received date.  
+
+select count(distinct sarquan_pidm)
+from sarquan
+where sarquan_pidm in (select gobintl_pidm from gobintl where gobintl_lang_code != '997')
+and sarquan_pidm in (select sarchkl_pidm from sarchkl where SARCHKL_ADMR_CODE = 'MCHN'
+                                                      and SARCHKL_RECEIVE_DATE is not null)
+and sarquan_question = 'Did you attend school completely in the United States (ages 6-18)?'
+and sarquan_answer like 'Y%'
+
+
+--Use below code for spot checking
+
+select distinct spriden_id
+from sarquan, spriden
+where spriden_change_ind is NULL
+and spriden_pidm = sarquan_pidm
+and sarquan_pidm in (select gobintl_pidm from gobintl where gobintl_lang_code != '997')
+and sarquan_pidm in (select sarchkl_pidm from sarchkl where SARCHKL_ADMR_CODE = 'MCHN'
+                                                      and SARCHKL_RECEIVE_DATE is not null)
+and sarquan_question = 'Did you attend school completely in the United States (ages 6-18)?'
+and sarquan_answer like 'Y%'

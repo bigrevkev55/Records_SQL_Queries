@@ -1,0 +1,37 @@
+/*=============================================================
+Author:    Kevin Thomas
+Date:      2025-10-29
+Purpose:   Retrieve student course grades for a specified term
+           from SHRTCKN and SHRTCKG, ensuring the student has
+           the T021 detail code in TBVCSRV for the same term.
+           This report is for Amazon Career Choice students'
+           grade reporting purposes and should be used to
+           update the batch upload file downloaded from the
+           Amazon Career Choice portal.
+==============================================================*/
+
+SELECT DISTINCT
+    s.spriden_id AS Student_ID,
+    s.spriden_last_name AS Last_Name,
+    s.spriden_first_name AS First_Name,
+    t.shrtckn_term_code AS Term,
+    t.shrtckn_subj_code AS Subject,
+    t.shrtckn_crse_numb AS Course,
+    t.shrtckn_crse_title AS Course_Title,
+    g.shrtckg_credit_hours AS Credit_Hours,
+    g.shrtckg_grde_code_final AS Final_Grade,
+    'Earned, Failed, In-Progress, Refunded, or Invalid are the options ' as Class_Status
+FROM spriden s
+JOIN shrtckn t 
+    ON t.shrtckn_pidm = s.spriden_pidm
+    AND t.shrtckn_term_code = :term_code
+JOIN shrtckg g 
+    ON g.shrtckg_pidm = t.shrtckn_pidm
+    AND g.shrtckg_term_code = t.shrtckn_term_code
+    AND g.shrtckg_tckn_seq_no = t.shrtckn_seq_no
+JOIN tbvcsrv v 
+    ON v.tbvcsrv_pidm = s.spriden_pidm
+    AND v.tbvcsrv_term_code = :term_code
+WHERE v.tbvcsrv_detail_code = 'T021'
+  AND s.spriden_change_ind IS NULL
+ORDER BY s.spriden_last_name, s.spriden_first_name, t.shrtckn_subj_code, t.shrtckn_crse_numb;

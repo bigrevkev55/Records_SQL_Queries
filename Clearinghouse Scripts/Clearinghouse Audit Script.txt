@@ -7,6 +7,8 @@
 --"CHEX" attribute in SGASADD for students that are auditing 
 --all courses.  
 
+--Edits:  Added a filter to exclude students who already have the attribute for the term...kt....7.20.2022
+
 
 select sfrstcr_term_code as TERM,
        spriden_id as ID,
@@ -23,4 +25,7 @@ and spriden_change_ind is NULL
 and sfrstcr_term_code = :Term
 and sfrstcr_rsts_code = :Reg_Code
 --and sfrstcr_rsts_code in ('AU','W2','W5','WC','WD','WF','WW')
-order by spriden_last_name, spriden_first_name
+and spriden_pidm not in (select sgrsatt_pidm from sgrsatt where sgrsatt_atts_code = 'CHEX' and sgrsatt_term_code_eff= :Term) 
+
+order by spriden_last_name, spriden_first_name;
+

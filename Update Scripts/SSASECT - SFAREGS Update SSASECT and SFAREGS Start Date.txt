@@ -1,0 +1,28 @@
+
+--Author:   Kevin Thomas, Registrar
+--Date:       03/01/2020
+--Purpose: These scripts update the start dates for CRNs in SSASECT/SSBSECT and SFAREGS/SFRSTCR. 
+
+
+--Script 1 - Update sections in App Nav that have already been built so that the future registration will be correct.  
+--desc ssbsect;
+update ssbsect
+set SSBSECT_PTRM_START_DATE = :Part_of_Term_Start_Date
+SSBSECT_PTRM_CODE  = :Part_of_Term_Code
+      and SSBSECT_TERM_CODE = :Term_Code;
+
+     
+--Script 2 - Update registered students schedules and registration form in App. Nav Banner.
+
+/*
+
+update sfrstcr
+set SFRSTCR_PTRM_CODE=  :Part_of_Term_Code
+where sfrstcr_term_code = :Registration_Term_Code
+      and SFRSTCR_RSTS_CODE like 'R%'
+      and SFRSTCR_PTRM_CODE = :Part_of_Term_Code  --this doesn't change the part of term code, but resetting it to the same code should correct the students' schedules
+
+
+*/
+
+ 

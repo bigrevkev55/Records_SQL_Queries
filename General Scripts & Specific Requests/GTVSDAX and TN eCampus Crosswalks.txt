@@ -1,0 +1,12 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    27-APR-2025
+--Purpose: This sql seeks to return TN eCampus sections that are less than 8 
+--        digits.  This needs to be corrected on GTVSDAX, Group 'RODP_CRSE' per
+--        request from TBR. 
+
+SELECT DISTINCT (ssbsect_subj_code || ' ' || ssbsect_crse_numb) AS "Rubric"
+FROM ssbsect
+WHERE ssbsect_term_code > 202000
+    AND SSBSECT_SEQ_NUMB LIKE 'R%'
+    AND LENGTH(ssbsect_subj_code || ssbsect_crse_numb) < 8
+ORDER BY 1;

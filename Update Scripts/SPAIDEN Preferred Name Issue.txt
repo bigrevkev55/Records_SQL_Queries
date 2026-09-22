@@ -1,0 +1,22 @@
+--Author:  Chuck Hackney, TSD
+--Date:  16-JAN-2024
+--Purpose:
+--          Update SPBPERS_PREF_FIRST_NAME to NULL where it matches SPRIDEN_LAST_NAME for students enrolled in courses
+--          for fall 2022 forward or admitted for fall 2023 forward:
+
+update spbpers
+set spbpers_pref_first_name = null
+where spbpers_pidm in (
+select spbpers_pidm
+from spriden
+,    spbpers
+where spriden_pidm = spbpers_pidm
+and spriden_pidm in (select sfrstcr_pidm
+                     from sfrstcr
+                     where sfrstcr_term_code >= '202280'
+                     union
+                     select sarappd_pidm
+                     from sarappd
+                     where sarappd_term_code_entry >= '202380')
+and spriden_change_ind is null
+and lower(spriden_last_name) = lower(spbpers_pref_first_name))

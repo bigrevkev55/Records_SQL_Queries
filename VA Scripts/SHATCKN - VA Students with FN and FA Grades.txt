@@ -14,6 +14,9 @@ and were marked as not attending.
 */
 
 
+--VIP:  Be sure to work FN first as they are chronologically before FAs and will make it easier to report FAs.  
+
+
 select  distinct spriden_id student_id
         , sgrvetn_vetc_code vet_code
         , spriden_last_name last_name
@@ -59,5 +62,5 @@ and     shrtckg_seq_no = (
                                 and a.shrtckg_term_code = shrtckg.shrtckg_term_code
                                 and a.shrtckg_tckn_seq_no = shrtckg.shrtckg_tckn_seq_no
                          )
-order by sgrvetn_vetc_code, spriden_last_name, spriden_first_name, sfvstms_last_attend
+order by spriden_last_name, spriden_first_name, shrtckg_grde_code_final desc, sfvstms_ptrm_code, sgrvetn_vetc_code, sfvstms_last_attend
 ;

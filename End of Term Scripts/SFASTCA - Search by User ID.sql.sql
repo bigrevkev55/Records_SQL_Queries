@@ -1,0 +1,102 @@
+--   Created By: Lance Woodard
+--   Date: August 13, 2014
+--   Purpose: This scripts should be run after students are dropped for failed
+--            or unmet pre-requisites (SFRRGAM) to produce their campus email
+--            for notification to the student.
+--    Edited: 1.  Edited by Kevin Thomas, Assistant Registrar on 08-MAY-2019 (Changed acitivty dates, User name, and added a term prompt).
+--            2.  Added a sub query to search and see if the student is a Dual Enrollment Student (DE)...kt...11.20.21  
+--            3.  Added advisor and advisor email. Reformated to be compatable with code blocks. (DD 12/16/22)
+--            4.  Added advisor A Number as that is required for Slate import...kt...12.20.24
+--
+SELECT siden.SPRIDEN_ID AS "ID",
+    (CASE WHEN stdn.SGBSTDN_ADMT_CODE IN ('DE','DM') THEN 'Y'
+        ELSE 'N' END) AS "DE STUDENT?",
+    siden.SPRIDEN_LAST_NAME AS "LAST NAME",
+    siden.SPRIDEN_FIRST_NAME AS "FIRST NAME",
+    chrt.SFRSTCA_TERM_CODE AS "TERM",
+    chrt.SFRSTCA_USER AS "USER",
+    chrt.SFRSTCA_ACTIVITY_DATE AS "DATE",
+    semal.CAMPUS_EMAIL,
+    semal.PERSONAL_EMAIL,
+    advr.ADVISOR_ANUM,
+    (CASE WHEN advr.ADVISOR_PIDM IS NOT NULL THEN aiden.SPRIDEN_LAST_NAME||', '||aiden.SPRIDEN_FIRST_NAME END) AS SUCCESS_ADVISOR,
+    aemal.CAMPUS_EMAIL AS ADVISOR_EMAIL
+FROM (
+-- Student List
+    SELECT aa.*
+    FROM SFRSTCA aa
+    WHERE aa.SFRSTCA_TERM_CODE >= :TERM
+        AND aa.SFRSTCA_SEQ_NUMBER = (
+            SELECT MAX(bb.SFRSTCA_SEQ_NUMBER)
+            FROM SFRSTCA bb
+            WHERE aa.SFRSTCA_PIDM = bb.SFRSTCA_PIDM
+                AND aa.SFRSTCA_TERM_CODE = bb.SFRSTCA_TERM_CODE
+                AND bb.SFRSTCA_USER = 'THOMAS_K'
+                AND bb.SFRSTCA_ACTIVITY_DATE >= '13-MAY-2026'
+                AND bb.SFRSTCA_RSTS_CODE = 'DD'
+                AND bb.SFRSTCA_SOURCE_CDE = 'BASE'
+        )
+) chrt
+-- Student Identifiers
+LEFT JOIN SPRIDEN siden ON chrt.SFRSTCA_PIDM = siden.SPRIDEN_PIDM
+    AND siden.SPRIDEN_CHANGE_IND IS NULL
+-- Student Admit Type
+LEFT JOIN SGBSTDN stdn ON chrt.SFRSTCA_PIDM = stdn.SGBSTDN_PIDM
+    AND stdn.SGBSTDN_TERM_CODE_EFF = (
+        SELECT MAX(SGBSTDN_TERM_CODE_EFF)
+        FROM SGBSTDN
+        WHERE SGBSTDN_PIDM = chrt.SFRSTCA_PIDM
+            --AND SGBSTDN_TERM_CODE_EFF <= :TERM
+    )
+-- Student Email Addresses
+LEFT JOIN (
+    SELECT GOREMAL_PIDM,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%MY.NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%MY.NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS 
+            WHEN GOREMAL_EMAL_CODE = 'CAMP' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS CAMPUS_EMAIL,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'PERS' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) NOT LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'PERS' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) NOT LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS PERSONAL_EMAIL
+    FROM GOREMAL
+    WHERE GOREMAL_STATUS_IND = 'A'
+    GROUP BY GOREMAL_PIDM
+) semal ON chrt.SFRSTCA_PIDM = semal.GOREMAL_PIDM
+-- Student Advisor
+LEFT JOIN (
+    SELECT SGRADVR_PIDM,
+        SPRIDEN_ID as ADVISOR_ANUM,
+        MAX(SGRADVR_ADVR_PIDM) AS ADVISOR_PIDM
+    FROM SGRADVR cc
+        -- Advisor Identifiers
+        LEFT JOIN SPRIDEN ON SGRADVR_ADVR_PIDM = SPRIDEN_PIDM
+            AND SPRIDEN_CHANGE_IND IS NULL
+    WHERE SGRADVR_TERM_CODE_EFF = (
+        SELECT MAX(SGRADVR_TERM_CODE_EFF)
+        FROM SGRADVR dd
+        WHERE cc.SGRADVR_PIDM = dd.SGRADVR_PIDM
+            AND cc.SGRADVR_ADVR_CODE = dd.SGRADVR_ADVR_CODE
+            AND dd.SGRADVR_TERM_CODE_EFF <= :TERM
+            )
+        AND SGRADVR_ADVR_CODE = 'ADVS'
+    GROUP BY SGRADVR_PIDM, SPRIDEN_ID
+) advr ON chrt.SFRSTCA_PIDM = advr.SGRADVR_PIDM
+-- Advisor Identifiers
+LEFT JOIN SPRIDEN aiden ON advr.ADVISOR_PIDM = aiden.SPRIDEN_PIDM
+    AND aiden.SPRIDEN_CHANGE_IND IS NULL
+-- Advisor Email Addresses
+LEFT JOIN (
+    SELECT GOREMAL_PIDM,
+        MAX(CASE WHEN GOREMAL_EMAL_CODE = 'BUSN' AND GOREMAL_PREFERRED_IND = 'Y' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            WHEN GOREMAL_EMAL_CODE = 'BUSN' AND GOREMAL_PREFERRED_IND = 'N' AND UPPER(GOREMAL_EMAIL_ADDRESS) LIKE '%NSCC.EDU%' THEN GOREMAL_EMAIL_ADDRESS
+            END) AS CAMPUS_EMAIL
+    FROM GOREMAL
+    WHERE GOREMAL_STATUS_IND = 'A'
+    GROUP BY GOREMAL_PIDM
+) aemal ON advr.ADVISOR_PIDM = aemal.GOREMAL_PIDM
+-- Report Organization
+ORDER BY chrt.SFRSTCA_TERM_CODE,
+    siden.SPRIDEN_LAST_NAME,
+    siden.SPRIDEN_FIRST_NAME
+;

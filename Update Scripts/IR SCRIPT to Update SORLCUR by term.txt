@@ -1,0 +1,59 @@
+--Author:  Derrick Dupuis, IR Director
+--Date:     17-FEB-2025
+--Purpose: This script seeks to find and update students who have a program of study in SFAREGS that has an end but 
+--               but still has the "current box" checked in SFAREGS.  
+
+--Note:     I've submitted this to TSD to be run in PROD and the job added to Automic...kt..2.19.2025
+
+
+UPDATE SORLCUR
+SET SORLCUR_TERM_CODE_END = SORLCUR_TERM_CODE
+--SELECT iden.SPRIDEN_ID AS STUDENT_ID, aa.*
+FROM SORLCUR aa
+-- Student Identifiers
+LEFT JOIN SPRIDEN iden ON SORLCUR_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+WHERE aa.SORLCUR_PIDM||aa.SORLCUR_SEQNO IN (
+    SELECT chrt.SFRSTCR_PIDM||lcur.SORLCUR_SEQNO
+    FROM (
+    -- Valid Term Enrollment
+        SELECT DISTINCT SFRSTCR_PIDM,
+            SFRSTCR_TERM_CODE
+        FROM SFRSTCR
+            LEFT JOIN STVRSTS ON SFRSTCR_RSTS_CODE = STVRSTS_CODE
+        WHERE SFRSTCR_LEVL_CODE NOT IN ('VO', 'CE')
+            AND SFRSTCR_CREDIT_HR > 0
+            AND STVRSTS_INCL_SECT_ENRL = 'Y'
+            AND SFRSTCR_TERM_CODE = :Term
+                --AND SFRSTCR_PIDM IN ('6393','1616')
+    ) chrt
+    -- Curriculum Degree
+    LEFT JOIN SORLCUR lcur ON chrt.SFRSTCR_PIDM = lcur.SORLCUR_PIDM
+        AND lcur.SORLCUR_LMOD_CODE = 'LEARNER'
+        AND lcur.SORLCUR_TERM_CODE < NVL(lcur.SORLCUR_TERM_CODE_END,'999999')
+        AND chrt.SFRSTCR_TERM_CODE BETWEEN lcur.SORLCUR_TERM_CODE AND NVL(lcur.SORLCUR_TERM_CODE_END,'999999')-1
+    -- Curriculum Major and Concentration
+    LEFT JOIN (
+        SELECT SORLFOS_PIDM,
+            SORLFOS_LCUR_SEQNO,
+            MAX(CASE WHEN SORLFOS_LFST_CODE = 'MAJOR' THEN SORLFOS_MAJR_CODE END) AS SORLFOS_MAJOR,
+            MAX(CASE WHEN SORLFOS_LFST_CODE = 'CONCENTRATION' THEN SORLFOS_MAJR_CODE END) AS SORLFOS_CONC
+        FROM SORLFOS
+        GROUP BY SORLFOS_PIDM,
+            SORLFOS_LCUR_SEQNO
+    ) lfos ON lcur.SORLCUR_PIDM = lfos.SORLFOS_PIDM
+        AND lcur.SORLCUR_SEQNO = lfos.SORLFOS_LCUR_SEQNO
+    -- Student Major
+    LEFT JOIN (
+        SELECT (SELECT NVL(MIN(bb.SGBSTDN_TERM_CODE_EFF),'999999') FROM SGBSTDN bb WHERE aa.SGBSTDN_PIDM = bb.SGBSTDN_PIDM AND bb.SGBSTDN_TERM_CODE_EFF > aa.SGBSTDN_TERM_CODE_EFF) AS END_TERM,
+            aa.* 
+        FROM SGBSTDN aa
+    ) stdn ON chrt.SFRSTCR_PIDM = stdn.SGBSTDN_PIDM
+        AND chrt.SFRSTCR_TERM_CODE BETWEEN stdn.SGBSTDN_TERM_CODE_EFF AND stdn.END_TERM - 1
+        AND lcur.SORLCUR_DEGC_CODE IN (stdn.SGBSTDN_DEGC_CODE_1, stdn.SGBSTDN_DEGC_CODE_2)
+        AND lfos.SORLFOS_MAJOR IN (stdn.SGBSTDN_MAJR_CODE_1, stdn.SGBSTDN_MAJR_CODE_2)
+        AND NVL(lfos.SORLFOS_CONC,'XXXX') IN (NVL(stdn.SGBSTDN_MAJR_CODE_CONC_1,'XXXX'), NVL(stdn.SGBSTDN_MAJR_CODE_CONC_2,'XXXX'))
+    -- Report Organization
+    WHERE stdn.SGBSTDN_PIDM IS NULL
+)
+;

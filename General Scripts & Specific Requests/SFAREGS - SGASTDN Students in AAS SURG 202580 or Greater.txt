@@ -1,0 +1,31 @@
+
+--Author: Kevin Thomas, Director of Admissions and Records, College Registrar
+--Date:  10/8/2025
+--Purpose:  This query returns active students who are in the AAS_SURG program
+--          for a term prior to 202580.  To fix Degree Works issues, these
+--          students need to be updated to 202610 in SFAREGS;
+
+SELECT
+    pers.spriden_id AS "A Number",
+    pers.spriden_last_name AS "Last Name",
+    pers.spriden_first_name AS "First Name",
+    prgm.sgbstdn_term_code_eff AS "Term Updated",
+    prgm.sgbstdn_term_code_ctlg_1 AS "Catalog Year",
+    prgm.sgbstdn_program_1 AS "Program"
+FROM
+    -- Active Enrollment Status
+    (SELECT * 
+     FROM SGBSTDN 
+     WHERE sgbstdn_term_code_eff > '202500' 
+       AND sgbstdn_stst_code = 'AS'
+       AND sgbstdn_program_1 = 'AAS_SURG'
+       AND sgbstdn_term_code_ctlg_1 < '202580') prgm
+
+JOIN
+    -- Student Identifiers
+    (SELECT * 
+     FROM SPRIDEN 
+     WHERE spriden_change_ind IS NULL) pers
+ON prgm.sgbstdn_pidm = pers.spriden_pidm
+
+ORDER BY "Last Name", "First Name";

@@ -1,0 +1,69 @@
+--Author: Kevin Thomas
+--Date: 13-NOV-2025
+--This script returns students receiving VA benefits for a selected term,
+--including registered courses and campus information.
+--
+--Edit: MB - Added SSN and Veteran Description
+--Edit: Added course registration details and campus information
+--Recommended for VA SCO enrollment review
+
+SELECT DISTINCT
+       spriden_id                                  AS "ID",
+       spbpers_ssn                                 AS "SSN",
+       spriden_last_name                           AS "Last Name",
+       spriden_first_name                          AS "First Name",
+
+       sgrvetn_term_code_va                        AS "Term",
+       sgrvetn_vetc_code                           AS "Veteran Type",
+       stvvetc_desc                                AS "Veteran Description",
+
+       sfrstcr_crn                                 AS "CRN",
+       ssbsect_subj_code || ' ' ||
+       ssbsect_crse_numb                           AS "Course",
+
+       ssbsect_seq_numb                            AS "Section",
+       ssbsect_crse_title                          AS "Course Title",
+
+       sfrstcr_credit_hr                           AS "Registered Hours",
+
+       sfrstcr_rsts_code                           AS "Reg Status",
+
+       ssbsect_camp_code                           AS "Campus Code",
+       stvcamp_desc                                AS "Campus Description"
+
+FROM sgrvetn
+
+JOIN spriden
+  ON spriden_pidm = sgrvetn_pidm
+ AND spriden_change_ind IS NULL
+
+JOIN spbpers
+  ON spbpers_pidm = sgrvetn_pidm
+
+JOIN stvvetc
+  ON stvvetc_code = sgrvetn_vetc_code
+
+JOIN sfrstcr
+  ON sfrstcr_pidm = sgrvetn_pidm
+ AND sfrstcr_term_code = sgrvetn_term_code_va
+
+JOIN ssbsect
+  ON ssbsect_term_code = sfrstcr_term_code
+ AND ssbsect_crn = sfrstcr_crn
+
+LEFT JOIN stvcamp
+  ON stvcamp_code = ssbsect_camp_code
+
+WHERE sgrvetn_vetc_code IS NOT NULL
+  AND sgrvetn_term_code_va = :Term
+
+  -- Active registrations only
+  AND sfrstcr_rsts_code IN (
+      'RE',  -- Registered
+      'RW'   -- Web Registered
+  )
+
+ORDER BY
+      spriden_last_name,
+      spriden_first_name,
+      sfrstcr_crn;

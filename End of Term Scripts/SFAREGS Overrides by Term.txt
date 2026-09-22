@@ -1,0 +1,40 @@
+--Edits:  Edited this to look at all students for prompted term and only return those who have PREREQ_OVER of Y or I...kt...3.17.2022
+
+
+select spriden_id, 
+        spriden_last_name,
+        spriden_first_name,
+        sfrstcr_Term_code,
+        SFRSTCR_CRN,
+        SFRSTCR_PTRM_CODE,
+        SFRSTCR_RSTS_CODE,
+        SFRSTCR_RSTS_DATE,
+        SFRSTCR_ERROR_FLAG,
+        SFRSTCR_DUPL_OVER,
+        SFRSTCR_LINK_OVER,                         
+        SFRSTCR_CORQ_OVER,                        
+        SFRSTCR_PREQ_OVER,                       
+        SFRSTCR_TIME_OVER,                        
+        SFRSTCR_CAPC_OVER,                         
+        SFRSTCR_LEVL_OVER,                         
+        SFRSTCR_COLL_OVER,                         
+        SFRSTCR_MAJR_OVER,                        
+        SFRSTCR_CLAS_OVER,                       
+        SFRSTCR_APPR_OVER, 
+        --sftregs.override,
+        SFRSTCR_APPR_RECEIVED_IND,
+        SFRSTCR_CAMP_CODE,
+        SFRSTCR_USER
+           
+from sfrstcr 
+left join spriden on spriden_pidm = sfrstcr_pidm
+--right outer join sftregs on sfrstcr_term_code = sftregs_term_code and sfrstcr_pidm=sftregs_pidm  --select * from sftregs where sftregs_term_code = '202380'
+where spriden_change_ind is NULL
+and sfrstcr_term_code = :TERM_CODE 
+and sfrstcr_rsts_code like 'R%' 
+and (SFRSTCR_DUPL_OVER = 'Y'
+     or sfrstcr_link_over = 'Y'
+     --or sftregs.override is not null
+     )
+
+order by spriden_last_name, spriden_first_name;

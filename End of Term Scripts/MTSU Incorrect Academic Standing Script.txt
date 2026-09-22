@@ -2,10 +2,6 @@
 --   Date:  16-DEC-2020
 --Purpose:  Finds students whose Academic Standing was not calculated correctly
 --          due to ellucian Banner defect in 202080 Q3 release.
-
-
-
-
  
 
 --50> & Good Standing

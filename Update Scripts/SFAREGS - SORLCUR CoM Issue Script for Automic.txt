@@ -1,0 +1,16 @@
+
+--Author: Kevin Thomas, Registrar
+--Date:     04-SEP-2023
+--Purpose: This script will insert an end date on SFAREGS for the prompted student, term, and SORLCUR_SEQNO.  
+--         This helps with the issues of SFAREGS and SGASTDN not matching. IR sends a report of these students
+--         weekly.  However, students that still have an active curriculum from a pre-Banner term
+--         cannot be updated manually on SFAREGS. Requesting this be put into Automic so that a SQL Data
+--         Change form does not have to be completed every time this is needed.  
+
+UPDATE sorlcur
+SET sorlcur_term_code_end = :program_end_term
+WHERE sorlcur_pidm = (select distinct spriden_pidm from spriden where spriden_id = :A_Number)
+               AND SORLCUR.SORLCUR_CACT_CODE  = :SFAREGS_Curr_Numb;
+               
+               
+            

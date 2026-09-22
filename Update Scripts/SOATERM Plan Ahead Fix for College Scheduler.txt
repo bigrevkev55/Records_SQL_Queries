@@ -1,0 +1,32 @@
+
+
+--Author:  Kevin Thomas, Registrar
+--Date:    24-NOV-2025
+--Purpose: There is a known issue in Application Navigator (SOATERM) that does not 
+--         save changes to the Web Processing "Self Service Planning" fields.  
+--         
+--         This UPDATE  SQL Script updates the background table (SOBPTRM)
+--         via a SQL Data Change form in case 
+--         checking the box manually on SOATERM doesn't work
+
+
+
+-- UPDATE SQL for SQL Data Change Form to update the Background table via SQL
+UPDATE sobterm
+SET sobterm_max_plans = 1,
+    sobterm_plan_term_open_cde = 'Y',
+    sobterm_plan_reg_cde = 'Y'
+WHERE sobterm_term_code = '202610';
+
+
+-- Script to check setup
+Select sobterm_max_plans, sobterm_plan_term_open_cde, sobterm_plan_reg_cde
+from sobterm
+where sobterm_term_code = :Registration_Term;
+
+
+
+
+
+
+

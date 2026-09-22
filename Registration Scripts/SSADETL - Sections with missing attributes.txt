@@ -1,0 +1,27 @@
+/*
+Author:  Kevin Thomas, Registrar
+Date:    09-JUN-2025
+Purpose: This query seeks to find PHIL 1040 CRNs that do not have either the 
+         G-HF or G-TP attribute since 202510 or greater. 
+*/
+
+--desc ssrattr;
+--desc ssbsect;
+
+SELECT 
+    ssrattr_crn, 
+    ssrattr_term_code,
+    LISTAGG(ssrattr_attr_code, ', ') 
+        WITHIN GROUP (ORDER BY ssrattr_attr_code) AS attr_codes
+FROM ssrattr
+WHERE ssrattr_crn IN (
+    SELECT ssbsect_crn 
+    FROM ssbsect
+    WHERE ssbsect_subj_code = 'PHIL' 
+      AND ssbsect_crse_numb = '1040'
+      AND ssbsect_term_code > '202480'
+)
+AND ssrattr_term_code > '202480'
+GROUP BY ssrattr_crn, ssrattr_term_code
+HAVING MAX(CASE WHEN ssrattr_attr_code IN ('G-HF', 'G-TP') THEN 1 ELSE 0 END) = 0
+ORDER BY ssrattr_term_code;

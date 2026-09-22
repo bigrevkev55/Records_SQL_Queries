@@ -1,0 +1,14 @@
+--Author:  Kevin Thomas, Director of Records and Admissions
+--Date:    22-SEP-2025
+--Purpose: Requested by Laura Moran, Executive Director of Enrollment management, for 
+--         25Live implementation, this query returns subject codes and descriptions for courses
+--         that are in SSASECT as of January 2024
+           
+
+
+
+select distinct ssbsect_subj_code as "Subject Code",
+                stvsubj_desc as "Description"
+from ssbsect 
+join stvsubj on stvsubj_code = ssbsect_subj_code
+where ssbsect_term_code > 202400;

@@ -13,7 +13,7 @@ Original file is located at
 ##      Author:  Kevin Thomas, Interim Registrar
 ##        Date:  31-MAR-2021
 #      Purpose:  This merges two SQL output files and creates the Stage Clips Participants File for virtual graduation.
-# Instructions:  1.  Run SQL script labeled "Intensts for Jostens.sql" save as CSV file with encoding=utf-8
+# Instructions:  1.  Run SQL script labeled "Josten's grad and potential grads list.sql" save as CSV file with encoding=utf-8
 #                2.  Save cap and gown orders file from Jostens as CSV with encoding=utf-8.  Use the copy from the 
 #                    bookstore General Manager, Jameson Bear.
 #         Note:  The script will create an entry for every student on the cap and gown order list from Jostens and every student
@@ -36,8 +36,8 @@ Original file is located at
 
 #Upload file from local machine to Google Colab for editing
 
-from google.colab import files
-uploaded = files.upload()
+#from google.colab import files
+#uploaded = files.upload()
 
 """# ***Convert Files to a Pandas Dataframe and pull them into the program***"""
 
@@ -65,7 +65,7 @@ jostens['First Name']=jostens['First Name'].str.upper()'''
 
 jostens = jostens.iloc[:,[1,2,3,4]]
 
-#print(jostens.head(10))
+print(jostens.head(10))
 
 #Rearrange columns on Jostens file to the order Stage Clip needs for their participants list
 cols = list(jostens.columns.values)

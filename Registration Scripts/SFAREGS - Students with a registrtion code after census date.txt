@@ -1,0 +1,35 @@
+
+--Author:  Kevin Thomas, Registrar
+--Date:    09-SEP-2024
+--Purpose: This query seeks to return students who have a registration date
+--         after the census date for prompted part of term and term. 
+--         We should ensure that all of these students have an R9 registration 
+--         code.  
+
+--desc sfrstcr;
+--desc sobptrm;
+
+
+SELECT spriden_id as "A_Number",
+       spriden.spriden_last_name as "lname",
+       spriden.spriden_first_name as "fname",
+       SFRSTCR_TERM_CODE term,
+       SFRSTCR_CRN crn, 
+       SFRSTCR_PTRM_CODE "Part of Term",
+       SFRSTCR_RSTS_CODE "Registration Code",
+       SFRSTCR_RSTS_DATE "Registration Date",
+       SFRSTCR_ACTIVITY_DATE "Activity Date",
+       SFRSTCR_USER "User"
+
+from SFRSTCR
+inner join spriden on spriden_pidm=sfrstcr_pidm
+where
+spriden.spriden_change_ind is NULL
+and SFRSTCR_TERM_CODE = :Term
+and sfrstcr_rsts_code like 'R%'
+and SFRSTCR_PTRM_CODE = :Part_of_Term_Code
+and  SFRSTCR_RSTS_DATE > (select SOBPTRM_CENSUS_DATE 
+                            from SOBPTRM 
+                            where sobptrm_term_code = :Term
+                            and SOBPTRM_PTRM_CODE = :Part_of_Term_Code
+                            );

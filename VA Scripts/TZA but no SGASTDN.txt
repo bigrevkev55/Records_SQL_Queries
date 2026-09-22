@@ -1,60 +1,59 @@
---   Name:  Kevin Thomas, Assistant Registrar
---   Date:  17-MAY-2020
---Purpose:  This query returns any student's who have been flagged to prevent being purged but have not been coded in SGASTDN
---Prompts:  1.  When prompted for "Term" enter the term code of the term in question
---  Edits:  1.  Edit SFRSTCR_TERM_CODE to the term before the term in question
---          2.  Edit TZRSTSF_ACTIVITY_DATE > = to the first day of registration for the term in question.  
+--   Name: Kevin Thomas, Assistant Registrar
+--   Date: 17-MAY-2020
+--   Purpose:
+--   This query identifies students with a Veterans Deferment
+--   (TZRSTSF_STATUS_CODE = 'V') in the selected term who are
+--   enrolled in credit-bearing coursework but do not have a
+--   Veterans Benefit Type (SGRVETN_VETC_CODE) assigned for the
+--   same term.
+--
+--   Prompts:
+--   1. When prompted for "Term", enter the term code to be audited.
+--
+--   Edits:
+--   1. Original query revised September 2026 to identify students
+--      with a TZRSTSF Veterans Deferment who are missing a VA
+--      Benefit Type in SGRVETN for the audited term.
+--   2. Query now returns the TZRSTSF term rather than SGRVETN term
+--      information because students being identified may not have
+--      an SGRVETN record for the selected term.
+--   3. Testing determined that using the maximum TZRSTSF_ACTIVITY_DATE
+--      excluded valid students with active Veterans Deferments.
+--      Therefore, the query identifies students with a V status in
+--      TZRSTSF for the selected term without requiring the most
+--      recent TZRSTSF record.
+--   4. Warning: A student returned by this query has a TZRSTSF
+--      Veterans Deferment in the prompted term; however, the V
+--      status may not appear as the first or most recent record
+--      displayed in TZASTSF/TZRSTSF history. Review the complete
+--      TZRSTSF record history before making updates.
 
 
 --desc TZRSTSF;
 --desc spriden;
 --desc sgrvetn;
 
-/*
-select spriden_id as "ID",
-       TZRSTSF_TERM as "Term",
-       spriden_last_name as "Last Name",
-       spriden_first_name as "First Name",
-       TZRSTSF_STATUS_CODE as "Deferment"
-from spriden, tzrstsf
-where spriden_pidm =  tzrstsf_pidm
-      and SPRIDEN_CHANGE_IND IS NULL
-      and TZRSTSF_TERM = :Term
-      and TZRSTSF_ACTIVITY_DATE = (select max (TZRSTSF_ACTIVITY_DATE) from TZRSTSF where spriden_pidm =  tzrstsf_pidm)
-      and TZRSTSF_STATUS_CODE = 'V'
-Order by spriden_last_name, spriden_first_name;
-*/
-
-
---/*
-select spriden_id as "ID",
-       max(SGRVETN_TERM_CODE_VA)  as "Term",
-       SGRVETN_VETC_CODE as "Vet Type",
-       STVVETC_DESC as "Vet Description",
+select distinct
+       spriden_id as "ID",
+       tzrstsf_term as "TZA Term",
        spriden_last_name as "Last Name",
        spriden_first_name as "First Name"
-from spriden, sgrvetn, stvvetc
-where spriden_pidm = sgrvetn_pidm
-      and sgrvetn_vetc_code = STVVETC_CODE
-      and SPRIDEN_CHANGE_IND IS NULL
-      --and SGRVETN_term_code_va < '202050'
-     -- and SGRVETN_TERM_CODE_VA = :Term
-      and spriden_pidm in 
-                              (select spriden_pidm 
-                               from spriden, tzrstsf
-                               where spriden_pidm =  tzrstsf_pidm
-                               and SPRIDEN_CHANGE_IND IS NULL
-                               and TZRSTSF_TERM = :Term
-                               and TZRSTSF_ACTIVITY_DATE > = '06-APR-2020' --First day of registration
-                               and TZRSTSF_STATUS_CODE = 'V')     
-     and spriden_pidm in (select distinct sfrstcr_pidm     --desc sfrstcr
-                           from sfrstcr
-                           where SFRSTCR_TERM_CODE = :Term
-                           and sfrstcr_credit_hr > '0')
-    and spriden_pidm not in (select distinct SGRVETN_pidm
-                             from sgrvetn
-                             where sgrvetn_term_code_va = :Term
-                             and SGRVETN_vetc_code is not null)
-group by spriden_id, SGRVETN_VETC_CODE, STVVETC_DESC, spriden_last_name, spriden_first_name
-Having max(sgrvetn_term_code_va) < '202050'
-Order by spriden_last_name, spriden_first_name, max (sgrvetn_term_code_va), SGRVETN_VETC_CODE;
+from spriden,
+     tzrstsf
+where spriden_pidm = tzrstsf_pidm
+      and spriden_change_ind is null
+      and tzrstsf_term = :Term
+      and tzrstsf_status_code = 'V'
+      and spriden_pidm in
+            (select distinct sfrstcr_pidm
+               from sfrstcr
+              where sfrstcr_term_code = :Term
+                and sfrstcr_credit_hr > 0)
+      and not exists
+            (select 1
+               from sgrvetn
+              where sgrvetn_pidm = spriden_pidm
+                and sgrvetn_term_code_va = :Term
+                and sgrvetn_vetc_code is not null)
+order by spriden_last_name,
+         spriden_first_name;

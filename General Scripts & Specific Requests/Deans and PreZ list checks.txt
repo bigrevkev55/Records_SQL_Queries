@@ -1,0 +1,27 @@
+/*
+Author:  Kevin Thomas
+Date:    26-MAY-2022
+Purpose: Various scripst while on a Teams video chat with TSD Analyst, Carol Gentry, to check 
+
+desc shrttrm;
+
+
+select * from SHRTTRM 
+
+where SHRTTRM_TERM_CODE = '202210'
+      and SHRTTRM_ASTD_CODE_DL = 'PL'
+
+--join GPA < 3.5
+--desc shrtgpa
+
+      and shrttrm_pidm not in 
+      (select distinct shrtgpa_pidm FROM shrtgpa 
+       where shrtgpa_gpa_type_ind = 'I'
+            and  SHRTGPA_GPA = '4'
+            and shrtgpa_term_code='202210' 
+            and SHRTGPA_GPA_HOURS >= '6')
+
+;
+
+
+select spriden_id from spriden where spriden_pidm = '7857';

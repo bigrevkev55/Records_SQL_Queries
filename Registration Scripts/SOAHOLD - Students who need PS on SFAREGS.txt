@@ -1,0 +1,23 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    01-DEC-2024
+--Purpose: This query seeks to find students who have an expired Academic Suspension and who are 
+--         eligible for Post-Suspension Probation Status on SGASTDN/SFAREGS
+
+
+select spriden_id,
+       spriden_last_name,
+       spriden_first_name,
+       sprhold_hldd_code,
+       sprhold_reason,
+       sprhold_to_date,
+       sprhold_orig_code,
+       sprhold_user
+from spriden,sprhold
+where spriden_change_ind IS NULL
+and   spriden_pidm = sprhold_pidm
+--and   sprhold_orig_code IS NULL
+and   sprhold_hldd_code IN ('S1','S2','S3','S4','SP')
+and   sprhold_reason LIKE '%2025%'
+--Use the statement below if I want to pull by Hold Release Date
+and   sprhold_to_date < SYSDATE
+order by sprhold_hldd_code, spriden_last_name,spriden_first_name;

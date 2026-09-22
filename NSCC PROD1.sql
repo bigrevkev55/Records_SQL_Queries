@@ -1,0 +1,40 @@
+select spriden_pidm from spriden where spriden_id = 'A00678536';
+
+
+--select * from shrtgpa where shrtgpa_pidm =
+--(Select distinct spriden_pidm from spriden where spriden_id = 'A00554871');
+
+
+
+
+--Author: Kevin Thomas
+--Date: 28-OCT-2019
+--This script will return a list of all students receiving VA benefits by prompted term.
+--Edit:  edit by kt to include SSN and all terms attended for VA Compliance Survey 2/27/2024...kt
+
+--desc spbpers
+
+select distinct spriden_id as "ID",
+       spbpers_ssn as "SSN",
+       spriden_last_name as "Last Name",
+       spriden_first_name as "First Name",
+       --TZRSTSF_STATUS_CODE as "Status",
+       SGRVETN.SGRVETN_TERM_CODE_VA as "Term",
+     --  GOREMAL_EMAIL_ADDRESS as "Email",
+    --   sgrvetn_vetc_code as "VET TYPE"
+      sgrvetn_vetc_code as "Veteran Type"
+from spriden, sgrvetn, spbpers--,GOREMAL, TZRSTSF
+Where --spriden_pidm = TZRSTSF_PIDM
+--and TZRSTSF_STATUS_CODE in ('V', 'E')
+--and 
+--spriden_pidm = GOREMAL_PIDM
+--and goremal_emal_code IN ('CAMP','PERS')
+--and  (goremal_status_ind IS NULL OR goremal_status_ind <> 'I')
+--and
+spriden_change_ind is NULL
+and spriden_pidm = sgrvetn_pidm
+and spriden_pidm = spbpers_pidm
+and sgrvetn_vetc_code is NOT NULL
+and SGRVETN.SGRVETN_TERM_CODE_VA = :Term
+--and sgrvetn_term_code_va > '2021'
+Order by spriden_last_name,spriden_first_name, sgrvetn_term_code_va;

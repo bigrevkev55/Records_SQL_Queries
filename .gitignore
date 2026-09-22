@@ -1,0 +1,6 @@
+# Excel files
+*.xlsx
+*.xls
+
+# Temporary Excel files
+~$*.xlsx

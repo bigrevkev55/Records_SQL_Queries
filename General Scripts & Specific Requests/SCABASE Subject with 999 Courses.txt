@@ -1,0 +1,15 @@
+--Author:  Kevin Thomas, Director of Admissions and Records
+--Date:    NOV-05-2025
+--Purpose: This query returns SUBJ Codes that have courses that end in 999
+
+
+select SCBCRKY_SUBJ_CODE as "SUBJ CODE",
+SCBCRKY_CRSE_NUMB,
+SCBCRKY_TERM_CODE_START,
+SCBCRKY_TERM_CODE_END
+from scbcrky
+Where scbcrky_crse_numb like '%999'
+order by 
+SCBCRKY_SUBJ_CODE, SCBCRKY_CRSE_NUMB;
+
+desc scbcrky;

@@ -1,0 +1,24 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    29-SEP-2022
+--Purpose: This script returns holds that have been placed on student accounts that may need
+--         to be changed on SOAHOLD prior to 202310 registration.  
+
+
+
+select spriden_id A_Number,
+       spriden_last_name last,
+       spriden_first_name first,
+       listagg(sprhold_hldd_code, ',')
+               within group(order by sprhold_hldd_code) hold_codes,
+       sprhold_from_date as "From",
+       sprhold_to_date as "To",
+       listagg(sprhold_reason, ',') within group (order by sprhold_reason, ',') Reason
+from sprhold
+inner join spriden on sprhold_pidm = spriden_pidm 
+where spriden_change_ind is null
+      and sprhold_hldd_code in ('CL', 'HS')
+      and sprhold_from_date > = '01-sep-2022' 
+      and sprhold_from_date < = '30-NOV-2022'
+      and sprhold_to_date > sprhold_from_date
+group by spriden_id,sprhold_from_date, sprhold_to_date, spriden_last_name, spriden_first_name
+order by spriden_last_name, spriden_first_name;

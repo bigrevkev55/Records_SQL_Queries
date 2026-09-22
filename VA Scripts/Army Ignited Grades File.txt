@@ -1,0 +1,54 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    27-JUL-2022
+--Purpose: This script returns needed grade data for Army Ignited Grade File
+
+
+----***************NOTE:  THIS PROGRAM STILL NEEDS SOME WORK.  HOWEVER, IT CAN BE USED AS IS WITH 
+--WITH EXCEL'S REMOVE DUPLICATES FUNCTION.  *****************
+
+--TO DO:  
+--  1.  Figure out why records are being duplicated
+--  2.  Make fields that can be dynamic, dynamic (example "Grade Reason", can be made dynamic).
+
+
+--desc sfrstcr;
+--desc ssbsect;
+--desc scbcrse;
+--desc ssrfees;
+--desc sgrvetn;
+--desc shrtckg;
+--desc shrtckn;
+
+--select * from sfrstcr where sfrstcr_pidm = '230247' and sfrstcr_term_code = '202280';
+
+select 
+       SSBSECT_SUBJ_CODE   as "Course Subject",
+       SSBSECT_CRSE_NUMB   as "Course Catalog Number",
+       CAST(:Term_Start_Date as varchar2(10CHAR))   as "Class Start DATE",
+       spriden_last_name   as "Soldier Last Name",
+       SPBPERS_SSN         as "SSN",
+       'Enter Grade'                   as "Grade",
+       'If Grade = P field is required.' as "Pass to Grade Translatioin", --If Grade = P field is required.  Valid options = A,B,C,D,F
+       'Required if Grade = I,W'         as "Grade Reason", --Required if Grade = I,W
+       CAST('00814500' as VARCHAR2(8CHAR))          as "OPEID",
+       CAST('only required if student has withdrawn' as VARCHAR2(10CHAR))                  as "Date of Withdrawal",
+       SFRSTCR_CRN         as "Class Reference Number",
+       'required'                  as "GPA Calculation Value"
+                         
+from spriden, spbpers, sfrstcr, sgrvetn, ssbsect--, shrtckg
+--inner join ssrfees on sfrstcr_term_code = ssrfees_term_code and ssrfees_crn = sfrstcr_crn
+--inner join shrtckn on shrtckn_pidm = shrtckg_pidm and shrtckn_term_code = shrtckg_term_code and SHRTCKN_SEQ_NO = SHRTCKG_TCKN_SEQ_NO 
+--inner join shrgrde on SHRTCKG_GRDE_CODE_FINAL = shrgrde_grde_status_ind
+where spriden_change_ind is NULL
+      and spriden_pidm = spbpers_pidm
+      and spriden_pidm = sfrstcr_pidm
+      and spriden_pidm = sgrvetn_pidm
+      --and spriden_pidm = shrtckg_pidm 
+      --and shrtckn_term_code = :Term
+      and sfrstcr_term_code = :Term
+      and sgrvetn_term_code_va= :Term
+      and SGRVETN_VETC_CODE = 'H'
+      and ssbsect_crn = sfrstcr_crn
+      and ssbsect_term_code = :Term
+      --and shrgrde_levl_code = 'UG'
+order by "Soldier Last Name";

@@ -1,0 +1,48 @@
+--Author: NSCC IR Team (Derrick Dupuis, Director)
+--Date:   03-OCT-2024
+--Purpose:The script seeks to return all active NSCC Programs in SOACURR
+
+
+
+SELECT curr.SOBCURR_PROGRAM AS PROGRAM_NAME,
+    majr.STVMAJR_DESC AS MAJOR_DESC,
+    conc.STVMAJR_DESC AS CONC_DESC,
+    curr.SOBCURR_DEGC_CODE AS DEGREE_CODE
+FROM (
+-- Base Curriculum Rules
+    SELECT *
+    FROM SOBCURR
+) curr
+-- Major Curriculum Rules
+LEFT JOIN (
+    SELECT SORCMJR.*,
+        (CASE WHEN SORCMJR_ADM_IND = 'N' OR SORCMJR_STU_IND = 'N' OR SORCMJR_HIS_IND = 'N'
+            OR SORCMJR_REC_IND = 'N' OR SORCMJR_DAU_IND = 'N' THEN 'N' ELSE 'Y' END) AS CMJR_OVER_IND
+    FROM SORCMJR
+) cmjr ON curr.SOBCURR_CURR_RULE = cmjr.SORCMJR_CURR_RULE
+    AND cmjr.SORCMJR_TERM_CODE_EFF = (
+        SELECT MAX(bb.SORCMJR_TERM_CODE_EFF)
+        FROM SORCMJR bb
+        WHERE curr.SOBCURR_CURR_RULE = bb.SORCMJR_CURR_RULE
+    )
+-- Major Description
+LEFT JOIN STVMAJR majr ON cmjr.SORCMJR_MAJR_CODE = majr.STVMAJR_CODE
+-- Concentration Curriculum Rules
+LEFT JOIN (
+    SELECT SORCCON.*,
+        (CASE WHEN SORCCON_ADM_IND = 'N' OR SORCCON_STU_IND = 'N' OR SORCCON_HIS_IND = 'N'
+            OR SORCCON_REC_IND = 'N' OR SORCCON_DAU_IND = 'N' THEN 'N' ELSE 'Y' END) AS CCON_OVER_IND
+    FROM SORCCON
+) ccon ON curr.SOBCURR_CURR_RULE = ccon.SORCCON_CURR_RULE
+    AND ccon.SORCCON_TERM_CODE_EFF = (
+        SELECT MAX(cc.SORCCON_TERM_CODE_EFF)
+        FROM SORCCON cc
+        WHERE curr.SOBCURR_CURR_RULE = cc.SORCCON_CURR_RULE
+    )
+-- Concentration Descriptions
+LEFT JOIN STVMAJR conc ON ccon.SORCCON_MAJR_CODE_CONC = conc.STVMAJR_CODE
+-- Report Organization
+WHERE curr.SOBCURR_PROGRAM IS NOT NULL
+    AND cmjr.CMJR_OVER_IND IN ('Y')
+    AND (ccon.CCON_OVER_IND IN ('Y') OR ccon.CCON_OVER_IND IS NULL)
+;

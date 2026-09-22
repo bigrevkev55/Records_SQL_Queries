@@ -1,0 +1,66 @@
+
+
+--Author:   Javon Yokley, Records Clerk
+--Date:     28-SEP-2021
+--Purpose:  Requested by Dr. Sarah Roberts (AVP Academic Affairs) & Kevin Thomas (Director of Admissions & Records). 
+--          Returns all sections that are active for specified term and lists if the course has DCM or not and its fees.  
+--Edit:     Edited to not include DCM information, add title, and max enrollment information...kt...2.26.2022
+--          Added a blank column title "Most Recent Adoption"...kt...9.19.2022
+
+/*
+
+These lines are causing issues because some CRNs have multiple SSRFEES_AMOUNT:  
+
+
+CASE WHEN EXISTS (SELECT ssrfees_term_code, ssrfees_crn, ssrfees_amount
+                         FROM ssrfees
+                         WHERE ssrfees_term_code = :Term 
+                         AND ssrfees_crn = ssbsect_crn) 
+            THEN (SELECT ssrfees_amount FROM ssrfees WHERE ssrfees_term_code = :Term 
+                                                     AND ssrfees_crn = ssbsect_crn) 
+            ELSE NULL 
+
+*/
+
+--desc scbcrse;  select * from scbcrse;
+
+
+
+SELECT ssbsect_term_code AS "Term",
+       ssbsect_crn AS "CRN",
+       ssbsect_subj_code AS "Subject",
+       ssbsect_crse_numb AS "Number",
+       ssbsect_seq_numb AS "Section",
+       NVL(SSBSECT_CRSE_TITLE,scbcrse_title) as "Course Title", 
+       ' ' as "Most Recent Adoption",
+/*
+      CASE WHEN EXISTS (SELECT ssrfees_term_code, ssrfees_crn, ssrfees_detl_code
+                         FROM ssrfees
+                         WHERE ssrfees_term_code = :Term 
+                         AND ssrfees_crn = ssbsect_crn) 
+            THEN 'Y' ELSE 'N'  
+       END AS "DCM?",
+       CASE WHEN EXISTS (SELECT ssrfees_term_code, ssrfees_crn, ssrfees_amount
+                         FROM ssrfees
+                         WHERE ssrfees_term_code = :Term 
+                         AND ssrfees_crn = ssbsect_crn) 
+            THEN (SELECT ssrfees_amount FROM ssrfees WHERE ssrfees_term_code = :Term 
+                                                     AND ssrfees_crn = ssbsect_crn) 
+            ELSE NULL  
+       END AS "Amount"--,
+      NVL(SSBSECT_CRSE_TITLE,scbcrse_title) as "Course Title", */
+      SSBSECT_MAX_ENRL as "Max Enrollment"
+      
+      --SCBCRSE_EFF_TERM 
+       
+FROM ssbsect,scbcrse  
+
+               
+WHERE ssbsect_term_code = :Term
+  and ssbsect_subj_code || ssbsect_crse_numb = scbcrse_subj_code || scbcrse_crse_numb
+  and SCBCRSE_EFF_TERM  = (SELECT MAX(d.SCBCRSE_EFF_TERM)
+                           FROM SCBCRSE d
+                             where scbcrse.scbcrse_subj_code = d.scbcrse_subj_code
+                             and   scbcrse.scbcrse_crse_numb = d.scbcrse_crse_numb)
+order by ssbsect_subj_code, ssbsect_crse_numb, ssbsect_seq_numb;
+

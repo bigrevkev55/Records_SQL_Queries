@@ -1,0 +1,31 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    28-OCT-2022
+--Purpose: This script was created for the Acclerated Terms/7Weeks committee
+--         to see how many students may be impacted by only having 6 weeks in the 
+--         first 7 weeks when we move most classes to 7 weeks part of terms.  
+
+
+
+
+
+--select * from ssbsect where ssbsect_term_code = '202280';
+
+--desc ssrmeet;
+--desc ssbsect;
+SELECT
+    ssbsect_crn       crn,
+    ssbsect_subj_code subj,
+    ssbsect_crse_numb course,
+    ssbsect_enrl      enrollment,
+    ssbsect_insm_code instructional_method,
+    ssrmeet_days_code "Days"
+FROM
+    ssrmeet,
+    ssbsect
+WHERE
+        ssrmeet_term_code = '202280'
+    AND ssbsect_term_code = '202280'
+    AND ssrmeet_crn = ssbsect_crn
+    AND ssrmeet_sat_day IS NOT NULL
+    AND ssrmeet_sat_day IS NOT NULL
+    AND ssbsect_subj_code != 'NSCC';

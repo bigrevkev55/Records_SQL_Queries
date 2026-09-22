@@ -3,7 +3,8 @@
 --Purpose: This script returns CRNs that need the X_% removed as the X_% prereq
 --         requires students to complete LS before taking the web college level class.  
 --         However, STEM dean, Dr. Jennifer Knapp removed that requirement in Spring 2019
---         so the X_% prereqs need to be removed.  
+--         so the X_% prereqs need to be removed. 
+--Edit:    Edited code to not check TN eCampus courses as TN eCampus courses still require the X_% prereq.  
 
 --/*
 --desc ssbsect;
@@ -48,6 +49,7 @@ WHERE
 --    or  (ssbsect_subj_code = 'THEA' and ssbsect_crse_numb = '1030'))
 
    and  SSRRARE_AREA Like 'X_%'  
+   and  ssbsect_insm_code not like 'R%'
 Order by ssbsect.ssbsect_subj_code, ssbsect.ssbsect_crse_numb;
 
 --*/

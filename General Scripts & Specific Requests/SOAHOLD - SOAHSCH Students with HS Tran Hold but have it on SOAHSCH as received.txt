@@ -1,0 +1,32 @@
+--Author:  Derrick Dupuis, IR Director
+--Date:    24-APR-2024
+--Purpose: This SQL returns students who have a hold on SOAHOLD for outstanding HS Transccripts but they have a HS transcript received date on 
+--         SOAHSCH. 
+
+
+
+SELECT iden.SPRIDEN_ID AS STUDENT_ID,
+    iden.SPRIDEN_FIRST_NAME AS STUDENT_FIRST_NAME,
+    iden.SPRIDEN_LAST_NAME AS STUDENT_LAST_NAME,
+    chrt.SORHSCH_ADMR_CODE AS TRANS_RECIEVED,
+    chrt.SORHSCH_TRANS_RECV_DATE AS TRANS_DATE,
+    chrt.SORHSCH_ACTIVITY_DATE AS SOAHSCH_ACT_DATE,
+    hold.SPRHOLD_HLDD_CODE TRANS_HOLD,
+    TO_CHAR(hold.SPRHOLD_TO_DATE,'MM-DD-YYYY') AS SOAHOLD_END_DATE
+FROM (
+-- Admissions Checklist HS Transcript
+    SELECT *
+    FROM SORHSCH
+    WHERE SORHSCH_ADMR_CODE IN ('HST1')
+) chrt
+-- Registration Holds
+LEFT JOIN SPRHOLD hold ON chrt.SORHSCH_PIDM = hold.SPRHOLD_PIDM
+    AND hold.SPRHOLD_HLDD_CODE IN ('HS')
+-- Student Identifiers
+LEFT JOIN SPRIDEN iden ON chrt.SORHSCH_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+-- Report Organization
+WHERE hold.SPRHOLD_PIDM IS NOT NULL
+    AND hold.SPRHOLD_TO_DATE > SYSDATE
+    AND chrt.SORHSCH_TRANS_RECV_DATE IS NOT NULL
+;

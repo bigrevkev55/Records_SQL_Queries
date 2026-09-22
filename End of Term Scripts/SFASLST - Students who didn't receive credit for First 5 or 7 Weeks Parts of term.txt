@@ -1,15 +1,132 @@
+/*
 -- Author:  Kevin Thomas, Assistant Registrar
 --   Date:  19-MAR-2020
 --Purpose: This query students who have failed a first 5 or 7 week course. Use this to make sure they are not enrolled in the 2nd 5/7 week concurrent course.   
 --         Only need to check courses that have a 2nd 5/7 week concurrent course.  
+--Revision: Rewritten by IR Director Derrick Dupuis....3.7.2023
+--          Added a WHERE clause that will filter out students who are not enrolled in a second 7 session so that the divisions don't have to filter those out on their own...kt..12-MAR-2025
+--          Added "AND sect.SSBSECT_SUBJ_CODE <> 'NSCC'" to the main "WHERE" clause so that NSCC 1010 isn't 
 
 
+SEND THIS EMAIL to the deans, AVP of Academic Affairs, and FA Director (CC Director of Advising, Admissions and Records Team, Welcome Center Director) with the output:
+
+**VERY IMPORTANT - REMOVE GRADES BEFORE SENDING OUTPUT**
+
+Subject: Output: Students at Risk in First 5/7 Week Courses
+
+Dear Academic Affairs Team,
+Attached is the output of a report to identify students who did successfully fullfill a first 5- or 7-week course 
+and are concurrently enrolled in a second 5/7-week course. This data is intended to support early 
+intervention efforts and help ensure students are not continuing in sequential courses that may be impacted by their earlier performance.
+
+Banner does not support running automating this process between parts of term, so the departments will need to check their students, make any
+necessary drops (using the DD code), and contact the students.  
+
+
+Key Notes:
+
+The report finds students with non-passing grades in early part-term courses (RA1, 2, 6).
+It includes only those who are also enrolled in a second part-term course (RA2, 3, 7).  This course may or may not be a subsequent course. 
+Advisor information is included to assist with outreach.
+The output is sorted by subject code for your convenience.  
+
+Please let me know if you have any questions or needs.
+
+FERPA Compliance Statement:  appearing in the report doesn't mean the student failed; grades are not 
+assumed. They may have received a W or had a different reason for being able to preregister.  
+
+*/
+
+SELECT chrt.SHRTCKN_TERM_CODE AS TERM_CODE,
+    iden.SPRIDEN_ID AS STUDENT_ID,
+    iden.SPRIDEN_FIRST_NAME AS STUDENT_FIRST_NAME,
+    iden.SPRIDEN_LAST_NAME AS STUDENT_LAST_NAME,
+    chrt.SHRTCKN_CRN AS CRN,
+    sect.SSBSECT_SUBJ_CODE AS COURSE_SUBJECT,
+    sect.SSBSECT_CRSE_NUMB AS COURSE_NUMBER,
+    sect.SSBSECT_SEQ_NUMB AS COURSE_SECTION,
+    sect.SSBSECT_PTRM_CODE AS PTERM_CODE,
+   -- chrt.SHRTCKG_GRDE_CODE_FINAL AS GRADE, --Excluding this in the output to avoid FERPA violations...kt...1016/2025
+    stcr.SFRSTCR_LAST_ATTEND AS LAST_ATTEND,
+    chrt.SHRTCKG_CREDIT_HOURS AS CREDIT_HOURS,
+    (CASE WHEN secd.SFRSTCR_PIDM IS NOT NULL THEN 'Y' ELSE 'N' END) AS SECOND_PART_FLAG,
+    (CASE WHEN advr.CENTER_ADVISOR IS NOT NULL THEN advr.CENTER_ADVISOR ELSE advr.MAJR_ADVISOR END) AS STUDENT_ADVISOR
+FROM (
+-- Student Grades
+    SELECT *
+    FROM SHRTCKN
+        LEFT JOIN SHRTCKG ON SHRTCKN_PIDM = SHRTCKG_PIDM
+            AND SHRTCKN_TERM_CODE = SHRTCKG_TERM_CODE
+            AND SHRTCKN_SEQ_NO = SHRTCKG_TCKN_SEQ_NO
+            AND SHRTCKG_SEQ_NO = (
+                SELECT MAX(SHRTCKG_SEQ_NO)
+                FROM SHRTCKG
+                WHERE SHRTCKN_PIDM = SHRTCKG_PIDM
+                    AND SHRTCKN_TERM_CODE = SHRTCKG_TERM_CODE
+                    AND SHRTCKN_SEQ_NO = SHRTCKG_TCKN_SEQ_NO
+            )
+    WHERE SHRTCKG_GRDE_CODE_FINAL NOT IN ('A','B','C','P','AU')
+        AND SHRTCKN_TERM_CODE = :TERM
+        AND SHRTCKN_PTRM_CODE IN ('RA1', '2', '6')
+) chrt
+-- Student Identifiers
+LEFT JOIN SPRIDEN iden ON chrt.SHRTCKN_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+-- Section Information
+LEFT JOIN SSBSECT sect ON chrt.SHRTCKN_TERM_CODE = sect.SSBSECT_TERM_CODE
+    AND chrt.SHRTCKN_CRN = sect.SSBSECT_CRN
+-- Last Attend Date
+LEFT JOIN SFRSTCR stcr ON chrt.SHRTCKN_TERM_CODE = stcr.SFRSTCR_TERM_CODE
+    AND chrt.SHRTCKN_CRN = stcr.SFRSTCR_CRN
+    AND chrt.SHRTCKN_PIDM = stcr.SFRSTCR_PIDM
+-- Second 5/7 weeks flag
+LEFT JOIN (
+    SELECT DISTINCT SFRSTCR_PIDM,
+        SFRSTCR_TERM_CODE
+    FROM SFRSTCR
+    WHERE SFRSTCR_PTRM_CODE IN ('RA2','3','7')
+) secd ON chrt.SHRTCKN_TERM_CODE = secd.SFRSTCR_TERM_CODE
+    AND chrt.SHRTCKN_PIDM = secd.SFRSTCR_PIDM
+LEFT JOIN (
+-- Student advisor names
+    SELECT SGRADVR_PIDM,
+        MAX(CASE WHEN SPRIDEN_LAST_NAME IS NOT NULL AND SGRADVR_ADVR_CODE = 'MAJR' THEN SPRIDEN_LAST_NAME || ', ' || SPRIDEN_FIRST_NAME ELSE NULL END) AS MAJR_ADVISOR,
+        MAX(CASE WHEN SPRIDEN_LAST_NAME IS NOT NULL AND SGRADVR_ADVR_CODE = 'ADVS' THEN SPRIDEN_LAST_NAME || ', ' || SPRIDEN_FIRST_NAME ELSE NULL END) AS CENTER_ADVISOR
+    FROM SGRADVR cc
+        -- Advisor Identifiers
+        LEFT JOIN SPRIDEN ON SGRADVR_ADVR_PIDM = SPRIDEN_PIDM
+            AND SPRIDEN_CHANGE_IND IS NULL
+    WHERE SGRADVR_TERM_CODE_EFF = (
+        SELECT MAX(SGRADVR_TERM_CODE_EFF)
+        FROM SGRADVR dd
+        WHERE cc.SGRADVR_PIDM = dd.SGRADVR_PIDM
+            AND cc.SGRADVR_ADVR_CODE = dd.SGRADVR_ADVR_CODE
+            AND dd.SGRADVR_TERM_CODE_EFF <= :TERM
+            )
+    GROUP BY SGRADVR_PIDM
+) advr ON chrt.SHRTCKN_PIDM = advr.SGRADVR_PIDM
+
+WHERE secd.SFRSTCR_PIDM is NOT NULL 
+      AND sect.SSBSECT_SUBJ_CODE <> 'NSCC'
+
+
+-- Report Organization
+ORDER BY sect.SSBSECT_SUBJ_CODE,
+    sect.SSBSECT_CRSE_NUMB,
+    sect.SSBSECT_SEQ_NUMB,
+    iden.SPRIDEN_LAST_NAME,
+    iden.SPRIDEN_FIRST_NAME
+;
+
+
+/*
 --desc ssbsect;  select distinct SSBSECT_SSTS_CODE from ssbsect;
+--desc sgradvr;
 
 select sfrstcr_term_code as "Term",
-       spriden_id as "ID",
-       spriden_last_name  as "Last Name",
-       spriden_first_name as "First Name", 
+       s.spriden_id as "ID",
+       s.spriden_last_name  as "Last Name",
+       s.spriden_first_name as "First Name", 
        sfrstcr_crn as "CRN",
        ssbsect_subj_code as "Subj",
        ssbsect_crse_numb as "Numb",
@@ -17,20 +134,27 @@ select sfrstcr_term_code as "Term",
        sfrstcr_ptrm_code as "PTRM Code",
        sfrstcr_grde_code as "Grade",
        sfrstcr_last_attend  as "LDA",
-       SFRSTCR_CREDIT_HR as "Hours"--,
+       SFRSTCR_CREDIT_HR as "Hours",
+       sgradvr_advr_pidm as "Advisor's PIDM",
+       a.spriden_first_name as "Advisor's First Name",
+       a.spriden_last_name as "Advisor's Last Name",
+       SGRADVR_TERM_CODE_EFF as "Advisor eff term"
+       --sgradvr_id as "Advisor A Number"
      --  I.spriden_id as "Instructor ID",
      --  I.spriden_first_name || ' '|| I.Spriden_last_name as Instructor,
      --  GOREMAL_EMAL_CODE as "Email Type",
      --  GOREMAL_EMAIL_ADDRESS as "Instructor Preferred Email"
 
-from sfrstcr, spriden, ssbsect--, sgrvetn, SPBPERS--, stvvetc, --Spriden I--, sirasgn--, goremal
-where spriden_change_ind IS NULL 
+from sfrstcr, spriden s, spriden a, ssbsect, sgradvr--, sgrvetn, SPBPERS--, stvvetc, --Spriden I--, sirasgn--, goremal
+where s.spriden_change_ind IS NULL 
+and s.spriden_pidm = sgradvr_pidm (+)
 --and   spriden_change_ind is null
 --and   I.spriden_pidm = goremal_pidm (+)
+and a.spriden_pidm = sgradvr_advr_pidm 
 --and   SP.spriden_PIDM = SPBPERS_PIDM
 --and   sgrvetn_pidm = SP.spriden_pidm
 ---and   spbpers_pidm = SP.spriden_pidm
-and   sfrstcr_pidm = spriden_pidm 
+and   sfrstcr_pidm = s.spriden_pidm 
 --and   SP.spriden_pidm = sgrvetn_pidm
 --and   I.spriden_pidm = sirasgn_pidm
 --and   SIRASGN_PRIMARY_IND = 'Y'
@@ -48,8 +172,14 @@ and   sfrstcr_grde_code in (select SHRGRDE_CODE from shrgrde where SHRGRDE_PASSE
 --and   (GOREMAL_EMAL_CODE  (+) = 'BUSN' or GOREMAL_EMAL_CODE  (+) = 'PERS' or GOREMAL_EMAL_CODE  (+) = 'CAMP')
 --and   GOREMAL_STATUS_IND  (+) <> 'I'
 --and   GOREMAL_PREFERRED_IND  (+) = 'Y'
-and ssbsect_subj_code <> 'NSCC'  ----Not checking NSCC 1010 courses as there is no course in the 2nd session that has NSCC 1010 as a pre-req
+--and ssbsect_subj_code <> 'NSCC'  ----Not checking NSCC 1010 courses as there is no course in the 2nd session that has NSCC 1010 as a pre-req
 and SSBSECT_SSTS_CODE in (select distinct STVSSTS_CODE from STVSSTS where STVSSTS_REG_IND = 'Y')   ---This keeps the query from looking a classes that are cancelled or not active.
-
+and SGRADVR_term_code_eff = (select max (sgradvr_term_code_eff)
+                             from sgradvr o
+                             where sgradvr_pidm = o.sgradvr_pidm
+                             and o.sgradvr_term_code_eff <= :Term)
+                               
 order by --sgrvetn_vetc_code, 
-spriden_last_name, spriden_first_name, sfrstcr_crn;
+ssbsect_subj_code, ssbsect_crse_numb, ssbsect_seq_numb, s.spriden_last_name, s.spriden_first_name;
+
+*/

@@ -1,0 +1,27 @@
+--Authors:  Kevin Thomas, Registrar
+--          Derrick Dupuis, IR Director - added and organized syntax to limit
+--                                        results to 5 per student type
+--Date:     02-MAR-2024
+--Purpose:  Variety of student types for XML Transcript Testing and SSB 9 Testing
+  
+
+SELECT iden.SPRIDEN_ID AS "STUDENT ID",
+    styp.STVSTYP_DESC as "Student Type",
+    to_char(dob.spbpers_birth_date,'DDMMYY') as "SSB 9 Password",
+    chrt.*
+FROM (
+    SELECT SGBSTDN.*,
+        ROW_NUMBER() OVER(PARTITION BY SGBSTDN_STYP_CODE ORDER BY SGBSTDN_PIDM) AS R_NUM
+    FROM SGBSTDN
+    WHERE SGBSTDN_TERM_CODE_ADMIT = '202410'
+) chrt
+-- Type Description
+LEFT JOIN STVSTYP styp ON chrt.SGBSTDN_STYP_CODE = styp.STVSTYP_CODE
+-- Student Identification
+LEFT JOIN SPRIDEN iden ON chrt.SGBSTDN_PIDM = iden.SPRIDEN_PIDM
+    AND iden.SPRIDEN_CHANGE_IND IS NULL
+-- DoB for PW
+LEFT JOIN SPBPERS dob on spbpers_pidm = iden.SPRIDEN_PIDM
+-- Report Organization
+WHERE chrt.R_NUM < = 5
+ORDER BY chrt.SGBSTDN_STYP_CODE

@@ -1,0 +1,40 @@
+--Author:  Kevin Thomas, Registrar
+--Date:    05-DEC-2024
+--Purpose: There is a known issue in Application Navigator (SOATERM) that does not 
+--         save changes to the "Limit Swap to Within Part of Term" field.  The Bursar’s office 
+--         needs this box checked.  TBR said
+--         to check the box and save and that even though the box won't appear as checked 
+--         in SOATERM it will be checked on the background table (SOBPTRM_POT_LIMIT_IND).  This
+--         query is a way to check the field in the background table to confirm that 
+--         it is set correctly.  
+--         
+--         There is a UPDATE  SQL Script above it to update the background table (SOBPTRM)
+--         via a SQL Data Change form in case 
+--         checking the box manually on SOATERM doesn't work
+
+--NOTES:   AN AUTOMIC JOB HAS BEEN CREATED NAMED 'ST_UPDATE_SOBPTRM_POT_LIMIT' FROM THE UPDATE SCRIPT BELOW SO THAT WE CAN RUN IT FROM AUTOMIC
+--         DURING SEMESTER SETUP AND NOT HAVE TO REQUEST IF FROM TSD ANY LONGER
+
+--desc sobptrm; 
+
+
+/*
+
+--UPDATE SQL For SQL Data Change Form to update the Background table via SQL
+UPDATE SOBPTRM
+SET SOBPTRM_POT_LIMIT_IND = 'Y'
+WHERE SOBPTRM_TERM_CODE = :Term_Code;
+
+*/
+
+--/*
+
+--Script to confirm that the "Limit Swap To Within Part of Term" box is checked on SOATERM:
+SELECT sobptrm_term_code SOATERM_TERM_CODE,
+       sobptrm_ptrm_code SOATERM_PART_OF_TERM_CODE, 
+       sobptrm_desc SOATERM_PART_OF_TERM_DESCRIPTION,
+       SOBPTRM_POT_LIMIT_IND SOATERM_LIMIT_SWAP_TO_WITHIN_PoT_INDICATOR
+from sobptrm where sobptrm_term_code=:Term_Code;
+
+--*/
+

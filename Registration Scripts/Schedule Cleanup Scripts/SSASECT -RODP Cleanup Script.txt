@@ -12,7 +12,8 @@
 --        Changed the name of the query to "RODP Cleanup Script" from "RODP Missing Tuition and Fee Waiver Box"...kt...2.26.21
 --        Added a Order by clause to order by CRNs as some CRNs have multiple issues...kt...2.26.21
 --        Added a Union to find CRNs that are built on school RODP codes that are no longer offereing RODP courses (MTSU 24R, ETSU 23R, APSU 14R)...kt...10/24/21
-
+--
+--         3.  Added a message to "Check T/F Box on SSASECT" in hte output for sections that don't have it...kt...10/8/2024
  
 select ssbsect_term_code as "Term",
        ssbsect_camp_code as "Campus",
@@ -21,7 +22,7 @@ select ssbsect_term_code as "Term",
        ssbsect_subj_code as "SUBJ",
        ssbsect_crse_numb as "NUMBER",
        ssbsect_seq_numb as "Section Number",
-       ssbsect_tuiw_ind as "Tuition Waiver", 
+       'Check T/F Box on SSASECT' as "Tuition Waiver", 
        SSBSECT_INTG_CDE as "Integration Partner"
 
 from ssbsect--,  

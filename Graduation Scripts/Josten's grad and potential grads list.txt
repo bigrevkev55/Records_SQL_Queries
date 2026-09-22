@@ -6,7 +6,7 @@
 --             are potential graduates for 201910, and 201950.
 --       Note: This script doesn't include studens with a GRN grad status...kt...3.18.21
 
-
+/**
 select spriden_id as "ID",
        spriden_last_name as "Last Name",
        spriden_first_name as "First Name",
@@ -46,7 +46,7 @@ order by spriden_last_name,spriden_first_name,shrdgmr_degc_code,shrdgmr_program;
 
 ----sub blocks for PR and LO addresses plus CAMP and Preferred PERS email address ....by Chuck Hackney
 
-
+*/
 
 
 select distinct spriden_id as "ID",

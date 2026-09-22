@@ -1,0 +1,35 @@
+/*
+Author:  Kevin Thomas, Registrar
+Date:    05-DEC-2022
+Purpose: Update students SFAREGS and schedules in 202310 CRNs to synch SSASECT and SFAREGS
+
+*/
+
+--Update CRN 19156 to H3J
+UPDATE sfrstcr
+SET sfrstcr_camp_code = 'H3J'
+WHERE sfrstcr_term_code = '202310'
+      and sfrstcr_rsts_code like 'R%'
+      and sfrstcr_crn = '19156';
+
+--Update 18538 to H3H
+UPDATE sfrstcr
+SET sfrstcr_camp_code = 'H3H'
+WHERE sfrstcr_term_code = '202310'
+      and sfrstcr_rsts_code like 'R%'
+      and sfrstcr_crn = '18538';
+
+
+--Update 88278 to H3L (Should update 13 Records)
+UPDATE sfrstcr
+SET sfrstcr_camp_code = 'H3L'
+WHERE sfrstcr_term_code = '202380'
+      and sfrstcr_rsts_code like 'R%'
+      and sfrstcr_crn = '88278';
+
+--Update 89338 to H3L (Should update 15 Records)
+UPDATE sfrstcr
+SET sfrstcr_camp_code = 'H3L'
+WHERE sfrstcr_term_code = '202380'
+      and sfrstcr_rsts_code like 'R%'
+      and sfrstcr_crn = '89338';
