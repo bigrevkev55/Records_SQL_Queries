@@ -16,6 +16,7 @@ The repository includes scripts supporting areas such as:
 - Slate-related processes
 - Banner reporting and data validation
 - Institutional and ad hoc reporting
+  
 
 Many of the SQL scripts are designed for use with Ellucian Banner and Oracle SQL Developer. Python scripts are used for data processing, file generation, validation, and other administrative workflows.
 
