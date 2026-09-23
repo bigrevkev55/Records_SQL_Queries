@@ -5,6 +5,8 @@
 --NOTE:  VIP!! This job needs to be run for both 6_% and 7_% (both scripts are below) 
 --             and should be run often while new sections are being created during a semesters registration.  
 
+--NOTE:  This was put into a weekly report delivered to the registrar by IR each week...kt...9/23/2026
+
 --desc ssbsect;
 
 

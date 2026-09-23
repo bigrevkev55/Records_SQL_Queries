@@ -1,9 +1,9 @@
 --Author:  Kevin Thomas
 --Date: 14-JAN-2021
---Description: This query returns prision sections that do not have the fee waiver box checked  
---             on SSASECT.  Per the Bursar, all prision sections must have this box checked.  
+--Description: This query returns prison sections that do not have the fee waiver box checked  
+--             on SSASECT.  Per the Bursar, all prison sections must have this box checked.  
 
---***NOTE:  AS OF 202210 THIS SCRIPT NO LONGER NEEDS TO BE RAN AS PRISON SECTIONS NO LONGER NEED THIS BOX CHECKED***
+--***NOTE:  AS OF 202210 THIS SCRIPT NO LONGER NEEDS TO BE RUN AS PRISON SECTIONS NO LONGER NEED THIS BOX CHECKED***
  
  
  --desc stvcamp
